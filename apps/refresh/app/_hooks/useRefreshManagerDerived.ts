@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import {
   buildSectionTree,
-  compareLegacyIdsDesc,
+  compareRecordNumbersDesc,
   getMenuConfig,
   getPermissionLabel
 } from "../_lib/utils";
@@ -67,7 +67,7 @@ export function useRefreshManagerDerived(state: RefreshManagerState) {
           return right.legacyId - left.legacyId;
         }
 
-        const byId = compareLegacyIdsDesc(left.id, right.id);
+        const byId = compareRecordNumbersDesc(left.id, right.id);
         if (byId !== 0) {
           return byId;
         }

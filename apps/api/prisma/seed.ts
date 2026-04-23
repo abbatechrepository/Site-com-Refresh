@@ -8,6 +8,8 @@ import { createSeedUsers, systemEmails } from "./seed/system.data";
 
 const prisma = new PrismaClient();
 
+type PermissionRecord = Awaited<ReturnType<typeof prisma.permission.findMany>>[number];
+
 async function seedPermissions() {
   for (const permission of permissions) {
     await prisma.permission.upsert({
@@ -20,7 +22,9 @@ async function seedPermissions() {
   }
 
   const allPermissions = await prisma.permission.findMany();
-  return new Map(allPermissions.map((permission) => [permission.code, permission]));
+  return new Map<string, PermissionRecord>(
+    allPermissions.map((permission: PermissionRecord) => [permission.code, permission])
+  );
 }
 
 async function seedRoles(

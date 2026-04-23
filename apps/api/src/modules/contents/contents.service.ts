@@ -24,7 +24,7 @@ type UpsertContentInput = {
 export class ContentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async nextLegacyId() {
+  private async nextSequenceNumber() {
     const aggregate = await this.prisma.content.aggregate({
       _max: {
         legacyId: true
@@ -119,7 +119,7 @@ export class ContentsService {
 
     const content = await this.prisma.content.create({
       data: {
-        legacyId: await this.nextLegacyId(),
+        legacyId: await this.nextSequenceNumber(),
         title: payload.title,
         slug,
         excerpt: payload.excerpt,

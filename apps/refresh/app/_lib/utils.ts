@@ -19,7 +19,7 @@ export function normalizeIdentityValue(value: string) {
   return normalized.length > 0 ? normalized : "";
 }
 
-export function compareLegacyIdsDesc(leftId: string, rightId: string) {
+export function compareRecordNumbersDesc(leftId: string, rightId: string) {
   const leftNumeric = Number(leftId);
   const rightNumeric = Number(rightId);
 
@@ -30,9 +30,9 @@ export function compareLegacyIdsDesc(leftId: string, rightId: string) {
   return rightId.localeCompare(leftId);
 }
 
-export function displayRecordCode(legacyId?: number | null, id?: string) {
-  if (typeof legacyId === "number") {
-    return String(legacyId);
+export function displayRecordCode(referenceNumber?: number | null, id?: string) {
+  if (typeof referenceNumber === "number") {
+    return String(referenceNumber);
   }
 
   return id ? id.slice(-8).toUpperCase() : "--";
@@ -89,7 +89,7 @@ export function getRoleKind(roleName: string | null | undefined) {
   return "publisher";
 }
 
-export function resolveLegacyAppView(applicationName: string, link: string): ViewKey | null {
+export function resolveApplicationView(applicationName: string, link: string): ViewKey | null {
   const normalizedName = applicationName.toLowerCase();
   const normalizedLink = link.toLowerCase();
 
@@ -109,7 +109,7 @@ export function resolveLegacyAppView(applicationName: string, link: string): Vie
   return null;
 }
 
-export function normalizeLegacyTopMenu(area: string): TopMenuKey {
+export function normalizeTopMenuArea(area: string): TopMenuKey {
   const normalizedArea = area.toLowerCase();
 
   if (normalizedArea.includes("admin")) {
@@ -212,12 +212,12 @@ export function getMenuConfig(role: LoggedUser["roles"][number] | null): MenuCon
         continue;
       }
 
-      const viewKey = resolveLegacyAppView(access.name, access.link);
+      const viewKey = resolveApplicationView(access.name, access.link);
       if (!viewKey) {
         continue;
       }
 
-      const topMenu = normalizeLegacyTopMenu(access.area);
+      const topMenu = normalizeTopMenuArea(access.area);
       const label = getBreadcrumbLabel(viewKey);
 
       if (!groups[topMenu].some((item) => item.key === viewKey)) {
@@ -379,7 +379,7 @@ export function getViewTitle(view: ViewKey) {
   return "Estatísticas";
 }
 
-export function legacyStatus(status: string) {
+export function formatContentStatus(status: string) {
   if (status === "published") {
     return "Publicado";
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { LegacyButton } from "../LegacyButton";
+import { ActionButton } from "../ActionButton";
 import {
   emptyPermissionForm,
   emptyRoleForm,
@@ -47,9 +47,9 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
             ) : null}
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
-                <label className="legacy-label">Aplicativo</label>
+                <label className="admin-label">Aplicativo</label>
                 <select
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setPermissionForm((current) => ({ ...current, appId: event.target.value }))}
                   value={permissionForm.appId}
                 >
@@ -62,9 +62,9 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                 </select>
               </div>
               <div>
-                <label className="legacy-label">Grupo</label>
+                <label className="admin-label">Grupo</label>
                 <select
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setPermissionForm((current) => ({ ...current, roleId: event.target.value }))}
                   value={permissionForm.roleId}
                 >
@@ -77,14 +77,14 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                 </select>
               </div>
               <div className="flex items-end gap-2">
-                <LegacyButton tone="green" type="submit">
+                <ActionButton tone="green" type="submit">
                   {permissionForm.id ? "Salvar" : "Incluir"}
-                </LegacyButton>
-                <LegacyButton onClick={() => setPermissionForm(emptyPermissionForm)}>Novo</LegacyButton>
+                </ActionButton>
+                <ActionButton onClick={() => setPermissionForm(emptyPermissionForm)}>Novo</ActionButton>
               </div>
             </div>
             <div>
-              <label className="legacy-label">Acesso</label>
+              <label className="admin-label">Acesso</label>
               <div className="grid gap-2 lg:grid-cols-4">
                 <label className="flex items-center gap-2 text-[14px]">
                   <input
@@ -122,7 +122,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
             </div>
           </form>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[40px]">
@@ -200,33 +200,33 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
           <form className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" onSubmit={handleRoleSubmit}>
             <div className="grid gap-4 lg:grid-cols-4">
               <div>
-                <label className="legacy-label">Nome do perfil</label>
+                <label className="admin-label">Nome do perfil</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setRoleForm((current) => ({ ...current, name: event.target.value }))}
                   value={roleForm.name}
                 />
               </div>
               <div>
-                <label className="legacy-label">Descrição</label>
+                <label className="admin-label">Descrição</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setRoleForm((current) => ({ ...current, description: event.target.value }))}
                   value={roleForm.description}
                 />
               </div>
               <div>
-                <label className="legacy-label">Função</label>
+                <label className="admin-label">Função</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setRoleForm((current) => ({ ...current, functionName: event.target.value }))}
                   value={roleForm.functionName}
                 />
               </div>
               <div>
-                <label className="legacy-label">Status</label>
+                <label className="admin-label">Status</label>
                 <select
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setRoleForm((current) => ({ ...current, status: event.target.value }))}
                   value={roleForm.status}
                 >
@@ -237,9 +237,9 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
             <div>
-              <label className="legacy-label">Grupo superior</label>
+              <label className="admin-label">Grupo superior</label>
               <select
-                className="legacy-input"
+                className="admin-input"
                 onChange={(event) => setRoleForm((current) => ({ ...current, parentRoleId: event.target.value }))}
                 value={roleForm.parentRoleId}
               >
@@ -254,7 +254,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               </select>
             </div>
             <div>
-              <label className="legacy-label">Permissões do perfil</label>
+              <label className="admin-label">Permissões do perfil</label>
               <div className="grid gap-2 lg:grid-cols-3">
                 {management.permissions.map((permission) => (
                   <label className="flex items-center gap-2 text-[14px]" key={permission.id}>
@@ -275,7 +275,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
               <div>
-                <label className="legacy-label">Seções associadas</label>
+                <label className="admin-label">Seções associadas</label>
                 <div className="max-h-[220px] overflow-auto border border-[#e4e4e4] bg-white p-3">
                   <div className="grid gap-2">
                     {sections.map((section) => (
@@ -297,7 +297,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                 </div>
               </div>
               <div>
-                <label className="legacy-label">Máscaras permitidas</label>
+                <label className="admin-label">Máscaras permitidas</label>
                 <p className="mb-2 text-[12px] text-[#666]">
                   Estas máscaras definem quais tipos de conteúdo este grupo pode listar, criar e editar.
                 </p>
@@ -323,7 +323,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
             <div>
-              <label className="legacy-label">Menus habilitados para este grupo</label>
+              <label className="admin-label">Menus habilitados para este grupo</label>
               <div className="grid gap-4 lg:grid-cols-2">
                 {(Object.entries(menuGroups) as Array<[TopMenuKey, Array<{ key: ViewKey; label: string }>]>).map(([menuKey, items]) => (
                   <div className="border border-[#e4e4e4] bg-white p-3" key={menuKey}>
@@ -352,14 +352,14 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <LegacyButton tone="green" type="submit">
+              <ActionButton tone="green" type="submit">
                 {roleForm.id ? "Salvar" : "Incluir"}
-              </LegacyButton>
-              <LegacyButton onClick={() => setRoleForm(emptyRoleForm)}>Novo</LegacyButton>
+              </ActionButton>
+              <ActionButton onClick={() => setRoleForm(emptyRoleForm)}>Novo</ActionButton>
             </div>
           </form>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[40px]">

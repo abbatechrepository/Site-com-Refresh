@@ -51,7 +51,7 @@ export class AuthService {
       }
     });
 
-    if (!user || !(await this.verifyLegacyCompatiblePassword(user.passwordHash, password))) {
+    if (!user || !(await this.verifyStoredPassword(user.passwordHash, password))) {
       throw new UnauthorizedException("Credenciais invalidas.");
     }
 
@@ -230,7 +230,7 @@ export class AuthService {
     return match.role;
   }
 
-  private async verifyLegacyCompatiblePassword(storedPasswordHash: string, password: string) {
+  private async verifyStoredPassword(storedPasswordHash: string, password: string) {
     try {
       return await verify(storedPasswordHash, password);
     } catch {

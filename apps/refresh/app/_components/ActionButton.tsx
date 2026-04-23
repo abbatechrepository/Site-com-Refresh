@@ -2,19 +2,19 @@ import type { ReactNode } from "react";
 
 import type { ButtonTone } from "../_lib/types";
 
-type LegacyButtonProps = {
+type ActionButtonProps = {
   children: ReactNode;
   tone?: ButtonTone;
   type?: "button" | "submit";
   onClick?: () => void;
 };
 
-export function LegacyButton({
+export function ActionButton({
   children,
   tone = "blue",
   type = "button",
   onClick
-}: LegacyButtonProps) {
+}: ActionButtonProps) {
   const toneClass =
     tone === "green"
       ? "bg-[linear-gradient(135deg,#29b36f_0%,#1f8f58_100%)] hover:brightness-105"

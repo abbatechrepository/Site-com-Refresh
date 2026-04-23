@@ -24,7 +24,7 @@ export class ManagementService {
     private readonly validation: ManagementValidationService
   ) {}
 
-  private async nextLegacyIdFor<
+  private async nextSequenceNumberFor<
     TModelName extends
       | "contentType"
       | "permission"
@@ -76,7 +76,7 @@ export class ManagementService {
 
     return this.prisma.contentType.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("contentType"),
+        legacyId: await this.nextSequenceNumberFor("contentType"),
         name: payload.name,
         slug,
         description: payload.description,
@@ -124,7 +124,7 @@ export class ManagementService {
 
     return this.prisma.permission.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("permission"),
+        legacyId: await this.nextSequenceNumberFor("permission"),
         code,
         description: payload.description
       }
@@ -163,7 +163,7 @@ export class ManagementService {
 
     return this.prisma.legacyApplication.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("legacyApplication"),
+        legacyId: await this.nextSequenceNumberFor("legacyApplication"),
         name: payload.name,
         area: payload.area,
         link: payload.link,
@@ -205,7 +205,7 @@ export class ManagementService {
 
     return this.prisma.roleApplicationAccess.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("roleApplicationAccess"),
+        legacyId: await this.nextSequenceNumberFor("roleApplicationAccess"),
         roleId: payload.roleId,
         appId: payload.appId,
         canCreate: payload.canCreate ?? false,
@@ -265,7 +265,7 @@ export class ManagementService {
 
     return this.prisma.role.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("role"),
+        legacyId: await this.nextSequenceNumberFor("role"),
         name: payload.name,
         description: payload.description,
         functionName: payload.functionName,
@@ -397,7 +397,7 @@ export class ManagementService {
 
     return this.prisma.user.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("user"),
+        legacyId: await this.nextSequenceNumberFor("user"),
         name: payload.name,
         email: normalizedEmail,
         username: normalizedUsername,
@@ -588,7 +588,7 @@ export class ManagementService {
 
     return this.prisma.template.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("template"),
+        legacyId: await this.nextSequenceNumberFor("template"),
         name: payload.name,
         slug,
         description: payload.description,
@@ -633,7 +633,7 @@ export class ManagementService {
   async createElement(payload: UpsertElementInput) {
     return this.prisma.element.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("element"),
+        legacyId: await this.nextSequenceNumberFor("element"),
         name: payload.name,
         thumbLabel: payload.thumbLabel,
         content: payload.content ?? "",
@@ -673,7 +673,7 @@ export class ManagementService {
   async createNewsletterGroup(payload: UpsertNewsletterGroupInput) {
     return this.prisma.newsletterGroup.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("newsletterGroup"),
+        legacyId: await this.nextSequenceNumberFor("newsletterGroup"),
         name: payload.name,
         description: payload.description
       }
@@ -701,7 +701,7 @@ export class ManagementService {
   async createSystemEmail(payload: UpsertSystemEmailInput) {
     return this.prisma.systemEmail.create({
       data: {
-        legacyId: await this.nextLegacyIdFor("systemEmail"),
+        legacyId: await this.nextSequenceNumberFor("systemEmail"),
         name: payload.name,
         email: payload.email.trim().toLowerCase(),
         area: payload.area,

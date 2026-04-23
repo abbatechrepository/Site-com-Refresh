@@ -1,9 +1,9 @@
 "use client";
 
-import { LegacyButton } from "../LegacyButton";
+import { ActionButton } from "../ActionButton";
 import { SectionTree } from "../SectionTree";
 import { templateLibrary } from "../../_lib/constants";
-import { displayRecordCode, formatDate, formatTime, legacyStatus } from "../../_lib/utils";
+import { displayRecordCode, formatContentStatus, formatDate, formatTime } from "../../_lib/utils";
 import type { ContentFormState } from "../../_lib/types";
 import type { RefreshManager } from "./moduleTypes";
 
@@ -31,26 +31,26 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
     return (
         <section className="space-y-6">
           <div className="flex flex-wrap items-center gap-2">
-            <LegacyButton onClick={openNewContent} tone="green">
+            <ActionButton onClick={openNewContent} tone="green">
               Incluir
-            </LegacyButton>
-            <LegacyButton>Buscar</LegacyButton>
-            <LegacyButton tone="red">Excluir</LegacyButton>
+            </ActionButton>
+            <ActionButton>Buscar</ActionButton>
+            <ActionButton tone="red">Excluir</ActionButton>
             <select className="ml-4 h-[38px] min-w-[135px] border border-[#d7d7d7] bg-white px-3 text-[15px]">
               <option>Publicado</option>
               <option>Novo</option>
               <option>Arquivado</option>
             </select>
-            <LegacyButton>Mudar Status</LegacyButton>
-            <LegacyButton>Mudar Usuário</LegacyButton>
-            <LegacyButton>Mudar Datas</LegacyButton>
-            <LegacyButton tone="green">Marcar Newsletter</LegacyButton>
-            <LegacyButton tone="red">Desmarcar Newsletter</LegacyButton>
-            <LegacyButton>Mudar Ordem</LegacyButton>
+            <ActionButton>Mudar Status</ActionButton>
+            <ActionButton>Mudar Usuário</ActionButton>
+            <ActionButton>Mudar Datas</ActionButton>
+            <ActionButton tone="green">Marcar Newsletter</ActionButton>
+            <ActionButton tone="red">Desmarcar Newsletter</ActionButton>
+            <ActionButton>Mudar Ordem</ActionButton>
           </div>
 
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[40px]">
@@ -91,7 +91,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                     <td>{content.contentType.name}</td>
                     <td>--</td>
                     <td>{content.author?.name ?? "--"}</td>
-                    <td className="text-[#0c67ad]">{legacyStatus(content.status)}</td>
+                    <td className="text-[#0c67ad]">{formatContentStatus(content.status)}</td>
                     <td>
                       <div className="flex flex-col gap-1">
                         <button className="text-left text-[#0c67ad] hover:underline" onClick={() => selectContent(content)} type="button">
@@ -115,10 +115,10 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
       return (
         <form className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_180px]" onSubmit={handleContentSubmit}>
           <div className="space-y-0 pr-0 lg:pr-4">
-            <div className="legacy-form-row">
-              <label className="legacy-label">Máscara: (?)</label>
+            <div className="admin-form-row">
+              <label className="admin-label">Máscara: (?)</label>
               <select
-                className="legacy-input"
+                className="admin-input"
                 onChange={(event) =>
                   setContentForm((current) => ({
                     ...current,
@@ -137,9 +137,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
 
             <div className="grid grid-cols-1 gap-0 border-x border-t border-[#e5e5e5] bg-[#f4f4f4] px-6 py-5 lg:grid-cols-6">
               <div className="lg:col-span-2">
-                <label className="legacy-label">Data do conteúdo: (?)</label>
+                <label className="admin-label">Data do conteúdo: (?)</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setContentForm((current) => ({
                       ...current,
@@ -150,9 +150,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div className="lg:col-span-1 lg:px-3">
-                <label className="legacy-label">Hora:</label>
+                <label className="admin-label">Hora:</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setContentForm((current) => ({
                       ...current,
@@ -163,9 +163,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div className="lg:col-span-1 lg:px-3">
-                <label className="legacy-label">Data inicial: (?)</label>
+                <label className="admin-label">Data inicial: (?)</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setContentForm((current) => ({
                       ...current,
@@ -176,9 +176,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div className="lg:col-span-1 lg:px-3">
-                <label className="legacy-label">Data Final: (?)</label>
+                <label className="admin-label">Data Final: (?)</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setContentForm((current) => ({
                       ...current,
@@ -189,9 +189,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div className="lg:col-span-1">
-                <label className="legacy-label">Status: (?)</label>
+                <label className="admin-label">Status: (?)</label>
                 <select
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setContentForm((current) => ({
                       ...current,
@@ -207,10 +207,10 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
 
-            <div className="legacy-form-row">
-              <label className="legacy-label">Url amigável: (?)</label>
+            <div className="admin-form-row">
+              <label className="admin-label">Url amigável: (?)</label>
               <input
-                className="legacy-input"
+                className="admin-input"
                 onChange={(event) =>
                   setContentForm((current) => ({
                     ...current,
@@ -221,10 +221,10 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               />
             </div>
 
-            <div className="legacy-form-row">
-              <label className="legacy-label">Título do Conteúdo: (?)</label>
+            <div className="admin-form-row">
+              <label className="admin-label">Título do Conteúdo: (?)</label>
               <input
-                className="legacy-input"
+                className="admin-input"
                 onChange={(event) =>
                   setContentForm((current) => ({
                     ...current,
@@ -235,10 +235,10 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               />
             </div>
 
-            <div className="legacy-form-row">
-              <label className="legacy-label">Chamada destaque: (?)</label>
+            <div className="admin-form-row">
+              <label className="admin-label">Chamada destaque: (?)</label>
               <textarea
-                className="legacy-textarea min-h-[84px]"
+                className="admin-textarea min-h-[84px]"
                 onChange={(event) =>
                   setContentForm((current) => ({
                     ...current,
@@ -268,16 +268,16 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
 
-            <div className="legacy-form-row">
-              <label className="legacy-label">Entra na Newsletter?</label>
-              <select className="legacy-input">
+            <div className="admin-form-row">
+              <label className="admin-label">Entra na Newsletter?</label>
+              <select className="admin-input">
                 <option>Não entra na Newsletter</option>
                 <option>Sim</option>
               </select>
             </div>
 
-            <div className="legacy-form-row">
-              <label className="legacy-label">Imagem de destaque do conteúdo (1300px x 730px): (?)</label>
+            <div className="admin-form-row">
+              <label className="admin-label">Imagem de destaque do conteúdo (1300px x 730px): (?)</label>
               <div className="border border-[#ddd] bg-white px-4 py-5 text-[15px] text-[#666]">Escolher arquivo</div>
             </div>
 
@@ -288,7 +288,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 Indique a seção principal marcando o rádio e a mesma seção visualizada marcando o checkbox.
               </p>
               <div className="overflow-x-auto border border-[#d8d8d8]">
-                <table className="legacy-table min-w-full">
+                <table className="admin-table min-w-full">
                   <thead>
                     <tr>
                       <th className="w-[90px]">Origem</th>
@@ -314,12 +314,12 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
             </div>
 
             <div className="mt-6 flex items-center justify-between">
-              <LegacyButton>Salvar Imagens</LegacyButton>
+              <ActionButton>Salvar Imagens</ActionButton>
               <div className="flex gap-3">
-                <LegacyButton onClick={() => setView("content-list")}>Voltar</LegacyButton>
-                <LegacyButton tone="green" type="submit">
+                <ActionButton onClick={() => setView("content-list")}>Voltar</ActionButton>
+                <ActionButton tone="green" type="submit">
                   Incluir
-                </LegacyButton>
+                </ActionButton>
               </div>
             </div>
           </div>
@@ -357,11 +357,11 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
           </p>
 
           <div className="flex items-center gap-4 border border-[#e6e6e6] px-4 py-3">
-            <LegacyButton onClick={openNewSection} tone="green">
+            <ActionButton onClick={openNewSection} tone="green">
               Incluir Seção
-            </LegacyButton>
+            </ActionButton>
             <input className="h-[38px] flex-1 border border-[#ddd] px-3 text-[15px] outline-none" placeholder="Nome da seção para busca" />
-            <LegacyButton>Buscar</LegacyButton>
+            <ActionButton>Buscar</ActionButton>
           </div>
 
           <div className="min-h-[380px]">
@@ -392,9 +392,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
 
             <div className="space-y-6 px-4 py-5">
               <div>
-                <label className="legacy-label">Nome da Seção:</label>
+                <label className="admin-label">Nome da Seção:</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setSectionForm((current) => ({ ...current, name: event.target.value }))
                   }
@@ -404,8 +404,8 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
 
               <div className="grid gap-4 lg:grid-cols-4">
                 <div>
-                  <label className="legacy-label">Template ou link associado a seção:</label>
-                  <select className="legacy-input">
+                  <label className="admin-label">Template ou link associado a seção:</label>
+                  <select className="admin-input">
                     <option>Selecione</option>
                     {meta.templates.map((template) => (
                       <option key={template.id}>{template.name}</option>
@@ -413,8 +413,8 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                   </select>
                 </div>
                 <div>
-                  <label className="legacy-label">Templates disponíveis:</label>
-                  <select className="legacy-input">
+                  <label className="admin-label">Templates disponíveis:</label>
+                  <select className="admin-input">
                     <option>Selecione</option>
                     {meta.templates.map((template) => (
                       <option key={template.id}>{template.name}</option>
@@ -422,18 +422,18 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                   </select>
                 </div>
                 <div className="flex items-end">
-                  <LegacyButton>Ver Template</LegacyButton>
+                  <ActionButton>Ver Template</ActionButton>
                 </div>
                 <div>
-                  <label className="legacy-label">Novo Template ou link:</label>
-                  <input className="legacy-input" />
+                  <label className="admin-label">Novo Template ou link:</label>
+                  <input className="admin-input" />
                 </div>
               </div>
 
               <div>
-                <label className="legacy-label">Url Amigável:</label>
+                <label className="admin-label">Url Amigável:</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setSectionForm((current) => ({ ...current, slug: event.target.value }))
                   }
@@ -442,9 +442,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               </div>
 
               <div>
-                <label className="legacy-label">Posição da seção (paternidade dos menus):</label>
+                <label className="admin-label">Posição da seção (paternidade dos menus):</label>
                 <select
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setSectionForm((current) => ({ ...current, parentId: event.target.value }))
                   }
@@ -461,9 +461,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
 
               <div className="grid gap-4 lg:grid-cols-4">
                 <div>
-                  <label className="legacy-label">Menu Interno:</label>
+                  <label className="admin-label">Menu Interno:</label>
                   <select
-                    className="legacy-input"
+                    className="admin-input"
                     onChange={(event) =>
                       setSectionForm((current) => ({
                         ...current,
@@ -477,23 +477,23 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                   </select>
                 </div>
                 <div>
-                  <label className="legacy-label">Abertura:</label>
-                  <select className="legacy-input">
+                  <label className="admin-label">Abertura:</label>
+                  <select className="admin-input">
                     <option>Mesma janela</option>
                     <option>Nova janela</option>
                   </select>
                 </div>
                 <div>
-                  <label className="legacy-label">Controle:</label>
-                  <select className="legacy-input">
+                  <label className="admin-label">Controle:</label>
+                  <select className="admin-input">
                     <option>Livre</option>
                     <option>Restrito</option>
                   </select>
                 </div>
                 <div>
-                  <label className="legacy-label">Ordem:</label>
+                  <label className="admin-label">Ordem:</label>
                   <input
-                    className="legacy-input"
+                    className="admin-input"
                     onChange={(event) =>
                       setSectionForm((current) => ({ ...current, order: event.target.value }))
                     }
@@ -503,9 +503,9 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               </div>
 
               <div>
-                <label className="legacy-label">Descrição:</label>
+                <label className="admin-label">Descrição:</label>
                 <textarea
-                  className="legacy-textarea min-h-[120px]"
+                  className="admin-textarea min-h-[120px]"
                   onChange={(event) =>
                     setSectionForm((current) => ({
                       ...current,
@@ -517,10 +517,10 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               </div>
 
               <div className="flex items-center justify-between">
-                <LegacyButton onClick={() => setView("sections-tree")}>Voltar</LegacyButton>
-                <LegacyButton tone="green" type="submit">
+                <ActionButton onClick={() => setView("sections-tree")}>Voltar</ActionButton>
+                <ActionButton tone="green" type="submit">
                   Salvar Seção
-                </LegacyButton>
+                </ActionButton>
               </div>
             </div>
           </form>

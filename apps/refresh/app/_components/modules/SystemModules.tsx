@@ -1,6 +1,6 @@
 "use client";
 
-import { LegacyButton } from "../LegacyButton";
+import { ActionButton } from "../ActionButton";
 import {
   emptyApplicationForm,
   emptySystemEmailForm
@@ -34,47 +34,47 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
           <form className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" onSubmit={handleApplicationSubmit}>
             <div className="grid gap-4 lg:grid-cols-4">
               <div>
-                <label className="legacy-label">Aplicativo</label>
+                <label className="admin-label">Aplicativo</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setApplicationForm((current) => ({ ...current, name: event.target.value }))}
                   value={applicationForm.name}
                 />
               </div>
               <div>
-                <label className="legacy-label">Área</label>
+                <label className="admin-label">Área</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setApplicationForm((current) => ({ ...current, area: event.target.value }))}
                   value={applicationForm.area}
                 />
               </div>
               <div>
-                <label className="legacy-label">Link</label>
+                <label className="admin-label">Link</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setApplicationForm((current) => ({ ...current, link: event.target.value }))}
                   value={applicationForm.link}
                 />
               </div>
               <div className="flex items-end gap-2">
-                <LegacyButton tone="green" type="submit">
+                <ActionButton tone="green" type="submit">
                   {applicationForm.id ? "Salvar" : "Incluir"}
-                </LegacyButton>
-                <LegacyButton onClick={() => setApplicationForm(emptyApplicationForm)}>Novo</LegacyButton>
+                </ActionButton>
+                <ActionButton onClick={() => setApplicationForm(emptyApplicationForm)}>Novo</ActionButton>
               </div>
             </div>
             <div>
-              <label className="legacy-label">Descrição</label>
+              <label className="admin-label">Descrição</label>
               <textarea
-                className="legacy-textarea min-h-[90px]"
+                className="admin-textarea min-h-[90px]"
                 onChange={(event) => setApplicationForm((current) => ({ ...current, description: event.target.value }))}
                 value={applicationForm.description}
               />
             </div>
           </form>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[90px]">Id</th>
@@ -120,37 +120,37 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
           <form className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" onSubmit={handleSystemEmailSubmit}>
             <div className="grid gap-4 lg:grid-cols-4">
               <div>
-                <label className="legacy-label">Nome</label>
-                <input className="legacy-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, name: event.target.value }))} value={systemEmailForm.name} />
+                <label className="admin-label">Nome</label>
+                <input className="admin-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, name: event.target.value }))} value={systemEmailForm.name} />
               </div>
               <div>
-                <label className="legacy-label">Email</label>
-                <input className="legacy-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, email: event.target.value }))} value={systemEmailForm.email} />
+                <label className="admin-label">Email</label>
+                <input className="admin-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, email: event.target.value }))} value={systemEmailForm.email} />
               </div>
               <div>
-                <label className="legacy-label">Área</label>
-                <input className="legacy-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, area: event.target.value }))} value={systemEmailForm.area} />
+                <label className="admin-label">Área</label>
+                <input className="admin-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, area: event.target.value }))} value={systemEmailForm.area} />
               </div>
               <div>
-                <label className="legacy-label">Valor</label>
-                <input className="legacy-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, value: event.target.value }))} value={systemEmailForm.value} />
+                <label className="admin-label">Valor</label>
+                <input className="admin-input" onChange={(event) => setSystemEmailForm((current) => ({ ...current, value: event.target.value }))} value={systemEmailForm.value} />
               </div>
             </div>
             <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
               <div>
-                <label className="legacy-label">Descrição</label>
-                <textarea className="legacy-textarea min-h-[90px]" onChange={(event) => setSystemEmailForm((current) => ({ ...current, description: event.target.value }))} value={systemEmailForm.description} />
+                <label className="admin-label">Descrição</label>
+                <textarea className="admin-textarea min-h-[90px]" onChange={(event) => setSystemEmailForm((current) => ({ ...current, description: event.target.value }))} value={systemEmailForm.description} />
               </div>
               <div className="flex items-end gap-2">
-                <LegacyButton tone="green" type="submit">
+                <ActionButton tone="green" type="submit">
                   {systemEmailForm.id ? "Salvar" : "Incluir"}
-                </LegacyButton>
-                <LegacyButton onClick={() => setSystemEmailForm(emptySystemEmailForm)}>Novo</LegacyButton>
+                </ActionButton>
+                <ActionButton onClick={() => setSystemEmailForm(emptySystemEmailForm)}>Novo</ActionButton>
               </div>
             </div>
           </form>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[90px]">Id</th>
@@ -196,12 +196,12 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
             Estatística resumida de acesso por navegação em seção. Clique em zerar estatística para recomeçar a contagem.
           </p>
           <div className="flex flex-wrap gap-2">
-            <LegacyButton tone="red" onClick={() => void resetStatistics()}>
+            <ActionButton tone="red" onClick={() => void resetStatistics()}>
               Zerar TODAS as Estatísticas
-            </LegacyButton>
+            </ActionButton>
           </div>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[90px]">Id</th>
@@ -230,12 +230,12 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
       return (
         <section className="space-y-6">
           <div className="flex flex-wrap gap-2">
-            <LegacyButton tone="green">Incluir</LegacyButton>
-            <LegacyButton>Buscar</LegacyButton>
-            <LegacyButton>Mudar Status</LegacyButton>
+            <ActionButton tone="green">Incluir</ActionButton>
+            <ActionButton>Buscar</ActionButton>
+            <ActionButton>Mudar Status</ActionButton>
           </div>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[90px]">Id</th>

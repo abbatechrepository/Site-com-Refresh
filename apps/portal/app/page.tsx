@@ -14,7 +14,7 @@ export default async function HomePage() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-ember">Abbatech</p>
             <h1 className="mt-3 font-serif text-4xl text-ink sm:text-5xl">
-              Portal conectado ao novo CMS Refresh
+              Portal conectado ao CMS Refresh
             </h1>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -37,7 +37,7 @@ export default async function HomePage() {
       <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.6fr_1fr]">
         <div className="rounded-[2rem] bg-pine p-8 text-white shadow-xl shadow-pine/15">
           <span className="inline-flex rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/80">
-            MVP em funcionamento
+            Plataforma em operação
           </span>
           <h2 className="mt-6 font-serif text-5xl leading-tight">
             Conteudo publicado no Refresh agora aparece aqui no portal.

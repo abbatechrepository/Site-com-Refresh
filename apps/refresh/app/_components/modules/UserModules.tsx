@@ -1,6 +1,6 @@
 "use client";
 
-import { LegacyButton } from "../LegacyButton";
+import { ActionButton } from "../ActionButton";
 import { emptyUserForm } from "../../_lib/constants";
 import { displayRecordCode, toggleItem } from "../../_lib/utils";
 import type { RefreshManager } from "./moduleTypes";
@@ -43,25 +43,25 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             ) : null}
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
-                <label className="legacy-label">Nome</label>
+                <label className="admin-label">Nome</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, name: event.target.value }))}
                   value={userForm.name}
                 />
               </div>
               <div>
-                <label className="legacy-label">E-mail</label>
+                <label className="admin-label">E-mail</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, email: event.target.value }))}
                   value={userForm.email}
                 />
               </div>
               <div>
-                <label className="legacy-label">Username</label>
+                <label className="admin-label">Username</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, username: event.target.value }))}
                   value={userForm.username}
                 />
@@ -69,33 +69,33 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
-                <label className="legacy-label">CPF</label>
+                <label className="admin-label">CPF</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, cpf: event.target.value }))}
                   value={userForm.cpf}
                 />
               </div>
               <div>
-                <label className="legacy-label">CNH</label>
+                <label className="admin-label">CNH</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, cnh: event.target.value }))}
                   value={userForm.cnh}
                 />
               </div>
               <div>
-                <label className="legacy-label">Senha</label>
+                <label className="admin-label">Senha</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, password: event.target.value }))}
                   value={userForm.password}
                 />
               </div>
               <div>
-                <label className="legacy-label">Status</label>
+                <label className="admin-label">Status</label>
                 <select
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setUserForm((current) => ({
                       ...current,
@@ -113,40 +113,40 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 </select>
               </div>
               <div className="flex items-end gap-2">
-                <LegacyButton tone="green" type="submit">
+                <ActionButton tone="green" type="submit">
                   {userForm.id ? "Salvar alterações" : "Incluir"}
-                </LegacyButton>
-                <LegacyButton
+                </ActionButton>
+                <ActionButton
                   onClick={() => {
                     setUserForm(emptyUserForm);
                     setHighlightedUserId("");
                   }}
                 >
                   Novo
-                </LegacyButton>
+                </ActionButton>
               </div>
             </div>
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
-                <label className="legacy-label">Empresa</label>
+                <label className="admin-label">Empresa</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, company: event.target.value }))}
                   value={userForm.company}
                 />
               </div>
               <div>
-                <label className="legacy-label">Função</label>
+                <label className="admin-label">Função</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, jobTitle: event.target.value }))}
                   value={userForm.jobTitle}
                 />
               </div>
               <div>
-                <label className="legacy-label">Telefone</label>
+                <label className="admin-label">Telefone</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, phone: event.target.value }))}
                   value={userForm.phone}
                 />
@@ -154,33 +154,33 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
             <div className="grid gap-4 lg:grid-cols-3">
               <div className="lg:col-span-3">
-                <label className="legacy-label">Endereço</label>
+                <label className="admin-label">Endereço</label>
                 <textarea
-                  className="legacy-textarea"
+                  className="admin-textarea"
                   onChange={(event) => setUserForm((current) => ({ ...current, address: event.target.value }))}
                   value={userForm.address}
                 />
               </div>
               <div>
-                <label className="legacy-label">CEP</label>
+                <label className="admin-label">CEP</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, zipCode: event.target.value }))}
                   value={userForm.zipCode}
                 />
               </div>
               <div>
-                <label className="legacy-label">Cidade</label>
+                <label className="admin-label">Cidade</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, city: event.target.value }))}
                   value={userForm.city}
                 />
               </div>
               <div>
-                <label className="legacy-label">Estado</label>
+                <label className="admin-label">Estado</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, state: event.target.value }))}
                   value={userForm.state}
                 />
@@ -188,9 +188,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
             <div className="grid gap-4 lg:grid-cols-4">
               <div>
-                <label className="legacy-label">Endereço 2</label>
+                <label className="admin-label">Endereço 2</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setUserForm((current) => ({ ...current, secondaryAddress: event.target.value }))
                   }
@@ -198,9 +198,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div>
-                <label className="legacy-label">Número</label>
+                <label className="admin-label">Número</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setUserForm((current) => ({ ...current, secondaryNumber: event.target.value }))
                   }
@@ -208,9 +208,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div>
-                <label className="legacy-label">Complemento</label>
+                <label className="admin-label">Complemento</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setUserForm((current) => ({ ...current, secondaryComplement: event.target.value }))
                   }
@@ -218,9 +218,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div>
-                <label className="legacy-label">Bairro</label>
+                <label className="admin-label">Bairro</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) =>
                     setUserForm((current) => ({ ...current, neighborhood: event.target.value }))
                   }
@@ -230,25 +230,25 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
-                <label className="legacy-label">Facebook</label>
+                <label className="admin-label">Facebook</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, facebook: event.target.value }))}
                   value={userForm.facebook}
                 />
               </div>
               <div>
-                <label className="legacy-label">Instagram</label>
+                <label className="admin-label">Instagram</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, instagram: event.target.value }))}
                   value={userForm.instagram}
                 />
               </div>
               <div>
-                <label className="legacy-label">YouTube</label>
+                <label className="admin-label">YouTube</label>
                 <input
-                  className="legacy-input"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, youtube: event.target.value }))}
                   value={userForm.youtube}
                 />
@@ -285,17 +285,17 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </label>
             </div>
             <div>
-              <label className="legacy-label">Observações</label>
+              <label className="admin-label">Observações</label>
               <textarea
-                className="legacy-textarea min-h-[120px]"
+                className="admin-textarea min-h-[120px]"
                 onChange={(event) => setUserForm((current) => ({ ...current, notes: event.target.value }))}
                 value={userForm.notes}
               />
             </div>
             <div>
-              <label className="legacy-label">Perfis vinculados</label>
+              <label className="admin-label">Perfis vinculados</label>
               <p className="mb-3 text-[13px] text-[#666]">
-                No legado, as permissões do usuário vêm dos grupos/perfis marcados abaixo.
+                As permissões do usuário são definidas pelos grupos e perfis marcados abaixo.
               </p>
               <div className="grid gap-2 lg:grid-cols-3">
                 {management.roles.map((role) => (
@@ -384,7 +384,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
           </form>
           <div className="overflow-x-auto border border-[#d8d8d8]">
-            <table className="legacy-table min-w-full">
+            <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[40px]">

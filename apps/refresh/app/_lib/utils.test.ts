@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  compareLegacyIdsDesc,
+  compareRecordNumbersDesc,
   getDefaultTopMenu,
   normalizeIdentityValue,
-  resolveLegacyAppView
+  resolveApplicationView
 } from "./utils";
 
 describe("refresh utils", () => {
@@ -13,15 +13,15 @@ describe("refresh utils", () => {
     expect(normalizeIdentityValue("   ")).toBe("");
   });
 
-  it("sorts legacy ids numerically when possible", () => {
-    expect(compareLegacyIdsDesc("10", "2")).toBeLessThan(0);
-    expect(compareLegacyIdsDesc("abc", "def")).toBeGreaterThan(0);
+  it("sorts record numbers numerically when possible", () => {
+    expect(compareRecordNumbersDesc("10", "2")).toBeLessThan(0);
+    expect(compareRecordNumbersDesc("abc", "def")).toBeGreaterThan(0);
   });
 
-  it("resolves legacy app views from old links", () => {
-    expect(resolveLegacyAppView("Conteúdo", "conteudo.php")).toBe("content-list");
-    expect(resolveLegacyAppView("Aplicativos", "aplicativos.php")).toBe("applications");
-    expect(resolveLegacyAppView("Desconhecido", "custom.php")).toBeNull();
+  it("resolves application views from configured links", () => {
+    expect(resolveApplicationView("Conteúdo", "conteudo.php")).toBe("content-list");
+    expect(resolveApplicationView("Aplicativos", "aplicativos.php")).toBe("applications");
+    expect(resolveApplicationView("Desconhecido", "custom.php")).toBeNull();
   });
 
   it("returns the default top menu per role kind", () => {

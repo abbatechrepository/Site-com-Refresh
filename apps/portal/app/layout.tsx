@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Portal | Abbatech",
-  description: "Portal publico reconstruido com Next.js, NestJS e Tailwind."
+  description: "Portal publico em Next.js conectado a API e ao CMS Refresh."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

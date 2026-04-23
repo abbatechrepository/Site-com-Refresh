@@ -15,7 +15,7 @@ type UpsertSectionInput = {
 export class SectionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async nextLegacyId() {
+  private async nextSequenceNumber() {
     const aggregate = await this.prisma.section.aggregate({
       _max: {
         legacyId: true
@@ -61,7 +61,7 @@ export class SectionsService {
 
     return this.prisma.section.create({
       data: {
-        legacyId: await this.nextLegacyId(),
+        legacyId: await this.nextSequenceNumber(),
         name: payload.name,
         slug,
         path,

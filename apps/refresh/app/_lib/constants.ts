@@ -3,7 +3,7 @@ import type {
   ContentFormState,
   ContentTypeFormState,
   ElementFormState,
-  LegacyElement,
+  ElementPreset,
   ManagementBootstrap,
   MenuItem,
   PermissionFormState,
@@ -135,7 +135,7 @@ export const emptySystemEmailForm: SystemEmailFormState = {
   value: ""
 };
 
-export const legacyElements: LegacyElement[] = [
+export const elementPresets: ElementPreset[] = [
   { id: 58, name: "Barra de progresso", thumbLabel: "Web Design", category: '200, "Destaques"', status: "Ativo" },
   { id: 54, name: "Destaque Leia Mais", thumbLabel: "Leia Mais", category: '200, "Destaques"', status: "Ativo" },
   { id: 57, name: "Galeria Carrossel", thumbLabel: "Galeria Carrossel", category: '201, "Galeria de Imagens"', status: "Inativo" },

@@ -153,7 +153,7 @@ export const contents: SeedContent[] = [
     ],
     sectionSlug: "noticias",
     contentTypeSlug: "pagina-editorial",
-    seoDescription: "Portal reconstruido com CMS moderno, SEO e governanca editorial.",
+    seoDescription: "Portal com CMS moderno, SEO e governanca editorial.",
     keywords: "abbatech, portal, cms, refresh"
   },
   {

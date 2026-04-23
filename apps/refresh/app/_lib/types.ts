@@ -186,7 +186,7 @@ export type Role = {
   }>;
 };
 
-export type LegacyApplicationRecord = {
+export type ApplicationRecord = {
   id: string;
   legacyId?: number | null;
   name: string;
@@ -317,7 +317,7 @@ export type ManagementBootstrap = {
   users: ManagedUser[];
   roles: Role[];
   permissions: Permission[];
-  applications: LegacyApplicationRecord[];
+  applications: ApplicationRecord[];
   roleApplicationAccesses: RoleApplicationAccessRecord[];
   systemEmails: SystemEmailRecord[];
   templates: Template[];
@@ -456,7 +456,7 @@ export type SystemEmailFormState = {
   value: string;
 };
 
-export type LegacyElement = {
+export type ElementPreset = {
   id: number;
   name: string;
   thumbLabel: string;

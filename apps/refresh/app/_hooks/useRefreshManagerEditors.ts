@@ -2,7 +2,7 @@
 
 import { emptyContentForm, emptySectionForm } from "../_lib/constants";
 import { formatDate, formatTime } from "../_lib/utils";
-import type { Content, ContentFormState, ContentType, LegacyApplicationRecord, ManagedElement, ManagedUser, Role, RoleApplicationAccessRecord, Section, SystemEmailRecord, Template } from "../_lib/types";
+import type { Content, ContentFormState, ContentType, ApplicationRecord, ManagedElement, ManagedUser, Role, RoleApplicationAccessRecord, Section, SystemEmailRecord, Template } from "../_lib/types";
 import type { useRefreshManagerState } from "./useRefreshManagerState";
 
 type RefreshManagerState = ReturnType<typeof useRefreshManagerState>;
@@ -94,7 +94,7 @@ export function useRefreshManagerEditors(state: RefreshManagerState) {
     });
   }
 
-  function editApplication(application: LegacyApplicationRecord) {
+  function editApplication(application: ApplicationRecord) {
     state.setApplicationForm({
       id: application.id,
       name: application.name,

@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 
-import { LegacyButton } from "./LegacyButton";
+import { ActionButton } from "./ActionButton";
 
 type RefreshLoginProps = {
   identifier: string;
@@ -77,9 +77,9 @@ export function RefreshLogin({
               <button className="text-[13px] font-semibold text-[#1f6feb]" type="button">
                 Lembrar senha
               </button>
-              <LegacyButton tone="blue" type="submit">
+              <ActionButton tone="blue" type="submit">
                 Entrar
-              </LegacyButton>
+              </ActionButton>
             </div>
             {error ? <p className="text-sm font-semibold text-[#c0392b]">{error}</p> : null}
             {success ? <p className="text-sm font-semibold text-[#2d8d46]">{success}</p> : null}

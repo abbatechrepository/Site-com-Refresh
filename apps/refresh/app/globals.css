@@ -36,7 +36,7 @@ body {
   font-family: "Rajdhani", ui-sans-serif, system-ui, sans-serif;
 }
 
-.legacy-table th {
+.admin-table th {
   background: linear-gradient(135deg, var(--refresh-navy) 0%, var(--refresh-navy-soft) 100%);
   color: #f8fbff;
   font-size: 15px;
@@ -46,7 +46,7 @@ body {
   text-align: left;
 }
 
-.legacy-table td {
+.admin-table td {
   border-top: 1px solid var(--refresh-stroke);
   color: var(--refresh-text);
   font-size: 14px;
@@ -54,26 +54,26 @@ body {
   vertical-align: top;
 }
 
-.legacy-table tbody tr:nth-child(odd) td {
+.admin-table tbody tr:nth-child(odd) td {
   background: rgba(255, 255, 255, 0.92);
 }
 
-.legacy-table tbody tr:nth-child(even) td {
+.admin-table tbody tr:nth-child(even) td {
   background: rgba(246, 250, 255, 0.92);
 }
 
-.legacy-table tbody tr:hover td {
+.admin-table tbody tr:hover td {
   background: #eef6ff;
 }
 
-.legacy-form-row {
+.admin-form-row {
   border: 1px solid var(--refresh-stroke);
   border-top: 0;
   background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,250,255,0.98) 100%);
   padding: 18px 14px;
 }
 
-.legacy-label {
+.admin-label {
   display: block;
   margin-bottom: 8px;
   color: var(--refresh-heading);
@@ -82,7 +82,7 @@ body {
   letter-spacing: 0.01em;
 }
 
-.legacy-input {
+.admin-input {
   height: 42px;
   width: 100%;
   border: 1px solid var(--refresh-stroke);
@@ -96,13 +96,13 @@ body {
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
-.legacy-input:focus {
+.admin-input:focus {
   border-color: rgba(31, 111, 235, 0.55);
   box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
   background: #fff;
 }
 
-.legacy-textarea {
+.admin-textarea {
   width: 100%;
   border: 1px solid var(--refresh-stroke);
   border-radius: 12px;
@@ -114,7 +114,7 @@ body {
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
-.legacy-textarea:focus {
+.admin-textarea:focus {
   border-color: rgba(31, 111, 235, 0.55);
   box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
   background: #fff;
@@ -125,7 +125,7 @@ input[type="radio"] {
   accent-color: var(--refresh-primary);
 }
 
-select.legacy-input {
+select.admin-input {
   appearance: none;
   background-image:
     linear-gradient(45deg, transparent 50%, #5a7592 50%),
