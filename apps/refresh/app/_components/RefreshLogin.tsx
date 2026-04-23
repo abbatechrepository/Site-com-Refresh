@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import Image from "next/image";
 
 import { ActionButton } from "./ActionButton";
 
@@ -25,8 +26,17 @@ export function RefreshLogin({
     <main className="min-h-screen bg-transparent">
       <div className="border-b border-[rgba(183,205,227,0.8)] bg-white/85 backdrop-blur-sm">
         <div className="mx-auto flex max-w-[1600px] items-center px-6 py-8">
-          <div className="leading-none">
-            <div className="font-display text-[70px] font-bold uppercase tracking-[-0.04em] text-[#1973ea]">ABBATECH</div>
+          <div className="leading-none flex items-center gap-4">
+            <Image
+              alt="Abbatech"
+              height={72}
+              priority
+              src="/brand/logov2.png"
+              width={100}
+            />
+            <h1 className="text-[50px] font-bold uppercase leading-none tracking-[0.02em] bg-[linear-gradient(135deg,#13203a_0%,#18365c_54%,#1f4b78_100%)] bg-clip-text text-transparent">
+              ABBATECH
+            </h1>
           </div>
         </div>
       </div>
@@ -74,7 +84,7 @@ export function RefreshLogin({
               />
             </label>
             <div className="flex items-center justify-between border-t border-[rgba(215,227,241,0.9)] pt-4">
-              <button className="text-[13px] font-semibold text-[#1f6feb]" type="button">
+              <button className="text-[13px] font-semibold bg-[linear-gradient(135deg,#13203a_0%,#18365c_54%,#1f4b78_100%)] bg-clip-text text-transparent" type="button">
                 Lembrar senha
               </button>
               <ActionButton tone="blue" type="submit">

@@ -1,0 +1,16 @@
+<svg width="320" height="72" viewBox="0 0 320 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="72" rx="18" fill="url(#paint0_linear)"/>
+  <path d="M35.5 18L22 54H30.4L33.2 46H47.8L50.6 54H59L45.5 18H35.5ZM35.8 39.3L40.5 26.1L45.2 39.3H35.8Z" fill="white"/>
+  <path d="M71.6 18V54H80V41H94.3V34.1H80V24.9H96.6V18H71.6Z" fill="white"/>
+  <path d="M111.2 18L97.7 54H106.1L108.9 46H123.5L126.3 54H134.7L121.2 18H111.2ZM111.5 39.3L116.2 26.1L120.9 39.3H111.5Z" fill="white"/>
+  <path d="M146 18V54H154.1L170.5 30.7V54H178.5V18H170.5L154.1 41.3V18H146Z" fill="white"/>
+  <path d="M205.7 29.7H213.8C212.6 22 206.2 17 197.4 17C186.4 17 178.6 24.8 178.6 36C178.6 47.2 186.4 55 197.4 55C206.2 55 212.6 50 213.8 42.3H205.7C204.7 46.2 201.4 48.1 197.4 48.1C191.2 48.1 186.9 43.4 186.9 36C186.9 28.6 191.2 23.9 197.4 23.9C201.4 23.9 204.7 25.8 205.7 29.7Z" fill="white"/>
+  <path d="M225.5 18V54H233.9V39.5H248.1V54H256.5V18H248.1V32.5H233.9V18H225.5Z" fill="white"/>
+  <text x="268" y="42" fill="#D8F2FF" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="0.16em">REFRESH</text>
+  <defs>
+    <linearGradient id="paint0_linear" x1="20" y1="10" x2="300" y2="72" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1973EA"/>
+      <stop offset="1" stop-color="#1AA3BF"/>
+    </linearGradient>
+  </defs>
+</svg>
