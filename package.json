@@ -15,13 +15,24 @@
     "dev:portal": "npm run dev -w @abbatech/portal",
     "dev:refresh": "npm run dev -w @abbatech/refresh",
     "build": "npm run build -w @abbatech/api && npm run build -w @abbatech/portal && npm run build -w @abbatech/refresh",
-    "lint": "npm run lint -w @abbatech/api && npm run lint -w @abbatech/portal && npm run lint -w @abbatech/refresh",
+    "typecheck": "npm run typecheck -w @abbatech/api && npm run typecheck -w @abbatech/portal && npm run typecheck -w @abbatech/refresh",
+    "lint": "eslint apps packages --ext .ts,.tsx,.js,.mjs",
+    "lint:fix": "eslint apps packages --ext .ts,.tsx,.js,.mjs --fix",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.5",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.5.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.3.3",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.59.0",
+    "vitest": "^4.1.5"
   }
 }
-

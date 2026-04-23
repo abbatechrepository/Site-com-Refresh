@@ -1,51 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import { hash } from "argon2";
 
+import { applicationDefinitions, permissions, roleAccessDefinitions, roleDefinitions } from "./seed/access.data";
+import { contents, sections, seedContentTypes, seedElements, seedTemplates, visitSeeds } from "./seed/content.data";
+import { launchCampaign, newsletterGroups, newsletterRecipients } from "./seed/newsletter.data";
+import { createSeedUsers, systemEmails } from "./seed/system.data";
+
 const prisma = new PrismaClient();
 
-type SeedSection = {
-  name: string;
-  slug: string;
-  description: string;
-  order: number;
-  parentSlug?: string;
-};
-
-type SeedContent = {
-  title: string;
-  slug: string;
-  excerpt: string;
-  body: string[];
-  sectionSlug: string;
-  contentTypeSlug: string;
-  seoDescription: string;
-  keywords: string;
-};
-
-async function main() {
-  const resetMode = process.env.SEED_RESET === "true";
-
-  const permissions = [
-    { code: "sections.read", description: "Ler secoes" },
-    { code: "sections.write", description: "Gerenciar secoes" },
-    { code: "contents.read", description: "Ler conteudos no CMS" },
-    { code: "contents.write", description: "Gerenciar conteudos" },
-    { code: "templates.read", description: "Ler templates" },
-    { code: "templates.write", description: "Gerenciar templates" },
-    { code: "elements.read", description: "Ler elementos" },
-    { code: "elements.write", description: "Gerenciar elementos" },
-    { code: "users.read", description: "Ler usuarios" },
-    { code: "users.write", description: "Gerenciar usuarios" },
-    { code: "roles.read", description: "Ler grupos e perfis" },
-    { code: "roles.write", description: "Gerenciar grupos e perfis" },
-    { code: "permissions.read", description: "Ler permissoes" },
-    { code: "permissions.write", description: "Gerenciar permissoes" },
-    { code: "newsletters.read", description: "Ler campanhas" },
-    { code: "privacy.read", description: "Ler pedidos LGPD" },
-    { code: "management.read", description: "Ler cadastros administrativos" },
-    { code: "management.write", description: "Gerenciar cadastros administrativos" }
-  ];
-
+async function seedPermissions() {
   for (const permission of permissions) {
     await prisma.permission.upsert({
       where: { code: permission.code },
@@ -57,108 +20,14 @@ async function main() {
   }
 
   const allPermissions = await prisma.permission.findMany();
-  const permissionByCode = new Map(allPermissions.map((permission) => [permission.code, permission]));
+  return new Map(allPermissions.map((permission) => [permission.code, permission]));
+}
 
-  const roleDefinitions = [
-    {
-      name: "Administrador",
-      description: "Acesso total ao MVP",
-      functionName: "Administrador",
-      permissionCodes: allPermissions.map((permission) => permission.code),
-      menuAccesses: [
-        { topMenu: "administration", viewKey: "permissions" },
-        { topMenu: "administration", viewKey: "groups" },
-        { topMenu: "administration", viewKey: "users" },
-        { topMenu: "administration", viewKey: "statistics" },
-        { topMenu: "system", viewKey: "applications" },
-        { topMenu: "system", viewKey: "emails" },
-        { topMenu: "content", viewKey: "content-list" },
-        { topMenu: "content", viewKey: "sections-tree" },
-        { topMenu: "content", viewKey: "templates" },
-        { topMenu: "content", viewKey: "masks" },
-        { topMenu: "content", viewKey: "elements" },
-        { topMenu: "newsletter", viewKey: "newsletter" }
-      ]
-    },
-    {
-      name: "Desenvolvedor",
-      description: "Responsavel pela criacao e manutencao dos templates internos e externos. Cria secoes.",
-      functionName: "Desenvolvedor",
-      permissionCodes: [
-        "sections.read",
-        "sections.write",
-        "contents.read",
-        "contents.write",
-        "templates.read",
-        "templates.write",
-        "elements.read",
-        "elements.write",
-        "management.read",
-        "management.write"
-      ],
-      menuAccesses: [
-        { topMenu: "content", viewKey: "content-list" },
-        { topMenu: "content", viewKey: "sections-tree" },
-        { topMenu: "content", viewKey: "templates" },
-        { topMenu: "content", viewKey: "masks" },
-        { topMenu: "content", viewKey: "elements" },
-        { topMenu: "system", viewKey: "applications" }
-      ]
-    },
-    {
-      name: "Publicador Geral",
-      description: "Responsavel pela publicacao dos conteudos dinamicos e validacao da newsletter.",
-      functionName: "Publicador",
-      permissionCodes: [
-        "contents.read",
-        "contents.write",
-        "sections.read",
-        "templates.read",
-        "newsletters.read",
-        "management.read"
-      ],
-      menuAccesses: [
-        { topMenu: "content", viewKey: "content-list" },
-        { topMenu: "content", viewKey: "sections-tree" },
-        { topMenu: "newsletter", viewKey: "newsletter" }
-      ]
-    },
-    {
-      name: "Editor",
-      description: "Opera conteudos, secoes e leitura administrativa",
-      functionName: "Editor",
-      permissionCodes: [
-        "sections.read",
-        "sections.write",
-        "contents.read",
-        "contents.write",
-        "templates.read",
-        "management.read"
-      ],
-      menuAccesses: [
-        { topMenu: "content", viewKey: "content-list" },
-        { topMenu: "content", viewKey: "sections-tree" }
-      ]
-    },
-    {
-      name: "Marketing",
-      description: "Opera comunicacao, newsletters e leitura do painel",
-      functionName: "Editor",
-      permissionCodes: ["contents.read", "templates.read", "newsletters.read", "management.read"],
-      menuAccesses: [
-        { topMenu: "content", viewKey: "content-list" },
-        { topMenu: "newsletter", viewKey: "newsletter" }
-      ]
-    },
-    {
-      name: "LGPD",
-      description: "Acompanha solicitacoes de privacidade e governanca",
-      functionName: "Administrador",
-      permissionCodes: ["privacy.read", "management.read"],
-      menuAccesses: [{ topMenu: "administration", viewKey: "statistics" }]
-    }
-  ];
-
+async function seedRoles(
+  permissionByCode: Map<string, Awaited<ReturnType<typeof prisma.permission.findMany>>[number]>,
+  resetMode: boolean
+) {
+  const allPermissions = Array.from(permissionByCode.values());
   const roleMap = new Map<string, Awaited<ReturnType<typeof prisma.role.upsert>>>();
 
   for (const roleDefinition of roleDefinitions) {
@@ -180,15 +49,13 @@ async function main() {
     roleMap.set(role.name, role);
 
     if (resetMode) {
-      await prisma.rolePermission.deleteMany({
-        where: { roleId: role.id }
-      });
-      await prisma.roleMenuAccess.deleteMany({
-        where: { roleId: role.id }
-      });
+      await prisma.rolePermission.deleteMany({ where: { roleId: role.id } });
+      await prisma.roleMenuAccess.deleteMany({ where: { roleId: role.id } });
     }
 
-    for (const permissionCode of roleDefinition.permissionCodes) {
+    const permissionCodes = roleDefinition.permissionCodes ?? allPermissions.map((permission) => permission.code);
+
+    for (const permissionCode of permissionCodes) {
       const permission = permissionByCode.get(permissionCode);
 
       if (!permission) {
@@ -229,20 +96,10 @@ async function main() {
     }
   }
 
-  const applicationDefinitions = [
-    { name: "Conteúdo", area: "Conteúdo", link: "/Manager/Conteudo.php", description: "Cadastro e listagem de conteúdos." },
-    { name: "Seção", area: "Conteúdo", link: "/Manager/Secao.php", description: "Navegação, menus e arquitetura de informação." },
-    { name: "Templates", area: "Conteúdo", link: "/Manager/Template.php", description: "Cadastro de templates." },
-    { name: "Máscara", area: "Conteúdo", link: "/Manager/Mascara.php", description: "Máscaras de conteúdo." },
-    { name: "Blocos de Conteúdo", area: "Conteúdo", link: "/Manager/Elemento.php", description: "Elementos e blocos customizados." },
-    { name: "Permissões", area: "Administração", link: "/Manager/Permissao.php", description: "Permissões por grupo e aplicativo." },
-    { name: "Grupos", area: "Administração", link: "/Manager/Grupos.php", description: "Cadastro de grupos e workflow." },
-    { name: "Usuários", area: "Administração", link: "/Manager/Usuarios.php", description: "Cadastro de usuários." },
-    { name: "Email", area: "Sistema", link: "/Manager/Email.php", description: "E-mails utilizados pelo portal." },
-    { name: "Aplicativos", area: "Sistema", link: "/Manager/Aplicativos.php", description: "Cadastro de aplicativos e áreas de menu." },
-    { name: "Estatísticas", area: "Administração", link: "/Manager/Estatistica.php", description: "Acessos por seção." }
-  ];
+  return roleMap;
+}
 
+async function seedApplications(roleMap: Map<string, Awaited<ReturnType<typeof prisma.role.upsert>>>, resetMode: boolean) {
   const applicationMap = new Map<string, Awaited<ReturnType<typeof prisma.legacyApplication.upsert>>>();
 
   for (const application of applicationDefinitions) {
@@ -254,30 +111,6 @@ async function main() {
 
     applicationMap.set(application.name, saved);
   }
-
-  const roleAccessDefinitions = [
-    { role: "Administrador", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Seção", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Templates", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Máscara", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Blocos de Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Permissões", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Grupos", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Usuários", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Email", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Aplicativos", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Administrador", app: "Estatísticas", canCreate: false, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Desenvolvedor", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Desenvolvedor", app: "Seção", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Desenvolvedor", app: "Templates", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Desenvolvedor", app: "Máscara", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Desenvolvedor", app: "Blocos de Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Publicador Geral", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
-    { role: "Publicador Geral", app: "Seção", canCreate: true, canUpdate: true, canDelete: false, canAccess: true },
-    { role: "Editor", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: false, canAccess: true },
-    { role: "Marketing", app: "Email", canCreate: false, canUpdate: true, canDelete: false, canAccess: true },
-    { role: "LGPD", app: "Estatísticas", canCreate: false, canUpdate: true, canDelete: false, canAccess: true }
-  ];
 
   if (resetMode) {
     await prisma.roleApplicationAccess.deleteMany({});
@@ -316,51 +149,11 @@ async function main() {
       }
     });
   }
+}
 
-  const seedContentTypes = [
-    {
-      name: "Pagina editorial",
-      slug: "pagina-editorial",
-      description: "Tipo base para paginas e noticias",
-      allowRichText: true,
-      allowFeaturedMedia: true,
-      schemaJson: {
-        fields: ["title", "excerpt", "body", "seo"]
-      }
-    },
-    {
-      name: "Mascara institucional",
-      slug: "mascara-institucional",
-      description: "Estrutura para paginas de apresentacao e posicionamento.",
-      allowRichText: true,
-      allowFeaturedMedia: true,
-      schemaJson: {
-        fields: ["title", "excerpt", "body", "highlights", "seo"]
-      }
-    },
-    {
-      name: "Mascara de case",
-      slug: "mascara-case",
-      description: "Estrutura orientada a desafios, entregas e resultados.",
-      allowRichText: true,
-      allowFeaturedMedia: true,
-      schemaJson: {
-        fields: ["title", "challenge", "solution", "result", "seo"]
-      }
-    },
-    {
-      name: "Mascara documental",
-      slug: "mascara-documental",
-      description: "Estrutura para guias, notas tecnicas e materiais de apoio.",
-      allowRichText: true,
-      allowFeaturedMedia: false,
-      schemaJson: {
-        fields: ["title", "summary", "body", "attachments", "seo"]
-      }
-    }
-  ];
-
+async function seedContentCatalog() {
   const contentTypeMap = new Map<string, Awaited<ReturnType<typeof prisma.contentType.upsert>>>();
+  const templateMap = new Map<string, Awaited<ReturnType<typeof prisma.template.upsert>>>();
 
   for (const entry of seedContentTypes) {
     const saved = await prisma.contentType.upsert({
@@ -371,32 +164,6 @@ async function main() {
 
     contentTypeMap.set(entry.slug, saved);
   }
-
-  const seedTemplates = [
-    {
-      name: "Pagina padrao",
-      slug: "pagina-padrao",
-      description: "Template base para o portal",
-      componentKey: "default-page",
-      configSchema: { layout: "default" }
-    },
-    {
-      name: "Lista noticias",
-      slug: "lista-noticias",
-      description: "Template de listagem de noticias",
-      componentKey: "news-list",
-      configSchema: { layout: "list" }
-    },
-    {
-      name: "Interna detalhe",
-      slug: "interna-detalhe",
-      description: "Template interno de detalhe",
-      componentKey: "detail-page",
-      configSchema: { layout: "detail" }
-    }
-  ];
-
-  const templateMap = new Map<string, Awaited<ReturnType<typeof prisma.template.upsert>>>();
 
   for (const templateEntry of seedTemplates) {
     const savedTemplate = await prisma.template.upsert({
@@ -414,36 +181,6 @@ async function main() {
     templateMap.set(templateEntry.slug, savedTemplate);
   }
 
-  const template = templateMap.get("pagina-padrao");
-
-  if (!template) {
-    throw new Error("Template base nao encontrado no seed.");
-  }
-
-  const seedElements = [
-    {
-      name: "Barra de progresso",
-      thumbLabel: "Web Design",
-      content: "<div class='progress-bars'>Barra de progresso</div>",
-      status: "active",
-      category: "Destaques"
-    },
-    {
-      name: "Destaque Leia Mais",
-      thumbLabel: "Leia Mais",
-      content: "<div class='highlight-read-more'>Leia mais</div>",
-      status: "active",
-      category: "Destaques"
-    },
-    {
-      name: "Galeria Carrossel",
-      thumbLabel: "Galeria Carrossel",
-      content: "<div class='gallery-carousel'>Galeria</div>",
-      status: "inactive",
-      category: "Galeria de Imagens"
-    }
-  ];
-
   for (const element of seedElements) {
     const existing = await prisma.element.findFirst({
       where: { name: element.name }
@@ -454,54 +191,18 @@ async function main() {
         where: { id: existing.id },
         data: element
       });
-    } else {
-      await prisma.element.create({
-        data: element
-      });
+      continue;
     }
+
+    await prisma.element.create({
+      data: element
+    });
   }
 
-  const sections: SeedSection[] = [
-    {
-      name: "Institucional",
-      slug: "institucional",
-      description: "Paginas institucionais e posicionamento da empresa.",
-      order: 1
-    },
-    {
-      name: "Sobre",
-      slug: "sobre",
-      description: "Historia, proposta e contexto institucional.",
-      order: 1,
-      parentSlug: "institucional"
-    },
-    {
-      name: "Servicos",
-      slug: "servicos",
-      description: "Linhas de atuacao e entregas centrais.",
-      order: 2,
-      parentSlug: "institucional"
-    },
-    {
-      name: "Noticias",
-      slug: "noticias",
-      description: "Novidades, comunicados e anuncios do time.",
-      order: 2
-    },
-    {
-      name: "Cases",
-      slug: "cases",
-      description: "Resultados entregues e historias de projeto.",
-      order: 3
-    },
-    {
-      name: "Documentos",
-      slug: "documentos",
-      description: "Materiais de apoio, downloads e documentos institucionais.",
-      order: 4
-    }
-  ];
+  return { contentTypeMap, templateMap };
+}
 
+async function seedSections(resetMode: boolean, roleMap: Map<string, Awaited<ReturnType<typeof prisma.role.upsert>>>, contentTypeMap: Map<string, Awaited<ReturnType<typeof prisma.contentType.upsert>>>) {
   const sectionMap = new Map<string, Awaited<ReturnType<typeof prisma.section.upsert>>>();
 
   for (const section of sections) {
@@ -533,15 +234,6 @@ async function main() {
 
     sectionMap.set(section.slug, saved);
   }
-
-  const visitSeeds = new Map([
-    ["institucional", 148],
-    ["sobre", 92],
-    ["servicos", 134],
-    ["noticias", 716],
-    ["cases", 87],
-    ["documentos", 56]
-  ]);
 
   for (const [slug, visits] of visitSeeds.entries()) {
     const section = sectionMap.get(slug);
@@ -638,30 +330,10 @@ async function main() {
     }
   }
 
-  const systemEmails = [
-    {
-      name: "Central de Atendimento",
-      email: "contato@abbatech.local",
-      area: "Contato",
-      description: "Endereço principal para relacionamento com o usuário.",
-      value: "portal"
-    },
-    {
-      name: "Newsletter Abbatech",
-      email: "newsletter@abbatech.local",
-      area: "Newsletter",
-      description: "Remetente padrão para campanhas editoriais.",
-      value: "newsletter"
-    },
-    {
-      name: "RH Interno",
-      email: "rh@abbatech.local",
-      area: "RH",
-      description: "Comunicação de pessoas e processos internos.",
-      value: "interno"
-    }
-  ];
+  return sectionMap;
+}
 
+async function seedSystemUsers(roleMap: Map<string, Awaited<ReturnType<typeof prisma.role.upsert>>>, resetMode: boolean) {
   for (const systemEmail of systemEmails) {
     const existing = await prisma.systemEmail.findFirst({
       where: {
@@ -674,65 +346,28 @@ async function main() {
         where: { id: existing.id },
         data: systemEmail
       });
-    } else {
-      await prisma.systemEmail.create({
-        data: systemEmail
-      });
+      continue;
     }
+
+    await prisma.systemEmail.create({
+      data: systemEmail
+    });
   }
 
   const adminEmail = process.env.ADMIN_EMAIL ?? "admin@abbatech.local";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "Refresh123!";
-
-  const seedUsers = [
-    {
-      name: "Administrador Abbatech",
-      email: adminEmail,
-      username: "felipe",
-      cpf: "11111111111",
-      password: adminPassword,
-      isSuperAdmin: true,
-      roleNames: ["Administrador", "Desenvolvedor", "Publicador Geral"]
-    },
-    {
-      name: "Paula Conteudo",
-      email: "conteudo@abbatech.local",
-      username: "conteudo",
-      cpf: "22222222222",
-      password: "Refresh123!",
-      isSuperAdmin: false,
-      roleNames: ["Editor"]
-    },
-    {
-      name: "Marcos Marketing",
-      email: "marketing@abbatech.local",
-      username: "marketing",
-      cpf: "33333333333",
-      password: "Refresh123!",
-      isSuperAdmin: false,
-      roleNames: ["Marketing"]
-    },
-    {
-      name: "Livia Privacidade",
-      email: "lgpd@abbatech.local",
-      username: "lgpd",
-      cpf: "44444444444",
-      password: "Refresh123!",
-      isSuperAdmin: false,
-      roleNames: ["LGPD"]
-    }
-  ];
-
+  const seedUsers = createSeedUsers(adminEmail, adminPassword);
   let adminUserId = "";
 
   for (const seedUser of seedUsers) {
+    const passwordHash = await hash(seedUser.password);
     const user = await prisma.user.upsert({
       where: { email: seedUser.email },
       update: {
         name: seedUser.name,
         username: seedUser.username,
         cpf: seedUser.cpf,
-        passwordHash: await hash(seedUser.password),
+        passwordHash,
         isActive: true,
         isSuperAdmin: seedUser.isSuperAdmin,
         consentVersion: "1.0"
@@ -742,7 +377,7 @@ async function main() {
         email: seedUser.email,
         username: seedUser.username,
         cpf: seedUser.cpf,
-        passwordHash: await hash(seedUser.password),
+        passwordHash,
         isActive: true,
         isSuperAdmin: seedUser.isSuperAdmin,
         consentVersion: "1.0",
@@ -783,21 +418,11 @@ async function main() {
     }
   }
 
-  const newsletterGroups = [
-    {
-      name: "Clientes ativos",
-      description: "Lista base para comunicados voltados aos clientes em operacao."
-    },
-    {
-      name: "Leads portal",
-      description: "Interessados em conteudos, novidades e demonstracoes da plataforma."
-    }
-  ];
+  return adminUserId;
+}
 
-  const newsletterGroupMap = new Map<
-    string,
-    Awaited<ReturnType<typeof prisma.newsletterGroup.upsert>>
-  >();
+async function seedNewsletter() {
+  const newsletterGroupMap = new Map<string, Awaited<ReturnType<typeof prisma.newsletterGroup.upsert>>>();
 
   for (const group of newsletterGroups) {
     const saved = await prisma.newsletterGroup.upsert({
@@ -809,25 +434,7 @@ async function main() {
     newsletterGroupMap.set(group.name, saved);
   }
 
-  const recipients = [
-    {
-      email: "contato@cliente-exemplo.com",
-      name: "Contato Cliente Exemplo",
-      groupName: "Clientes ativos"
-    },
-    {
-      email: "time@empresa-parceira.com",
-      name: "Time Empresa Parceira",
-      groupName: "Clientes ativos"
-    },
-    {
-      email: "lead@interessado.com",
-      name: "Lead Interessado",
-      groupName: "Leads portal"
-    }
-  ];
-
-  for (const recipient of recipients) {
+  for (const recipient of newsletterRecipients) {
     const group = newsletterGroupMap.get(recipient.groupName);
 
     if (!group) {
@@ -852,127 +459,39 @@ async function main() {
 
   const leadGroup = newsletterGroupMap.get("Leads portal");
 
-  if (leadGroup) {
-    const existingCampaign = await prisma.newsletterCampaign.findFirst({
-      where: { name: "Lancamento do portal MVP" }
-    });
-
-    if (existingCampaign) {
-      await prisma.newsletterCampaign.update({
-        where: { id: existingCampaign.id },
-        data: {
-          subject: "Novo portal Abbatech no ar",
-          senderName: "Equipe Abbatech",
-          senderEmail: "noreply@abbatech.local",
-          bodyHtml: "<p>O novo portal Abbatech ja esta em demonstracao com CMS e API integrados.</p>",
-          bodyText: "O novo portal Abbatech ja esta em demonstracao com CMS e API integrados.",
-          status: "draft",
-          recipientGroupId: leadGroup.id
-        }
-      });
-    } else {
-      await prisma.newsletterCampaign.create({
-        data: {
-          name: "Lancamento do portal MVP",
-          subject: "Novo portal Abbatech no ar",
-          senderName: "Equipe Abbatech",
-          senderEmail: "noreply@abbatech.local",
-          bodyHtml: "<p>O novo portal Abbatech ja esta em demonstracao com CMS e API integrados.</p>",
-          bodyText: "O novo portal Abbatech ja esta em demonstracao com CMS e API integrados.",
-          status: "draft",
-          recipientGroupId: leadGroup.id
-        }
-      });
-    }
+  if (!leadGroup) {
+    return;
   }
 
-  const contents: SeedContent[] = [
-    {
-      title: "Nova plataforma Abbatech",
-      slug: "nova-plataforma-abbatech",
-      excerpt: "O MVP do novo portal ja esta operando com API, CMS e publicacao inicial.",
-      body: [
-        "A Abbatech agora conta com uma base moderna separando portal, CMS e API.",
-        "Este conteudo inicial foi criado automaticamente para validar o fluxo editorial.",
-        "A partir daqui, o time pode cadastrar novas secoes e publicar novos materiais."
-      ],
-      sectionSlug: "noticias",
-      contentTypeSlug: "pagina-editorial",
-      seoDescription: "Portal reconstruido com CMS moderno, SEO e governanca editorial.",
-      keywords: "abbatech, portal, cms, refresh"
-    },
-    {
-      title: "Como estruturamos o Refresh para o time editorial",
-      slug: "estrutura-refresh-time-editorial",
-      excerpt: "Uma visao rapida do fluxo entre autenticacao, gestao de secoes e publicacao de conteudos.",
-      body: [
-        "O Refresh foi desenhado para separar operacao editorial, API e experiencia publica sem carregar as limitacoes do legado.",
-        "No MVP atual, a equipe consegue autenticar, cadastrar secoes, editar publicacoes e validar o reflexo imediato no portal.",
-        "Esse desenho reduz acoplamento, facilita evolucao do front e cria uma base mais segura para futuros modulos."
-      ],
-      sectionSlug: "noticias",
-      contentTypeSlug: "pagina-editorial",
-      seoDescription: "Fluxo editorial do Refresh e da nova arquitetura da Abbatech.",
-      keywords: "refresh, editorial, cms, arquitetura"
-    },
-    {
-      title: "Quem somos",
-      slug: "quem-somos",
-      excerpt: "A Abbatech combina estrategia, produto e implementacao para projetos digitais com necessidade de escala.",
-      body: [
-        "Somos um time orientado a resolver operacao e produto com uma base tecnica que suporta crescimento.",
-        "Atuamos em projetos que exigem clareza de dominio, automacao e experiencia digital consistente.",
-        "A nova plataforma nasce para refletir essa mesma filosofia internamente."
-      ],
-      sectionSlug: "sobre",
-      contentTypeSlug: "mascara-institucional",
-      seoDescription: "Apresentacao institucional da Abbatech e da proposta da nova plataforma.",
-      keywords: "abbatech, institucional, sobre, empresa"
-    },
-    {
-      title: "Linhas de servico da Abbatech",
-      slug: "linhas-de-servico-abbatech",
-      excerpt: "Consultoria, evolucao de produto e operacao digital com foco em implementacao pragmatica.",
-      body: [
-        "A Abbatech atua com diagnostico, estruturacao de fluxos, desenvolvimento de sistemas e modernizacao de experiencia digital.",
-        "Nosso foco e tirar a operacao do improviso e levar o time para uma base mais governavel.",
-        "Esse portal novo serve tambem como demonstracao da forma como desenhamos produtos internos e externos."
-      ],
-      sectionSlug: "servicos",
-      contentTypeSlug: "mascara-institucional",
-      seoDescription: "Resumo das principais linhas de servico da Abbatech.",
-      keywords: "servicos, consultoria, produto, operacao digital"
-    },
-    {
-      title: "Caso de modernizacao de CMS e portal",
-      slug: "caso-modernizacao-cms-portal",
-      excerpt: "Uma entrega focada em separar legado, API e camada de experiencia sem interromper a operacao.",
-      body: [
-        "Neste caso, o objetivo era reconstruir a base sem depender diretamente do codigo legado.",
-        "A solucao envolveu um CMS administrativo novo, API centralizada, mapeamento de dominio e infraestrutura preparada para evolucao.",
-        "O resultado e uma fundacao mais segura para SEO, publicacao e governanca editorial."
-      ],
-      sectionSlug: "cases",
-      contentTypeSlug: "mascara-case",
-      seoDescription: "Exemplo de caso de modernizacao de CMS, API e portal.",
-      keywords: "case, cms, modernizacao, portal"
-    },
-    {
-      title: "Guia rapido do portal e do CMS",
-      slug: "guia-rapido-portal-cms",
-      excerpt: "Documento inicial para orientar demonstracao interna e validacao do MVP.",
-      body: [
-        "Use o Refresh para entrar com o usuario seedado, cadastrar secoes e criar novos conteudos.",
-        "O portal consome automaticamente os conteudos publicados e os apresenta na home e na pagina de detalhe.",
-        "Esse fluxo serve como base para homologacao visual e para priorizacao das proximas entregas."
-      ],
-      sectionSlug: "documentos",
-      contentTypeSlug: "mascara-documental",
-      seoDescription: "Guia inicial de uso do portal e do CMS Refresh no MVP.",
-      keywords: "guia, portal, cms, mvp"
-    }
-  ];
+  const existingCampaign = await prisma.newsletterCampaign.findFirst({
+    where: { name: launchCampaign.name }
+  });
 
+  if (existingCampaign) {
+    await prisma.newsletterCampaign.update({
+      where: { id: existingCampaign.id },
+      data: {
+        ...launchCampaign,
+        recipientGroupId: leadGroup.id
+      }
+    });
+    return;
+  }
+
+  await prisma.newsletterCampaign.create({
+    data: {
+      ...launchCampaign,
+      recipientGroupId: leadGroup.id
+    }
+  });
+}
+
+async function seedContents(
+  adminUserId: string,
+  sectionMap: Map<string, Awaited<ReturnType<typeof prisma.section.upsert>>>,
+  contentTypeMap: Map<string, Awaited<ReturnType<typeof prisma.contentType.upsert>>>,
+  templateId: string
+) {
   for (const content of contents) {
     const section = sectionMap.get(content.sectionSlug);
     const contentType = contentTypeMap.get(content.contentTypeSlug);
@@ -1026,7 +545,7 @@ async function main() {
             publishedAt: existing.publishedAt ?? new Date(),
             sectionId: section.id,
             contentTypeId: contentType.id,
-            templateId: template.id,
+            templateId,
             seoId: seo.id,
             authorId: adminUserId
           }
@@ -1042,7 +561,7 @@ async function main() {
             publishedAt: new Date(),
             sectionId: section.id,
             contentTypeId: contentType.id,
-            templateId: template.id,
+            templateId,
             seoId: seo.id,
             authorId: adminUserId
           }
@@ -1071,32 +590,59 @@ async function main() {
       });
     }
   }
+}
 
+async function seedPrivacyRequests() {
   const privacyCount = await prisma.privacyRequest.count();
 
-  if (privacyCount === 0) {
-    await prisma.privacyRequest.createMany({
-      data: [
-        {
-          type: "access",
-          subjectEmail: "titular@abbatech.local",
-          description: "Exemplo inicial de solicitacao LGPD"
-        },
-        {
-          type: "delete",
-          subjectEmail: "remocao@abbatech.local",
-          description: "Pedido de exclusao de dados em homologacao"
-        }
-      ]
-    });
+  if (privacyCount > 0) {
+    return;
   }
 
-  console.log(`Seed concluido. Admin: ${adminEmail}`);
+  await prisma.privacyRequest.createMany({
+    data: [
+      {
+        type: "access",
+        subjectEmail: "titular@abbatech.local",
+        description: "Exemplo inicial de solicitacao LGPD"
+      },
+      {
+        type: "delete",
+        subjectEmail: "remocao@abbatech.local",
+        description: "Pedido de exclusao de dados em homologacao"
+      }
+    ]
+  });
+}
+
+async function main() {
+  const resetMode = process.env.SEED_RESET === "true";
+  const permissionByCode = await seedPermissions();
+  const roleMap = await seedRoles(permissionByCode, resetMode);
+
+  await seedApplications(roleMap, resetMode);
+
+  const { contentTypeMap, templateMap } = await seedContentCatalog();
+  const sectionMap = await seedSections(resetMode, roleMap, contentTypeMap);
+  const adminUserId = await seedSystemUsers(roleMap, resetMode);
+
+  await seedNewsletter();
+
+  const template = templateMap.get("pagina-padrao");
+
+  if (!template) {
+    throw new Error("Template base nao encontrado no seed.");
+  }
+
+  await seedContents(adminUserId, sectionMap, contentTypeMap, template.id);
+  await seedPrivacyRequests();
+
+  process.stdout.write(`Seed concluido. Admin: ${process.env.ADMIN_EMAIL ?? "admin@abbatech.local"}\n`);
 }
 
 main()
   .catch(async (error) => {
-    console.error(error);
+    process.stderr.write(`${error instanceof Error ? error.stack ?? error.message : String(error)}\n`);
     process.exitCode = 1;
   })
   .finally(async () => {

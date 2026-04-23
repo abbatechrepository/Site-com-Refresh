@@ -1,347 +1,78 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { hash } from "argon2";
 import { PrismaService } from "../../infra/prisma.service";
-
-type UpsertContentTypeInput = {
-  name: string;
-  slug?: string;
-  description?: string;
-  allowRichText?: boolean;
-  allowFeaturedMedia?: boolean;
-  schemaJson?: unknown;
-};
-
-type UpsertPermissionInput = {
-  code: string;
-  description?: string;
-};
-
-type UpsertApplicationInput = {
-  name: string;
-  area: string;
-  link: string;
-  description?: string;
-};
-
-type UpsertRoleApplicationAccessInput = {
-  roleId: string;
-  appId: string;
-  canCreate?: boolean;
-  canUpdate?: boolean;
-  canDelete?: boolean;
-  canAccess?: boolean;
-};
-
-type UpsertRoleInput = {
-  name: string;
-  description?: string;
-  functionName?: string;
-  status?: string;
-  parentRoleId?: string;
-  permissionIds?: string[];
-  menuAccesses?: Array<{
-    topMenu: string;
-    viewKey: string;
-  }>;
-  sectionIds?: string[];
-  contentTypeIds?: string[];
-};
-
-type UpsertUserInput = {
-  name: string;
-  email: string;
-  username?: string;
-  cpf?: string;
-  cnh?: string;
-  status?: string;
-  company?: string;
-  jobTitle?: string;
-  phone?: string;
-  address?: string;
-  zipCode?: string;
-  city?: string;
-  state?: string;
-  secondaryAddress?: string;
-  secondaryNumber?: string;
-  secondaryComplement?: string;
-  neighborhood?: string;
-  notes?: string;
-  facebook?: string;
-  instagram?: string;
-  youtube?: string;
-  forcePasswordChange?: boolean;
-  password?: string;
-  isActive?: boolean;
-  isSuperAdmin?: boolean;
-  roleIds?: string[];
-};
-
-type UpsertNewsletterGroupInput = {
-  name: string;
-  description?: string;
-};
-
-type UpsertSystemEmailInput = {
-  name: string;
-  email: string;
-  area: string;
-  description?: string;
-  value?: string;
-};
-
-type UpsertTemplateInput = {
-  name: string;
-  slug?: string;
-  description?: string;
-  componentKey?: string;
-  configSchema?: unknown;
-  isActive?: boolean;
-};
-
-type UpsertElementInput = {
-  name: string;
-  thumbLabel?: string;
-  content?: string;
-  status?: string;
-  category?: string;
-};
+import { buildManagementBootstrap } from "./management.bootstrap";
+import {
+  UpsertApplicationInput,
+  UpsertContentTypeInput,
+  UpsertElementInput,
+  UpsertNewsletterGroupInput,
+  UpsertPermissionInput,
+  UpsertRoleApplicationAccessInput,
+  UpsertRoleInput,
+  UpsertSystemEmailInput,
+  UpsertTemplateInput,
+  UpsertUserInput
+} from "./management.types";
+import { normalizeCpf, toSlug } from "./management.utils";
+import { ManagementValidationService } from "./management.validation.service";
 
 @Injectable()
 export class ManagementService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly validation: ManagementValidationService
+  ) {}
 
-  private async nextLegacyIdFor(modelName: string) {
-    const aggregate = await (this.prisma as any)[modelName].aggregate({
-      _max: {
-        legacyId: true
+  private async nextLegacyIdFor<
+    TModelName extends
+      | "contentType"
+      | "permission"
+      | "legacyApplication"
+      | "roleApplicationAccess"
+      | "role"
+      | "user"
+      | "template"
+      | "element"
+      | "newsletterGroup"
+      | "systemEmail"
+  >(modelName: TModelName) {
+    const aggregatePromise = (() => {
+      switch (modelName) {
+        case "contentType":
+          return this.prisma.contentType.aggregate({ _max: { legacyId: true } });
+        case "permission":
+          return this.prisma.permission.aggregate({ _max: { legacyId: true } });
+        case "legacyApplication":
+          return this.prisma.legacyApplication.aggregate({ _max: { legacyId: true } });
+        case "roleApplicationAccess":
+          return this.prisma.roleApplicationAccess.aggregate({ _max: { legacyId: true } });
+        case "role":
+          return this.prisma.role.aggregate({ _max: { legacyId: true } });
+        case "user":
+          return this.prisma.user.aggregate({ _max: { legacyId: true } });
+        case "template":
+          return this.prisma.template.aggregate({ _max: { legacyId: true } });
+        case "element":
+          return this.prisma.element.aggregate({ _max: { legacyId: true } });
+        case "newsletterGroup":
+          return this.prisma.newsletterGroup.aggregate({ _max: { legacyId: true } });
+        case "systemEmail":
+          return this.prisma.systemEmail.aggregate({ _max: { legacyId: true } });
       }
-    });
+    })();
 
-    return (aggregate?._max?.legacyId ?? 0) + 1;
+    const aggregate = await aggregatePromise;
+    return (aggregate._max.legacyId ?? 0) + 1;
   }
 
   async bootstrap() {
-    const [
-      contentTypes,
-      users,
-      roles,
-      permissions,
-      applications,
-      roleApplicationAccesses,
-      systemEmails,
-      templates,
-      elements,
-      newsletterGroups,
-      newsletterCampaigns,
-      privacyRequests
-    ] = await Promise.all([
-      this.prisma.contentType.findMany({
-        include: {
-          _count: {
-            select: {
-              contents: true
-            }
-          }
-        },
-        orderBy: [{ name: "asc" }]
-      }),
-      this.prisma.user.findMany({
-        include: {
-          roles: {
-            include: {
-              role: true
-            }
-          },
-          _count: {
-            select: {
-              authoredContents: true,
-              revisions: true
-            }
-          }
-        },
-        orderBy: [{ createdAt: "desc" }]
-      }),
-      this.prisma.role.findMany({
-        include: {
-          parentRole: true,
-          permissions: {
-            include: {
-              permission: true
-            }
-          },
-          menuAccesses: true,
-          appAccesses: {
-            include: {
-              app: true
-            }
-          },
-          sectionAccesses: true,
-          contentTypeAccesses: true,
-          users: {
-            include: {
-              user: true
-            }
-          }
-        },
-        orderBy: [{ name: "asc" }]
-      }),
-      this.prisma.permission.findMany({
-        include: {
-          roles: {
-            include: {
-              role: true
-            }
-          }
-        },
-        orderBy: [{ code: "asc" }]
-      }),
-      this.prisma.legacyApplication.findMany({
-        orderBy: [{ area: "asc" }, { name: "asc" }]
-      }),
-      this.prisma.roleApplicationAccess.findMany({
-        include: {
-          role: true,
-          app: true
-        },
-        orderBy: [{ role: { name: "asc" } }, { app: { name: "asc" } }]
-      }),
-      this.prisma.systemEmail.findMany({
-        orderBy: [{ area: "asc" }, { name: "asc" }]
-      }),
-      this.prisma.template.findMany({
-        orderBy: [{ name: "asc" }]
-      }),
-      this.prisma.element.findMany({
-        orderBy: [{ name: "asc" }]
-      }),
-      this.prisma.newsletterGroup.findMany({
-        include: {
-          _count: {
-            select: {
-              recipients: true,
-              campaigns: true
-            }
-          }
-        },
-        orderBy: [{ createdAt: "asc" }]
-      }),
-      this.prisma.newsletterCampaign.findMany({
-        include: {
-          recipientGroup: true,
-          _count: {
-            select: {
-              dispatches: true
-            }
-          }
-        },
-        orderBy: [{ createdAt: "desc" }]
-      }),
-      this.prisma.privacyRequest.findMany({
-        orderBy: [{ createdAt: "desc" }]
-      })
-    ]);
-
-    return {
-      contentTypes,
-      users: users.map((user: (typeof users)[number] & Record<string, unknown>) => ({
-        id: user.id,
-        legacyId: (user.legacyId as number | undefined) ?? null,
-        name: user.name,
-        email: user.email,
-        username: user.username,
-        cpf: user.cpf,
-        cnh: (user.cnh as string | null | undefined) ?? null,
-        status: (user.legacyStatus as string | null | undefined) ?? (user.isActive ? "Ativo" : "Inativo"),
-        company: (user.company as string | null | undefined) ?? null,
-        jobTitle: (user.jobTitle as string | null | undefined) ?? null,
-        phone: (user.phone as string | null | undefined) ?? null,
-        address: (user.address as string | null | undefined) ?? null,
-        zipCode: (user.zipCode as string | null | undefined) ?? null,
-        city: (user.city as string | null | undefined) ?? null,
-        state: (user.state as string | null | undefined) ?? null,
-        secondaryAddress: (user.secondaryAddress as string | null | undefined) ?? null,
-        secondaryNumber: (user.secondaryNumber as string | null | undefined) ?? null,
-        secondaryComplement: (user.secondaryComplement as string | null | undefined) ?? null,
-        neighborhood: (user.neighborhood as string | null | undefined) ?? null,
-        notes: (user.notes as string | null | undefined) ?? null,
-        facebook: (user.facebook as string | null | undefined) ?? null,
-        instagram: (user.instagram as string | null | undefined) ?? null,
-        youtube: (user.youtube as string | null | undefined) ?? null,
-        forcePasswordChange: Boolean(user.forcePasswordChange),
-        isActive: user.isActive,
-        isSuperAdmin: user.isSuperAdmin,
-        lastLoginAt: user.lastLoginAt,
-        createdAt: user.createdAt,
-        roles: user.roles.map((entry: (typeof user.roles)[number]) => entry.role),
-        stats: user._count
-      })),
-      roles: roles.map((role: (typeof roles)[number]) => ({
-        id: role.id,
-        legacyId: role.legacyId,
-        name: role.name,
-        description: role.description,
-        functionName: role.functionName,
-        status: role.status,
-        parentRoleId: role.parentRoleId,
-        parentRoleName: role.parentRole?.name ?? null,
-        permissions: role.permissions.map((entry: (typeof role.permissions)[number]) => entry.permission),
-        menuAccesses: role.menuAccesses,
-        appAccesses: role.appAccesses.map((entry: (typeof role.appAccesses)[number]) => ({
-          id: entry.id,
-          appId: entry.appId,
-          appName: entry.app.name,
-          area: entry.app.area,
-          canCreate: entry.canCreate,
-          canUpdate: entry.canUpdate,
-          canDelete: entry.canDelete,
-          canAccess: entry.canAccess
-        })),
-        sectionIds: role.sectionAccesses.map((entry: (typeof role.sectionAccesses)[number]) => entry.sectionId),
-        contentTypeIds: role.contentTypeAccesses.map(
-          (entry: (typeof role.contentTypeAccesses)[number]) => entry.contentTypeId
-        ),
-        users: role.users.map((entry: (typeof role.users)[number]) => ({
-          id: entry.user.id,
-          name: entry.user.name,
-          email: entry.user.email
-        }))
-      })),
-      permissions: permissions.map((permission: (typeof permissions)[number]) => ({
-        id: permission.id,
-        legacyId: permission.legacyId,
-        code: permission.code,
-        description: permission.description,
-        roles: permission.roles.map((entry: (typeof permission.roles)[number]) => ({
-          id: entry.role.id,
-          name: entry.role.name
-        }))
-      })),
-      applications,
-      roleApplicationAccesses: roleApplicationAccesses.map((entry: (typeof roleApplicationAccesses)[number]) => ({
-        id: entry.id,
-        legacyId: entry.legacyId,
-        roleId: entry.roleId,
-        roleName: entry.role.name,
-        appId: entry.appId,
-        appName: entry.app.name,
-        area: entry.app.area,
-        canCreate: entry.canCreate,
-        canUpdate: entry.canUpdate,
-        canDelete: entry.canDelete,
-        canAccess: entry.canAccess
-      })),
-      systemEmails,
-      templates,
-      elements,
-      newsletterGroups,
-      newsletterCampaigns,
-      privacyRequests
-    };
+    return buildManagementBootstrap(this.prisma);
   }
 
   async createContentType(payload: UpsertContentTypeInput) {
-    const slug = this.toSlug(payload.slug ?? payload.name);
-    await this.ensureUniqueContentType(slug);
+    const slug = toSlug(payload.slug ?? payload.name);
+    await this.validation.ensureUniqueContentType(slug);
 
     return this.prisma.contentType.create({
       data: {
@@ -365,8 +96,8 @@ export class ManagementService {
       throw new NotFoundException("Mascara nao encontrada.");
     }
 
-    const slug = this.toSlug(payload.slug ?? current.slug);
-    await this.ensureUniqueContentType(slug, id);
+    const slug = toSlug(payload.slug ?? current.slug);
+    await this.validation.ensureUniqueContentType(slug, id);
 
     return this.prisma.contentType.update({
       where: { id },
@@ -389,7 +120,7 @@ export class ManagementService {
 
   async createPermission(payload: UpsertPermissionInput) {
     const code = payload.code.trim().toLowerCase();
-    await this.ensureUniquePermission(code);
+    await this.validation.ensureUniquePermission(code);
 
     return this.prisma.permission.create({
       data: {
@@ -410,7 +141,7 @@ export class ManagementService {
     }
 
     const code = payload.code.trim().toLowerCase();
-    await this.ensureUniquePermission(code, id);
+    await this.validation.ensureUniquePermission(code, id);
 
     return this.prisma.permission.update({
       where: { id },
@@ -428,7 +159,7 @@ export class ManagementService {
   }
 
   async createApplication(payload: UpsertApplicationInput) {
-    await this.ensureUniqueApplicationName(payload.name);
+    await this.validation.ensureUniqueApplicationName(payload.name);
 
     return this.prisma.legacyApplication.create({
       data: {
@@ -450,7 +181,7 @@ export class ManagementService {
       throw new NotFoundException("Aplicativo nao encontrado.");
     }
 
-    await this.ensureUniqueApplicationName(payload.name, id);
+    await this.validation.ensureUniqueApplicationName(payload.name, id);
 
     return this.prisma.legacyApplication.update({
       where: { id },
@@ -470,7 +201,7 @@ export class ManagementService {
   }
 
   async createRoleApplicationAccess(payload: UpsertRoleApplicationAccessInput) {
-    await this.ensureRoleApplication(payload.roleId, payload.appId);
+    await this.validation.ensureRoleApplication(payload.roleId, payload.appId);
 
     return this.prisma.roleApplicationAccess.create({
       data: {
@@ -503,7 +234,7 @@ export class ManagementService {
       throw new NotFoundException("Permissao administrativa nao encontrada.");
     }
 
-    await this.ensureRoleApplication(payload.roleId, payload.appId, current.id);
+    await this.validation.ensureRoleApplication(payload.roleId, payload.appId, current.id);
 
     return this.prisma.roleApplicationAccess.update({
       where: { id: current.id },
@@ -525,12 +256,12 @@ export class ManagementService {
   }
 
   async createRole(payload: UpsertRoleInput) {
-    await this.ensureRolePermissions(payload.permissionIds ?? []);
-    await this.ensureParentRole(payload.parentRoleId);
-    await this.ensureSectionIds(payload.sectionIds ?? []);
-    await this.ensureContentTypeIds(payload.contentTypeIds ?? []);
-    this.ensureRoleMenus(payload.menuAccesses ?? []);
-    const appAccesses = await this.resolveRoleApplicationAccesses(payload);
+    await this.validation.ensureRolePermissions(payload.permissionIds ?? []);
+    await this.validation.ensureParentRole(payload.parentRoleId);
+    await this.validation.ensureSectionIds(payload.sectionIds ?? []);
+    await this.validation.ensureContentTypeIds(payload.contentTypeIds ?? []);
+    this.validation.ensureRoleMenus(payload.menuAccesses ?? []);
+    const appAccesses = await this.validation.resolveRoleApplicationAccesses(payload);
 
     return this.prisma.role.create({
       data: {
@@ -585,12 +316,12 @@ export class ManagementService {
       throw new NotFoundException("Grupo nao encontrado.");
     }
 
-    await this.ensureRolePermissions(payload.permissionIds ?? []);
-    await this.ensureParentRole(payload.parentRoleId, id);
-    await this.ensureSectionIds(payload.sectionIds ?? []);
-    await this.ensureContentTypeIds(payload.contentTypeIds ?? []);
-    this.ensureRoleMenus(payload.menuAccesses ?? []);
-    const appAccesses = await this.resolveRoleApplicationAccesses(payload);
+    await this.validation.ensureRolePermissions(payload.permissionIds ?? []);
+    await this.validation.ensureParentRole(payload.parentRoleId, id);
+    await this.validation.ensureSectionIds(payload.sectionIds ?? []);
+    await this.validation.ensureContentTypeIds(payload.contentTypeIds ?? []);
+    this.validation.ensureRoleMenus(payload.menuAccesses ?? []);
+    const appAccesses = await this.validation.resolveRoleApplicationAccesses(payload);
 
     return this.prisma.role.update({
       where: { id },
@@ -648,11 +379,11 @@ export class ManagementService {
   }
 
   async createUser(payload: UpsertUserInput) {
-    await this.ensureRoleIds(payload.roleIds ?? []);
+    await this.validation.ensureRoleIds(payload.roleIds ?? []);
     const normalizedEmail = payload.email.trim().toLowerCase();
     const normalizedUsername = payload.username?.trim().toLowerCase() || null;
-    const normalizedCpf = this.normalizeCpf(payload.cpf);
-    await this.ensureUniqueUserIdentity({
+    const normalizedCpf = normalizeCpf(payload.cpf);
+    await this.validation.ensureUniqueUserIdentity({
       email: normalizedEmail,
       username: normalizedUsername,
       cpf: normalizedCpf
@@ -699,7 +430,7 @@ export class ManagementService {
             roleId
           }))
         }
-      } as any,
+      },
       include: {
         roles: {
           include: {
@@ -719,11 +450,11 @@ export class ManagementService {
       throw new NotFoundException("Usuario nao encontrado.");
     }
 
-    await this.ensureRoleIds(payload.roleIds ?? []);
+    await this.validation.ensureRoleIds(payload.roleIds ?? []);
     const normalizedEmail = payload.email.trim().toLowerCase();
     const normalizedUsername = payload.username?.trim().toLowerCase() || null;
-    const normalizedCpf = this.normalizeCpf(payload.cpf);
-    await this.ensureUniqueUserIdentity(
+    const normalizedCpf = normalizeCpf(payload.cpf);
+    await this.validation.ensureUniqueUserIdentity(
       {
         email: normalizedEmail,
         username: normalizedUsername,
@@ -733,7 +464,7 @@ export class ManagementService {
     );
 
     const legacyStatus =
-      payload.status?.trim() || ((current as Record<string, unknown>).legacyStatus as string | undefined) || "Novo";
+      payload.status?.trim() || current.legacyStatus || "Novo";
     const isActive =
       payload.isActive ?? !["Inativo", "Excluído"].includes(legacyStatus);
 
@@ -763,7 +494,7 @@ export class ManagementService {
         youtube: payload.youtube?.trim() || null,
         forcePasswordChange:
           payload.forcePasswordChange ??
-          ((current as Record<string, unknown>).forcePasswordChange as boolean | undefined) ??
+          current.forcePasswordChange ??
           false,
         passwordHash: payload.password ? await hash(payload.password) : undefined,
         isActive,
@@ -774,7 +505,7 @@ export class ManagementService {
             roleId
           }))
         }
-      } as any,
+      },
       include: {
         roles: {
           include: {
@@ -847,13 +578,13 @@ export class ManagementService {
         roles: {
           deleteMany: {}
         }
-      } as any
+      }
     });
   }
 
   async createTemplate(payload: UpsertTemplateInput) {
-    const slug = this.toSlug(payload.slug ?? payload.name);
-    await this.ensureUniqueTemplate(slug);
+    const slug = toSlug(payload.slug ?? payload.name);
+    await this.validation.ensureUniqueTemplate(slug);
 
     return this.prisma.template.create({
       data: {
@@ -877,8 +608,8 @@ export class ManagementService {
       throw new NotFoundException("Template nao encontrado.");
     }
 
-    const slug = this.toSlug(payload.slug ?? current.slug);
-    await this.ensureUniqueTemplate(slug, id);
+    const slug = toSlug(payload.slug ?? current.slug);
+    await this.validation.ensureUniqueTemplate(slug, id);
 
     return this.prisma.template.update({
       where: { id },
@@ -1015,304 +746,5 @@ export class ManagementService {
     });
 
     return { success: true };
-  }
-
-  private async ensureUniqueContentType(slug: string, currentId?: string) {
-    const existing = await this.prisma.contentType.findFirst({
-      where: {
-        slug,
-        ...(currentId ? { NOT: { id: currentId } } : {})
-      }
-    });
-
-    if (existing) {
-      throw new BadRequestException("Ja existe uma mascara com este slug.");
-    }
-  }
-
-  private async ensureUniquePermission(code: string, currentId?: string) {
-    const existing = await this.prisma.permission.findFirst({
-      where: {
-        code,
-        ...(currentId ? { NOT: { id: currentId } } : {})
-      }
-    });
-
-    if (existing) {
-      throw new BadRequestException("Ja existe uma permissao com este codigo.");
-    }
-  }
-
-  private async ensureUniqueApplicationName(name: string, currentId?: string) {
-    const existing = await this.prisma.legacyApplication.findFirst({
-      where: {
-        name,
-        ...(currentId ? { NOT: { id: currentId } } : {})
-      }
-    });
-
-    if (existing) {
-      throw new BadRequestException("Ja existe um aplicativo com este nome.");
-    }
-  }
-
-  private async ensureUniqueTemplate(slug: string, currentId?: string) {
-    const existing = await this.prisma.template.findFirst({
-      where: {
-        slug,
-        ...(currentId ? { NOT: { id: currentId } } : {})
-      }
-    });
-
-    if (existing) {
-      throw new BadRequestException("Ja existe um template com este slug.");
-    }
-  }
-
-  private async ensureRolePermissions(permissionIds: string[]) {
-    if (permissionIds.length === 0) {
-      return;
-    }
-
-    const count = await this.prisma.permission.count({
-      where: {
-        id: {
-          in: permissionIds
-        }
-      }
-    });
-
-    if (count !== permissionIds.length) {
-      throw new BadRequestException("Uma ou mais permissoes sao invalidas.");
-    }
-  }
-
-  private async ensureRoleIds(roleIds: string[]) {
-    if (roleIds.length === 0) {
-      return;
-    }
-
-    const count = await this.prisma.role.count({
-      where: {
-        id: {
-          in: roleIds
-        }
-      }
-    });
-
-    if (count !== roleIds.length) {
-      throw new BadRequestException("Um ou mais grupos sao invalidos.");
-    }
-  }
-
-  private async ensureSectionIds(sectionIds: string[]) {
-    if (sectionIds.length === 0) {
-      return;
-    }
-
-    const count = await this.prisma.section.count({
-      where: {
-        id: {
-          in: sectionIds
-        }
-      }
-    });
-
-    if (count !== sectionIds.length) {
-      throw new BadRequestException("Uma ou mais secoes sao invalidas.");
-    }
-  }
-
-  private async ensureContentTypeIds(contentTypeIds: string[]) {
-    if (contentTypeIds.length === 0) {
-      return;
-    }
-
-    const count = await this.prisma.contentType.count({
-      where: {
-        id: {
-          in: contentTypeIds
-        }
-      }
-    });
-
-    if (count !== contentTypeIds.length) {
-      throw new BadRequestException("Uma ou mais mascaras sao invalidas.");
-    }
-  }
-
-  private async ensureParentRole(parentRoleId?: string, currentRoleId?: string) {
-    if (!parentRoleId) {
-      return;
-    }
-
-    if (currentRoleId && parentRoleId === currentRoleId) {
-      throw new BadRequestException("Um grupo nao pode ser superior de si mesmo.");
-    }
-
-    const role = await this.prisma.role.findUnique({
-      where: { id: parentRoleId }
-    });
-
-    if (!role) {
-      throw new BadRequestException("Grupo superior invalido.");
-    }
-  }
-
-  private async ensureRoleApplication(roleId: string, appId: string, currentId?: string) {
-    const [role, app, duplicate] = await Promise.all([
-      this.prisma.role.findUnique({ where: { id: roleId } }),
-      this.prisma.legacyApplication.findUnique({ where: { id: appId } }),
-      this.prisma.roleApplicationAccess.findFirst({
-        where: {
-          roleId,
-          appId,
-          ...(currentId ? { NOT: { id: currentId } } : {})
-        }
-      })
-    ]);
-
-    if (!role) {
-      throw new BadRequestException("Grupo nao encontrado.");
-    }
-
-    if (!app) {
-      throw new BadRequestException("Aplicativo nao encontrado.");
-    }
-
-    if (duplicate) {
-      throw new BadRequestException("Ja existe permissao cadastrada para este grupo e aplicativo.");
-    }
-  }
-
-  private normalizeCpf(cpf?: string | null) {
-    if (!cpf) {
-      return null;
-    }
-
-    const digits = cpf.replace(/\D/g, "");
-    return digits.length > 0 ? digits : null;
-  }
-
-  private async ensureUniqueUserIdentity(
-    identity: {
-      email: string;
-      username: string | null;
-      cpf: string | null;
-    },
-    currentUserId?: string
-  ) {
-    const matches = await this.prisma.user.findMany({
-      where: {
-        OR: [
-          { email: identity.email },
-          ...(identity.username ? [{ username: identity.username }] : []),
-          ...(identity.cpf ? [{ cpf: identity.cpf }] : [])
-        ]
-      }
-    });
-
-    for (const match of matches) {
-      if (currentUserId && match.id === currentUserId) {
-        continue;
-      }
-
-      if (match.email === identity.email) {
-        throw new BadRequestException("Ja existe um usuario com este e-mail.");
-      }
-
-      if (identity.username && match.username === identity.username) {
-        throw new BadRequestException("Ja existe um usuario com este username.");
-      }
-
-      if (identity.cpf && match.cpf === identity.cpf) {
-        throw new BadRequestException("Ja existe um usuario com este CPF.");
-      }
-    }
-  }
-
-  private ensureRoleMenus(menuAccesses: Array<{ topMenu: string; viewKey: string }>) {
-    const uniqueViews = new Set<string>();
-
-    for (const menuAccess of menuAccesses) {
-      if (!menuAccess.topMenu || !menuAccess.viewKey) {
-        throw new BadRequestException("Menu de grupo invalido.");
-      }
-
-      const compositeKey = `${menuAccess.topMenu}:${menuAccess.viewKey}`;
-
-      if (uniqueViews.has(compositeKey)) {
-        throw new BadRequestException("Existem views duplicadas no menu do grupo.");
-      }
-
-      uniqueViews.add(compositeKey);
-    }
-  }
-
-  private async resolveRoleApplicationAccesses(payload: UpsertRoleInput) {
-    const viewToApplicationName: Partial<Record<string, string>> = {
-      "content-list": "Conteúdo",
-      "content-editor": "Conteúdo",
-      "sections-tree": "Seção",
-      "section-editor": "Seção",
-      masks: "Máscara",
-      templates: "Templates",
-      elements: "Blocos de Conteúdo",
-      permissions: "Permissões",
-      groups: "Grupos",
-      users: "Usuários",
-      applications: "Aplicativos",
-      emails: "Email",
-      statistics: "Estatísticas",
-      newsletter: "Newsletter"
-    };
-
-    const requestedApplicationNames = new Set<string>();
-
-    for (const menuAccess of payload.menuAccesses ?? []) {
-      const applicationName = viewToApplicationName[menuAccess.viewKey];
-
-      if (applicationName) {
-        requestedApplicationNames.add(applicationName);
-      }
-    }
-
-    if ((payload.contentTypeIds ?? []).length > 0) {
-      requestedApplicationNames.add("Máscara");
-    }
-
-    if ((payload.sectionIds ?? []).length > 0) {
-      requestedApplicationNames.add("Seção");
-    }
-
-    if (requestedApplicationNames.size === 0) {
-      return [];
-    }
-
-    const applications = await this.prisma.legacyApplication.findMany({
-      where: {
-        name: {
-          in: Array.from(requestedApplicationNames)
-        }
-      }
-    });
-
-    return applications.map((application: (typeof applications)[number]) => ({
-      appId: application.id,
-      canCreate: true,
-      canUpdate: true,
-      canDelete: true,
-      canAccess: true
-    }));
-  }
-
-  private toSlug(value: string) {
-    return value
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
   }
 }

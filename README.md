@@ -36,6 +36,7 @@ abbatech/
 
 ```bash
 cp .env.example .env
+npm install
 docker compose up --build
 ```
 
@@ -49,11 +50,22 @@ Servicos:
 
 ## Acesso inicial do MVP
 
-- Refresh CMS: `http://localhost:3001`
+- Refresh CMS: `http://localhost:3101`
 - E-mail inicial: `admin@abbatech.local`
 - Senha inicial: `Refresh123!`
 
 Ao subir o ambiente, a API aplica as migrations e executa o seed inicial automaticamente.
+
+## Qualidade
+
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm run check
+```
+
+O repositório possui esteira local e CI para `typecheck`, lint, testes e build.
 
 ## Escopo desta primeira reconstrucao
 
