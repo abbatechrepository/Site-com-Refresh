@@ -28,7 +28,7 @@ export const newsletterRecipients = [
 ] as const;
 
 export const launchCampaign = {
-  name: "Lancamento do portal MVP",
+  name: "Lancamento da plataforma Abbatech",
   subject: "Novo portal Abbatech no ar",
   senderName: "Equipe Abbatech",
   senderEmail: "noreply@abbatech.local",

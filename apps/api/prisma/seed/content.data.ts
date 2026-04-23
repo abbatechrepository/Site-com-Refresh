@@ -145,7 +145,7 @@ export const contents: SeedContent[] = [
   {
     title: "Nova plataforma Abbatech",
     slug: "nova-plataforma-abbatech",
-    excerpt: "O MVP do novo portal ja esta operando com API, CMS e publicacao inicial.",
+    excerpt: "A plataforma Abbatech opera com API, CMS e publicacao editorial integrada.",
     body: [
       "A Abbatech agora conta com uma base moderna separando portal, CMS e API.",
       "Este conteudo inicial foi criado automaticamente para validar o fluxo editorial.",
@@ -161,8 +161,8 @@ export const contents: SeedContent[] = [
     slug: "estrutura-refresh-time-editorial",
     excerpt: "Uma visao rapida do fluxo entre autenticacao, gestao de secoes e publicacao de conteudos.",
     body: [
-      "O Refresh foi desenhado para separar operacao editorial, API e experiencia publica sem carregar as limitacoes do legado.",
-      "No MVP atual, a equipe consegue autenticar, cadastrar secoes, editar publicacoes e validar o reflexo imediato no portal.",
+      "O Refresh foi desenhado para separar operacao editorial, API e experiencia publica com uma base modular.",
+      "No ambiente atual, a equipe consegue autenticar, cadastrar secoes, editar publicacoes e validar o reflexo imediato no portal.",
       "Esse desenho reduz acoplamento, facilita evolucao do front e cria uma base mais segura para futuros modulos."
     ],
     sectionSlug: "noticias",
@@ -201,9 +201,9 @@ export const contents: SeedContent[] = [
   {
     title: "Caso de modernizacao de CMS e portal",
     slug: "caso-modernizacao-cms-portal",
-    excerpt: "Uma entrega focada em separar legado, API e camada de experiencia sem interromper a operacao.",
+    excerpt: "Uma entrega focada em organizar API e camada de experiencia com continuidade operacional.",
     body: [
-      "Neste caso, o objetivo era reconstruir a base sem depender diretamente do codigo legado.",
+      "Neste caso, o objetivo era estruturar a base com separacao clara entre dominios e interfaces.",
       "A solucao envolveu um CMS administrativo novo, API centralizada, mapeamento de dominio e infraestrutura preparada para evolucao.",
       "O resultado e uma fundacao mais segura para SEO, publicacao e governanca editorial."
     ],
@@ -215,7 +215,7 @@ export const contents: SeedContent[] = [
   {
     title: "Guia rapido do portal e do CMS",
     slug: "guia-rapido-portal-cms",
-    excerpt: "Documento inicial para orientar demonstracao interna e validacao do MVP.",
+    excerpt: "Documento inicial para orientar demonstracao interna e validacao da plataforma.",
     body: [
       "Use o Refresh para entrar com o usuario seedado, cadastrar secoes e criar novos conteudos.",
       "O portal consome automaticamente os conteudos publicados e os apresenta na home e na pagina de detalhe.",
@@ -223,7 +223,7 @@ export const contents: SeedContent[] = [
     ],
     sectionSlug: "documentos",
     contentTypeSlug: "mascara-documental",
-    seoDescription: "Guia inicial de uso do portal e do CMS Refresh no MVP.",
+    seoDescription: "Guia inicial de uso do portal e do CMS Refresh.",
     keywords: "guia, portal, cms, mvp"
   }
 ];

@@ -33,7 +33,7 @@ export const permissions = [
 export const roleDefinitions: readonly RoleDefinition[] = [
   {
     name: "Administrador",
-    description: "Acesso total ao MVP",
+    description: "Acesso total a plataforma",
     functionName: "Administrador",
     menuAccesses: [
       { topMenu: "administration", viewKey: "permissions" },

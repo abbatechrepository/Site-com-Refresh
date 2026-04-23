@@ -1,6 +1,6 @@
 # Abbatech
 
-Reconstrucao do legado em nova stack com:
+Plataforma em monorepo com:
 
 - `portal`: site publico em Next.js
 - `refresh`: CMS em Next.js
@@ -48,7 +48,7 @@ Servicos:
 - Mailpit: `http://localhost:8025`
 - MinIO Console: `http://localhost:9001`
 
-## Acesso inicial do MVP
+## Acesso inicial
 
 - Refresh CMS: `http://localhost:3101`
 - E-mail inicial: `admin@abbatech.local`
@@ -67,15 +67,15 @@ npm run check
 
 O repositório possui esteira local e CI para `typecheck`, lint, testes e build.
 
-## Escopo desta primeira reconstrucao
+## Escopo atual
 
 - Monorepo pronto para evolucao
-- API modular baseada no dominio legado
+- API modular baseada no dominio da plataforma
 - Portal e CMS com App Router e Tailwind
-- Schema inicial que preserva a logica conceitual de secoes, conteudos, templates, SEO, usuarios, papeis, newsletter e auditoria
+- Schema inicial com suporte a secoes, conteudos, templates, SEO, usuarios, papeis, newsletter e auditoria
 - Infra local e produtiva com Docker Compose e artefato de Dokploy
 
 ## Observacoes
 
-- O codigo legado continua sendo a fonte funcional de referencia.
-- O schema novo preserva a estrutura conceitual, mas nao replica cegamente tecnicas antigas como `seq`, `longblob` para imagens e templates HTML executados sem controle.
+- O projeto esta organizado para evolucao incremental com separacao clara entre portal, CMS e API.
+- O schema prioriza governanca, seguranca e consistencia operacional.
