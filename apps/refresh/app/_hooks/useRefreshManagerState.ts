@@ -73,6 +73,7 @@ export function useRefreshManagerState() {
   const [elementForm, setElementForm] = useState<ElementFormState>(emptyElementForm);
   const [systemEmailForm, setSystemEmailForm] = useState<SystemEmailFormState>(emptySystemEmailForm);
   const [highlightedUserId, setHighlightedUserId] = useState("");
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [view, setView] = useState<ViewKey>("content-list");
   const [topMenu, setTopMenu] = useState<TopMenuKey>("content");
   const [selectedProfileId, setSelectedProfileId] = useState("");
@@ -124,6 +125,8 @@ export function useRefreshManagerState() {
     setSystemEmailForm,
     highlightedUserId,
     setHighlightedUserId,
+    selectedUserIds,
+    setSelectedUserIds,
     view,
     setView,
     topMenu,

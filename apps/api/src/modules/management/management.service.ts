@@ -390,10 +390,9 @@ export class ManagementService {
     });
 
     const legacyStatus = payload.status?.trim() || "Novo";
-    const isActive =
-      payload.isActive ?? !["Inativo", "Excluído"].includes(legacyStatus);
+    const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
 
-    const passwordHash = await hash(payload.password ?? "Refresh123!");
+    const passwordHash = await hash(payload.password ?? "123456");
 
     return this.prisma.user.create({
       data: {
@@ -465,8 +464,11 @@ export class ManagementService {
 
     const legacyStatus =
       payload.status?.trim() || current.legacyStatus || "Novo";
-    const isActive =
-      payload.isActive ?? !["Inativo", "Excluído"].includes(legacyStatus);
+    const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
+    const passwordHash =
+      current.passwordHash === "LDAP" || !payload.password
+        ? undefined
+        : await hash(payload.password);
 
     return this.prisma.user.update({
       where: { id },
@@ -496,7 +498,7 @@ export class ManagementService {
           payload.forcePasswordChange ??
           current.forcePasswordChange ??
           false,
-        passwordHash: payload.password ? await hash(payload.password) : undefined,
+        passwordHash,
         isActive,
         isSuperAdmin: payload.isSuperAdmin ?? current.isSuperAdmin,
         roles: {

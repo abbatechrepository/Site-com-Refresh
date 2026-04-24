@@ -16,12 +16,56 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     selectedUserPermissionLabels,
     selectedUserAppAccesses,
     sortedUsers,
+    selectedUserIds,
+    setSelectedUserIds,
     editUser,
     management,
     setTopMenu,
     setView,
-    removeEntity
+    removeUsers
   } = manager;
+
+  const allVisibleUserIds = sortedUsers.map((managedUser) => managedUser.id);
+  const allVisibleUsersSelected =
+    allVisibleUserIds.length > 0 && allVisibleUserIds.every((userId) => selectedUserIds.includes(userId));
+
+  function toggleAllVisibleUsers() {
+    setSelectedUserIds((current) => {
+      if (allVisibleUsersSelected) {
+        return current.filter((userId) => !allVisibleUserIds.includes(userId));
+      }
+
+      return Array.from(new Set([...current, ...allVisibleUserIds]));
+    });
+  }
+
+  function confirmRemoveUsers(userIds: string[]) {
+    if (userIds.length === 0) {
+      void removeUsers([]);
+      return;
+    }
+
+    if (window.confirm("Você tem certeza que deseja excluir este registro?")) {
+      void removeUsers(userIds);
+    }
+  }
+
+  function getUserRowClassName(managedUser: (typeof sortedUsers)[number]) {
+    if (managedUser.id === highlightedUserId) {
+      return "bg-[#fff8d9]";
+    }
+
+    if (managedUser.status === "Inativo") {
+      return "bg-[#fee2d8]/55";
+    }
+
+    if (managedUser.status === "Novo") {
+      return "bg-[#eeffdd]/70";
+    }
+
+    return undefined;
+  }
+
     if (view === "users") {
       return (
         <section className="space-y-6">
@@ -47,6 +91,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 <input
                   className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, name: event.target.value }))}
+                  required
                   value={userForm.name}
                 />
               </div>
@@ -55,6 +100,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 <input
                   className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, email: event.target.value }))}
+                  required
+                  type="email"
                   value={userForm.email}
                 />
               </div>
@@ -63,6 +110,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 <input
                   className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, username: event.target.value }))}
+                  required
                   value={userForm.username}
                 />
               </div>
@@ -85,11 +133,27 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div>
-                <label className="admin-label">Senha</label>
+                <label className="admin-label">Senha (padrão 123456)</label>
                 <input
                   className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, password: event.target.value }))}
+                  minLength={6}
+                  required={!userForm.id}
+                  type="password"
                   value={userForm.password}
+                />
+              </div>
+              <div>
+                <label className="admin-label">Confirmação</label>
+                <input
+                  className="admin-input"
+                  onChange={(event) =>
+                    setUserForm((current) => ({ ...current, passwordConfirmation: event.target.value }))
+                  }
+                  minLength={6}
+                  required={!userForm.id}
+                  type="password"
+                  value={userForm.passwordConfirmation}
                 />
               </div>
               <div>
@@ -258,7 +322,17 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               <label className="flex items-center gap-2 text-[14px]">
                 <input
                   checked={userForm.isActive}
-                  onChange={(event) => setUserForm((current) => ({ ...current, isActive: event.target.checked }))}
+                  onChange={(event) =>
+                    setUserForm((current) => ({
+                      ...current,
+                      isActive: event.target.checked,
+                      status: event.target.checked
+                        ? ["Inativo", "Excluído"].includes(current.status)
+                          ? "Ativo"
+                          : current.status
+                        : "Inativo"
+                    }))
+                  }
                   type="checkbox"
                 />
                 Usuário ativo
@@ -383,12 +457,25 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
           </form>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-[13px] text-[#666]">
+              {selectedUserIds.length > 0 ? `${selectedUserIds.length} selecionado(s)` : `${sortedUsers.length} usuário(s)`}
+            </div>
+            <ActionButton disabled={selectedUserIds.length === 0} onClick={() => confirmRemoveUsers(selectedUserIds)} tone="red">
+              Excluir selecionados
+            </ActionButton>
+          </div>
           <div className="overflow-x-auto border border-[#d8d8d8]">
             <table className="admin-table min-w-full">
               <thead>
                 <tr>
                   <th className="w-[40px]">
-                    <input type="checkbox" />
+                    <input
+                      aria-label="Selecionar todos os usuários"
+                      checked={allVisibleUsersSelected}
+                      onChange={toggleAllVisibleUsers}
+                      type="checkbox"
+                    />
                   </th>
                   <th className="w-[70px]">Id</th>
                   <th>Nome/Município</th>
@@ -402,9 +489,16 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </thead>
               <tbody>
                 {sortedUsers.map((managedUser) => (
-                  <tr className={managedUser.id === highlightedUserId ? "bg-[#fff8d9]" : undefined} key={managedUser.id}>
+                  <tr className={getUserRowClassName(managedUser)} key={managedUser.id}>
                     <td>
-                      <input type="checkbox" />
+                      <input
+                        aria-label={`Selecionar ${managedUser.name}`}
+                        checked={selectedUserIds.includes(managedUser.id)}
+                        onChange={() =>
+                          setSelectedUserIds((current) => toggleItem(current, managedUser.id))
+                        }
+                        type="checkbox"
+                      />
                     </td>
                     <td>{displayRecordCode(managedUser.legacyId, managedUser.id)}</td>
                     <td>
@@ -423,7 +517,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                         <button className="text-left text-[#0c67ad] hover:underline" onClick={() => editUser(managedUser)} type="button">
                           Editar
                         </button>
-                        <button className="text-left text-[#c4473c] hover:underline" onClick={() => removeEntity(`/management/users/${managedUser.id}`, "Usuário excluído com sucesso.")} type="button">
+                        <button className="text-left text-[#c4473c] hover:underline" onClick={() => confirmRemoveUsers([managedUser.id])} type="button">
                           Excluir
                         </button>
                       </div>

@@ -305,8 +305,52 @@ export function useRefreshManagerMutations(
     state.setSuccess("");
 
     try {
-      const normalizedEmail = normalizeIdentityValue(state.userForm.email);
-      const normalizedUsername = normalizeIdentityValue(state.userForm.username);
+      const trimmedName = state.userForm.name.trim();
+      const trimmedEmail = state.userForm.email.trim();
+      const trimmedUsername = state.userForm.username.trim();
+      const shouldValidatePassword =
+        !state.userForm.id || Boolean(state.userForm.password) || Boolean(state.userForm.passwordConfirmation);
+
+      if (!trimmedName) {
+        state.setError("Você precisa informar o nome.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (!trimmedEmail) {
+        state.setError("Você precisa informar o e-mail.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (!trimmedUsername) {
+        state.setError("Você precisa informar o username.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (shouldValidatePassword) {
+        if (!state.userForm.password) {
+          state.setError("Você precisa informar a senha.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+
+        if (state.userForm.password !== state.userForm.passwordConfirmation) {
+          state.setError("Senha informada não confere.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+
+        if (state.userForm.password.length < 6) {
+          state.setError("A senha deve ter no mínimo seis caracteres.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+      }
+
+      const normalizedEmail = normalizeIdentityValue(trimmedEmail);
+      const normalizedUsername = normalizeIdentityValue(trimmedUsername);
       const normalizedCpf = state.userForm.cpf.replace(/\D/g, "");
       const conflictingUser = state.management.users.find((managedUser) => {
         if (state.userForm.id && managedUser.id === state.userForm.id) {
@@ -337,9 +381,9 @@ export function useRefreshManagerMutations(
         {
           method,
           body: JSON.stringify({
-            name: state.userForm.name,
-            email: state.userForm.email,
-            username: state.userForm.username || undefined,
+            name: trimmedName,
+            email: trimmedEmail,
+            username: trimmedUsername,
             cpf: state.userForm.cpf || undefined,
             cnh: state.userForm.cnh || undefined,
             status: state.userForm.status,
@@ -370,6 +414,7 @@ export function useRefreshManagerMutations(
 
       state.setHighlightedUserId(savedUser.id);
       state.setUserForm(emptyUserForm);
+      state.setSelectedUserIds([]);
       await session.bootstrap(state.token);
       state.setSuccess(state.userForm.id ? "Usuário atualizado com sucesso." : "Usuário criado com sucesso.");
     } catch (submitError) {
@@ -474,6 +519,30 @@ export function useRefreshManagerMutations(
     }
   }
 
+  async function removeUsers(userIds: string[]) {
+    state.setError("");
+    state.setSuccess("");
+
+    if (userIds.length === 0) {
+      state.setError("Selecione pelo menos um usuário para excluir.");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        userIds.map((userId) => apiRequest(`/management/users/${userId}`, { method: "DELETE" }, state.token))
+      );
+      state.setSelectedUserIds([]);
+      if (userIds.includes(state.highlightedUserId)) {
+        state.setHighlightedUserId("");
+      }
+      await session.bootstrap(state.token);
+      state.setSuccess(userIds.length === 1 ? "Usuário excluído com sucesso." : "Usuários excluídos com sucesso.");
+    } catch (removeError) {
+      state.setError(removeError instanceof Error ? removeError.message : "Falha ao excluir usuários.");
+    }
+  }
+
   return {
     handleSectionSubmit,
     handleContentSubmit,
@@ -486,6 +555,7 @@ export function useRefreshManagerMutations(
     handleUserSubmit,
     handleTemplateSubmit,
     handleElementSubmit,
-    removeEntity
+    removeEntity,
+    removeUsers
   };
 }

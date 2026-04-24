@@ -55,6 +55,10 @@ export class AuthService {
       throw new UnauthorizedException("Credenciais invalidas.");
     }
 
+    if (!user.isActive || ["Inativo", "Excluído"].includes(user.legacyStatus)) {
+      throw new UnauthorizedException("Usuario inativo.");
+    }
+
     const activeRole = this.resolveActiveRole(user.roles, roleId);
     const permissions = activeRole
       ? activeRole.permissions.map(

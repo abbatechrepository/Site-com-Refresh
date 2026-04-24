@@ -2,6 +2,7 @@ import { Type } from "class-transformer";
 import {
   IsArray,
   IsBoolean,
+  IsEmail,
   IsObject,
   IsOptional,
   IsString,
@@ -146,13 +147,13 @@ export class UpsertUserDto {
   name!: string;
 
   @IsString()
+  @IsEmail()
   @MinLength(3)
   email!: string;
 
-  @IsOptional()
   @IsString()
   @MinLength(3)
-  username?: string;
+  username!: string;
 
   @IsOptional()
   @IsString()
@@ -233,7 +234,7 @@ export class UpsertUserDto {
 
   @IsOptional()
   @IsString()
-  @MinLength(8)
+  @MinLength(6)
   password?: string;
 
   @IsOptional()
