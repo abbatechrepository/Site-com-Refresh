@@ -146,6 +146,7 @@ export function useRefreshManagerEditors(state: RefreshManagerState) {
       youtube: managedUser.youtube ?? "",
       forcePasswordChange: managedUser.forcePasswordChange ?? false,
       password: "",
+      passwordConfirmation: "",
       isActive: managedUser.isActive,
       isSuperAdmin: managedUser.isSuperAdmin,
       roleIds: managedUser.roles.map((role) => role.id)

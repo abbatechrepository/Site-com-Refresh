@@ -4,7 +4,6 @@ import { useMemo } from "react";
 
 import {
   buildSectionTree,
-  compareRecordNumbersDesc,
   getMenuConfig,
   getPermissionLabel
 } from "../_lib/utils";
@@ -63,16 +62,12 @@ export function useRefreshManagerDerived(state: RefreshManagerState) {
           return 1;
         }
 
-        if (typeof left.legacyId === "number" && typeof right.legacyId === "number") {
-          return right.legacyId - left.legacyId;
+        const byName = left.name.localeCompare(right.name, "pt-BR", { sensitivity: "base" });
+        if (byName !== 0) {
+          return byName;
         }
 
-        const byId = compareRecordNumbersDesc(left.id, right.id);
-        if (byId !== 0) {
-          return byId;
-        }
-
-        return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+        return (left.legacyId ?? 0) - (right.legacyId ?? 0);
       }),
     [state.highlightedUserId, state.management.users]
   );

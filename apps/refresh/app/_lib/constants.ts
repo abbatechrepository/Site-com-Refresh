@@ -105,7 +105,8 @@ export const emptyUserForm: UserFormState = {
   instagram: "",
   youtube: "",
   forcePasswordChange: false,
-  password: "",
+  password: "123456",
+  passwordConfirmation: "123456",
   isActive: true,
   isSuperAdmin: false,
   roleIds: []

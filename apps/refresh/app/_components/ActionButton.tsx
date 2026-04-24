@@ -4,6 +4,7 @@ import type { ButtonTone } from "../_lib/types";
 
 type ActionButtonProps = {
   children: ReactNode;
+  disabled?: boolean;
   tone?: ButtonTone;
   type?: "button" | "submit";
   onClick?: () => void;
@@ -11,6 +12,7 @@ type ActionButtonProps = {
 
 export function ActionButton({
   children,
+  disabled = false,
   tone = "blue",
   type = "button",
   onClick
@@ -24,7 +26,8 @@ export function ActionButton({
 
   return (
     <button
-      className={`rounded-[10px] border border-white/10 px-8 py-2 text-sm font-semibold tracking-[0.01em] text-white shadow-[0_12px_28px_rgba(15,33,57,0.16)] transition ${toneClass}`}
+      className={`rounded-[10px] border border-white/10 px-8 py-2 text-sm font-semibold tracking-[0.01em] text-white shadow-[0_12px_28px_rgba(15,33,57,0.16)] transition ${toneClass} disabled:cursor-not-allowed disabled:opacity-55`}
+      disabled={disabled}
       onClick={onClick}
       type={type}
     >

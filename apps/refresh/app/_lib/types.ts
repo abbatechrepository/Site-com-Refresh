@@ -424,6 +424,7 @@ export type UserFormState = {
   youtube: string;
   forcePasswordChange: boolean;
   password: string;
+  passwordConfirmation: string;
   isActive: boolean;
   isSuperAdmin: boolean;
   roleIds: string[];

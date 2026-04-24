@@ -32,6 +32,7 @@ export function RefreshLogin({
               height={72}
               priority
               src="/brand/logov2.png"
+              unoptimized
               width={100}
             />
             <h1 className="text-[50px] font-bold uppercase leading-none tracking-[0.02em] bg-[linear-gradient(135deg,#13203a_0%,#18365c_54%,#1f4b78_100%)] bg-clip-text text-transparent">
