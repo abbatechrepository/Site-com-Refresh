@@ -15,4 +15,4 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 COPY --from=base /app /app
 EXPOSE 3333
-CMD ["sh", "-c", "npm run prisma:generate -w @abbatech/api && until npm run prisma:migrate -w @abbatech/api; do echo 'Aguardando MySQL...'; sleep 5; done; node apps/api/dist/src/main.js"]
+CMD ["sh", "-c", "npm run prisma:generate -w @abbatech/api && npx prisma db push --schema=apps/api/prisma/schema.prisma && npm run prisma:seed -w @abbatech/api && node apps/api/dist/src/main.js"]
