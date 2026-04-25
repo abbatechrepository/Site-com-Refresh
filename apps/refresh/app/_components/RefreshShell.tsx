@@ -31,7 +31,7 @@ export function RefreshShell({
                         alt="Abbatech"
                         height={72}
                         priority
-                        src="/brand/logov2.png"
+                        src="/abbatech/refresh/brand/logov2.png"
                         unoptimized
                         width={100}
                       />

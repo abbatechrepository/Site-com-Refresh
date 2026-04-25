@@ -52,13 +52,13 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
             ) : null}
             <div className="grid gap-4 lg:grid-cols-[1fr_2fr_auto]">
               <div>
-                <label className="admin-label">Código</label>
+                <label className="admin-label">Código interno</label>
                 <input
                   className="admin-input"
                   onChange={(event) =>
                     setPermissionCodeForm((current) => ({ ...current, code: event.target.value }))
                   }
-                  placeholder="modulo.acao"
+                  placeholder="exemplo: usuarios.ler"
                   value={permissionCodeForm.code}
                 />
               </div>
@@ -85,7 +85,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               <thead>
                 <tr>
                   <th className="w-[90px]">Id</th>
-                  <th>Código</th>
+                  <th>Permissão</th>
                   <th>Descrição</th>
                   <th>Perfis</th>
                   <th className="w-[90px]">Ação</th>
@@ -101,7 +101,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                         onClick={() => editPermissionCode(permission)}
                         type="button"
                       >
-                        {permission.code}
+                        {getPermissionLabel(permission.code)}
                       </button>
                     </td>
                     <td>{permission.description ?? ""}</td>

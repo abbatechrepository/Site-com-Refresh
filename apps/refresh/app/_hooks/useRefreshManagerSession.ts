@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect } from "react";
 
 import { emptyManagementBootstrap } from "../_lib/constants";
 import { apiRequest, safeApiRequest } from "../_lib/api";
-import { getDefaultTopMenu, getDefaultView, getMenuConfig, getRoleKind } from "../_lib/utils";
+import { getDefaultNavigation, getMenuConfig } from "../_lib/utils";
 import type { Content, EditorMeta, LoggedUser, ManagementBootstrap, Section } from "../_lib/types";
 import type { useRefreshManagerState } from "./useRefreshManagerState";
 
@@ -57,11 +57,8 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
 
         const firstProfileId = profile.activeRoleId ?? profile.roles[0]?.id ?? "";
         const activeProfile = profile.roles.find((role) => role.id === firstProfileId) ?? profile.roles[0] ?? null;
-        const kind = getRoleKind(activeProfile?.name);
         const initialMenuConfig = getMenuConfig(activeProfile);
-        const defaultTopMenu = initialMenuConfig.topMenus[0]?.key ?? getDefaultTopMenu(kind);
-        const defaultView =
-          initialMenuConfig.groups[defaultTopMenu]?.[0]?.key ?? getDefaultView(kind, activeProfile, initialMenuConfig);
+        const defaultNavigation = getDefaultNavigation(activeProfile, initialMenuConfig);
 
         setUser(profile);
         setSelectedProfileId(firstProfileId);
@@ -72,8 +69,8 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
 
         const shouldResetShell = selectedProfileId !== firstProfileId || !selectedProfileId;
         if (shouldResetShell) {
-          setTopMenu(defaultTopMenu);
-          setView(defaultView);
+          setTopMenu(defaultNavigation.topMenu);
+          setView(defaultNavigation.view);
         }
 
         setExpandedTopMenu(null);
@@ -135,16 +132,12 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
 
     if (!selectedStillExists) {
       const fallbackProfile = user.roles[0];
-      const kind = getRoleKind(fallbackProfile?.name);
       const fallbackMenuConfig = getMenuConfig(fallbackProfile ?? null);
-      const defaultTopMenu = fallbackMenuConfig.topMenus[0]?.key ?? getDefaultTopMenu(kind);
-      const defaultView =
-        fallbackMenuConfig.groups[defaultTopMenu]?.[0]?.key ??
-        getDefaultView(kind, fallbackProfile ?? null, fallbackMenuConfig);
+      const defaultNavigation = getDefaultNavigation(fallbackProfile ?? null, fallbackMenuConfig);
 
       setSelectedProfileId(fallbackProfile?.id ?? "");
-      setTopMenu(defaultTopMenu);
-      setView(defaultView);
+      setTopMenu(defaultNavigation.topMenu);
+      setView(defaultNavigation.view);
     }
   }, [selectedProfileId, setSelectedProfileId, setTopMenu, setView, user]);
 
@@ -184,10 +177,7 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
 
     try {
       const nextMenuConfig = getMenuConfig(nextProfile);
-      const nextKind = getRoleKind(nextProfile.name);
-      const nextTopMenu = nextMenuConfig.topMenus[0]?.key ?? getDefaultTopMenu(nextKind);
-      const nextView =
-        nextMenuConfig.groups[nextTopMenu]?.[0]?.key ?? getDefaultView(nextKind, nextProfile, nextMenuConfig);
+      const nextNavigation = getDefaultNavigation(nextProfile, nextMenuConfig);
 
       const response = await apiRequest<{ accessToken: string }>(
         "/auth/switch-profile",
@@ -201,8 +191,8 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
       window.localStorage.setItem("refresh_access_token", response.accessToken);
       setToken(response.accessToken);
       setSelectedProfileId(profileId);
-      setTopMenu(nextTopMenu);
-      setView(nextView);
+      setTopMenu(nextNavigation.topMenu);
+      setView(nextNavigation.view);
       setProfileMenuOpen(false);
       setExpandedTopMenu(null);
       setSuccess(`Perfil ativo: ${nextProfile.name}`);

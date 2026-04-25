@@ -35,7 +35,15 @@ export function displayRecordCode(referenceNumber?: number | null, id?: string) 
     return String(referenceNumber);
   }
 
-  return id ? id.slice(-8).toUpperCase() : "--";
+  if (!id) {
+    return "--";
+  }
+
+  const numericFallback = Array.from(id).reduce((accumulator, character) => {
+    return (accumulator * 31 + character.charCodeAt(0)) % 90_000_000;
+  }, 0);
+
+  return String(numericFallback + 10_000_000);
 }
 
 export function buildDuplicateUserMessage(
@@ -189,6 +197,75 @@ export function getDefaultTopMenu(kind: "admin" | "developer" | "publisher"): To
   return "content";
 }
 
+const viewPermissionRequirements: Partial<Record<ViewKey, string[]>> = {
+  "content-list": ["contents.read"],
+  "content-editor": ["contents.read"],
+  "sections-tree": ["sections.read"],
+  "section-editor": ["sections.read"],
+  templates: ["templates.read"],
+  elements: ["elements.read"],
+  users: ["users.read"],
+  groups: ["roles.read"],
+  permissions: ["permissions.read"],
+  applications: ["applications.read"],
+  emails: ["emails.read"],
+  newsletter: ["newsletters.read"],
+  statistics: ["statistics.read"]
+};
+
+function hasPermissionForView(role: LoggedUser["roles"][number], viewKey: ViewKey) {
+  const requiredPermissions = viewPermissionRequirements[viewKey] ?? [];
+  return requiredPermissions.every((permission) => role.permissions.includes(permission));
+}
+
+function hasApplicationAccessForView(role: LoggedUser["roles"][number], viewKey: ViewKey) {
+  if (role.appAccesses.length === 0) {
+    return true;
+  }
+
+  return role.appAccesses.some((access) => {
+    return access.canAccess && resolveApplicationView(access.name, access.link) === viewKey;
+  });
+}
+
+function canShowView(role: LoggedUser["roles"][number], viewKey: ViewKey) {
+  return hasPermissionForView(role, viewKey) && hasApplicationAccessForView(role, viewKey);
+}
+
+export function getDefaultNavigation(
+  role: LoggedUser["roles"][number] | null,
+  menuConfig: MenuConfig
+) {
+  const kind = getRoleKind(role?.name);
+  const desiredView = getDefaultView(kind, role, menuConfig);
+  const desiredTopMenu = (Object.entries(menuConfig.groups) as Array<[TopMenuKey, MenuConfig["groups"][TopMenuKey]]>)
+    .find(([, items]) => items.some((item) => item.key === desiredView))?.[0];
+
+  if (desiredTopMenu) {
+    return {
+      topMenu: desiredTopMenu,
+      view: desiredView
+    };
+  }
+
+  const preferredTopMenu = getDefaultTopMenu(kind);
+  const preferredItems = menuConfig.groups[preferredTopMenu] ?? [];
+
+  if (preferredItems.length > 0) {
+    return {
+      topMenu: preferredTopMenu,
+      view: preferredItems[0].key
+    };
+  }
+
+  const fallbackTopMenu = menuConfig.topMenus[0]?.key ?? preferredTopMenu;
+
+  return {
+    topMenu: fallbackTopMenu,
+    view: menuConfig.groups[fallbackTopMenu]?.[0]?.key ?? desiredView
+  };
+}
+
 export function getMenuConfig(role: LoggedUser["roles"][number] | null): MenuConfig {
   if (!role) {
     const kind = getRoleKind("");
@@ -208,6 +285,10 @@ export function getMenuConfig(role: LoggedUser["roles"][number] | null): MenuCon
 
   if (role.menuAccesses.length > 0) {
     for (const access of role.menuAccesses) {
+      if (!canShowView(role, access.viewKey)) {
+        continue;
+      }
+
       const label = getBreadcrumbLabel(access.viewKey);
 
       if (!groups[access.topMenu].some((item) => item.key === access.viewKey)) {
@@ -224,7 +305,7 @@ export function getMenuConfig(role: LoggedUser["roles"][number] | null): MenuCon
       }
 
       const viewKey = resolveApplicationView(access.name, access.link);
-      if (!viewKey) {
+      if (!viewKey || !hasPermissionForView(role, viewKey)) {
         continue;
       }
 

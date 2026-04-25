@@ -179,7 +179,7 @@ export class AuthService {
       isActive: user.isActive,
       lastLoginAt: user.lastLoginAt,
       permissions: authenticatedUser.permissions,
-      activeRoleId: authenticatedUser.roleId ?? user.roles[0]?.role.id ?? null,
+      activeRoleId: authenticatedUser.roleId ?? this.resolveActiveRole(user.roles)?.id ?? null,
       roles: user.roles.map((entry: (typeof user.roles)[number]) => ({
         id: entry.role.id,
         name: entry.role.name,
@@ -208,6 +208,8 @@ export class AuthService {
     roles: Array<{
       role: {
         id: string;
+        name?: string;
+        functionName?: string | null;
         permissions: Array<{
           permission: {
             code: string;
@@ -225,13 +227,35 @@ export class AuthService {
       return null;
     }
 
-    const match = roleId ? roles.find((entry) => entry.role.id === roleId) : roles[0];
+    const match = roleId ? roles.find((entry) => entry.role.id === roleId) : this.getDefaultRoleEntry(roles);
 
     if (!match) {
       throw new UnauthorizedException("Perfil solicitado nao pertence ao usuario.");
     }
 
     return match.role;
+  }
+
+  private getDefaultRoleEntry<
+    TRoleEntry extends {
+      role: {
+        name?: string;
+        functionName?: string | null;
+      };
+    }
+  >(roles: TRoleEntry[]) {
+    return (
+      roles.find((entry) => this.isRoleKind(entry.role, "administrador")) ??
+      roles.find((entry) => this.isRoleKind(entry.role, "desenvolvedor")) ??
+      roles[0]
+    );
+  }
+
+  private isRoleKind(role: { name?: string; functionName?: string | null }, keyword: string) {
+    const normalizedName = role.name?.toLowerCase() ?? "";
+    const normalizedFunctionName = role.functionName?.toLowerCase() ?? "";
+
+    return normalizedName.includes(keyword) || normalizedFunctionName.includes(keyword);
   }
 
   private async verifyStoredPassword(storedPasswordHash: string, password: string) {

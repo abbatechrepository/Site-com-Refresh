@@ -6,6 +6,15 @@ import { bootstrapAdminRole, bootstrapApplications, bootstrapPermissions } from 
 type PermissionRecord = Awaited<ReturnType<PrismaClient["permission"]["findMany"]>>[number];
 type RoleRecord = Awaited<ReturnType<PrismaClient["role"]["upsert"]>>;
 type ApplicationRecord = Awaited<ReturnType<PrismaClient["legacyApplication"]["upsert"]>>;
+type LegacyModelDelegate = {
+  aggregate(args: { _max: { legacyId: true } }): Promise<{ _max: { legacyId: number | null } }>;
+  findMany(args: {
+    where: { legacyId: null };
+    select: { id: true };
+    orderBy: { id: "asc" };
+  }): Promise<Array<{ id: string }>>;
+  update(args: { where: { id: string }; data: { legacyId: number } }): Promise<unknown>;
+};
 
 async function seedPermissions(prisma: PrismaClient) {
   for (const permission of bootstrapPermissions) {
@@ -44,6 +53,13 @@ async function seedAdminRole(
     }
   });
 
+  const [permissionCount, menuAccessCount] = await Promise.all([
+    prisma.rolePermission.count({ where: { roleId: role.id } }),
+    prisma.roleMenuAccess.count({ where: { roleId: role.id } })
+  ]);
+  const shouldSeedPermissions = resetMode || permissionCount === 0;
+  const shouldSeedMenus = resetMode || menuAccessCount === 0;
+
   if (resetMode) {
     await prisma.rolePermission.deleteMany({ where: { roleId: role.id } });
     await prisma.roleMenuAccess.deleteMany({ where: { roleId: role.id } });
@@ -52,44 +68,48 @@ async function seedAdminRole(
   const permissionCodes =
     bootstrapAdminRole.permissionCodes ?? Array.from(permissionByCode.values()).map((permission) => permission.code);
 
-  for (const permissionCode of permissionCodes) {
-    const permission = permissionByCode.get(permissionCode);
+  if (shouldSeedPermissions) {
+    for (const permissionCode of permissionCodes) {
+      const permission = permissionByCode.get(permissionCode);
 
-    if (!permission) {
-      continue;
-    }
+      if (!permission) {
+        continue;
+      }
 
-    await prisma.rolePermission.upsert({
-      where: {
-        roleId_permissionId: {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: role.id,
+            permissionId: permission.id
+          }
+        },
+        update: {},
+        create: {
           roleId: role.id,
           permissionId: permission.id
         }
-      },
-      update: {},
-      create: {
-        roleId: role.id,
-        permissionId: permission.id
-      }
-    });
+      });
+    }
   }
 
-  for (const menuAccess of bootstrapAdminRole.menuAccesses) {
-    await prisma.roleMenuAccess.upsert({
-      where: {
-        roleId_topMenu_viewKey: {
+  if (shouldSeedMenus) {
+    for (const menuAccess of bootstrapAdminRole.menuAccesses) {
+      await prisma.roleMenuAccess.upsert({
+        where: {
+          roleId_topMenu_viewKey: {
+            roleId: role.id,
+            topMenu: menuAccess.topMenu,
+            viewKey: menuAccess.viewKey
+          }
+        },
+        update: {},
+        create: {
           roleId: role.id,
           topMenu: menuAccess.topMenu,
           viewKey: menuAccess.viewKey
         }
-      },
-      update: {},
-      create: {
-        roleId: role.id,
-        topMenu: menuAccess.topMenu,
-        viewKey: menuAccess.viewKey
-      }
-    });
+      });
+    }
   }
 
   return role;
@@ -108,35 +128,37 @@ async function seedApplications(prisma: PrismaClient, adminRole: RoleRecord, res
     applicationMap.set(application.name, saved);
   }
 
+  const accessCount = await prisma.roleApplicationAccess.count({
+    where: { roleId: adminRole.id }
+  });
+  const shouldSeedAccesses = resetMode || accessCount === 0;
+
   if (resetMode) {
     await prisma.roleApplicationAccess.deleteMany({
       where: { roleId: adminRole.id }
     });
   }
 
-  for (const app of applicationMap.values()) {
-    await prisma.roleApplicationAccess.upsert({
-      where: {
-        roleId_appId: {
+  if (shouldSeedAccesses) {
+    for (const app of applicationMap.values()) {
+      await prisma.roleApplicationAccess.upsert({
+        where: {
+          roleId_appId: {
+            roleId: adminRole.id,
+            appId: app.id
+          }
+        },
+        update: {},
+        create: {
           roleId: adminRole.id,
-          appId: app.id
+          appId: app.id,
+          canCreate: app.name !== "Estatísticas",
+          canUpdate: true,
+          canDelete: true,
+          canAccess: true
         }
-      },
-      update: {
-        canCreate: app.name !== "Estatísticas",
-        canUpdate: true,
-        canDelete: true,
-        canAccess: true
-      },
-      create: {
-        roleId: adminRole.id,
-        appId: app.id,
-        canCreate: app.name !== "Estatísticas",
-        canUpdate: true,
-        canDelete: true,
-        canAccess: true
-      }
-    });
+      });
+    }
   }
 }
 
@@ -194,6 +216,48 @@ async function seedAdminUser(prisma: PrismaClient, adminRole: RoleRecord) {
   return user;
 }
 
+async function backfillLegacyIdsFor(model: LegacyModelDelegate) {
+  const aggregate = await model.aggregate({ _max: { legacyId: true } });
+  const records = await model.findMany({
+    where: { legacyId: null },
+    select: { id: true },
+    orderBy: { id: "asc" }
+  });
+  let nextLegacyId = (aggregate._max.legacyId ?? 0) + 1;
+
+  for (const record of records) {
+    await model.update({
+      where: { id: record.id },
+      data: { legacyId: nextLegacyId }
+    });
+    nextLegacyId += 1;
+  }
+}
+
+async function backfillLegacyIds(prisma: PrismaClient) {
+  const models = [
+    prisma.user,
+    prisma.role,
+    prisma.permission,
+    prisma.legacyApplication,
+    prisma.roleApplicationAccess,
+    prisma.section,
+    prisma.contentType,
+    prisma.systemEmail,
+    prisma.template,
+    prisma.element,
+    prisma.content,
+    prisma.newsletterGroup,
+    prisma.newsletterRecipient,
+    prisma.newsletterCampaign,
+    prisma.privacyRequest
+  ] as unknown as LegacyModelDelegate[];
+
+  for (const model of models) {
+    await backfillLegacyIdsFor(model);
+  }
+}
+
 export async function runBootstrapSeed(prisma: PrismaClient) {
   const resetMode = process.env.SEED_RESET === "true";
   const permissionByCode = await seedPermissions(prisma);
@@ -201,6 +265,7 @@ export async function runBootstrapSeed(prisma: PrismaClient) {
 
   await seedApplications(prisma, adminRole, resetMode);
   const adminUser = await seedAdminUser(prisma, adminRole);
+  await backfillLegacyIds(prisma);
 
   return {
     adminEmail: adminUser.email
