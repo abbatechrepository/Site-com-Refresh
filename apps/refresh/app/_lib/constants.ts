@@ -6,6 +6,10 @@ import type {
   ElementPreset,
   ManagementBootstrap,
   MenuItem,
+  NewsletterCampaignFormState,
+  NewsletterGroupFormState,
+  NewsletterRecipientFormState,
+  PermissionCodeFormState,
   PermissionFormState,
   RoleFormState,
   SectionFormState,
@@ -63,6 +67,11 @@ export const emptyPermissionForm: PermissionFormState = {
   canAccess: true
 };
 
+export const emptyPermissionCodeForm: PermissionCodeFormState = {
+  code: "",
+  description: ""
+};
+
 export const emptyApplicationForm: ApplicationFormState = {
   name: "",
   area: "",
@@ -104,9 +113,9 @@ export const emptyUserForm: UserFormState = {
   facebook: "",
   instagram: "",
   youtube: "",
-  forcePasswordChange: false,
-  password: "123456",
-  passwordConfirmation: "123456",
+  forcePasswordChange: true,
+  password: "",
+  passwordConfirmation: "",
   isActive: true,
   isSuperAdmin: false,
   roleIds: []
@@ -134,6 +143,32 @@ export const emptySystemEmailForm: SystemEmailFormState = {
   area: "",
   description: "",
   value: ""
+};
+
+export const emptyNewsletterGroupForm: NewsletterGroupFormState = {
+  name: "",
+  description: ""
+};
+
+export const emptyNewsletterRecipientForm: NewsletterRecipientFormState = {
+  email: "",
+  name: "",
+  groupId: "",
+  consentAt: "",
+  unsubscribedAt: ""
+};
+
+export const emptyNewsletterCampaignForm: NewsletterCampaignFormState = {
+  name: "",
+  subject: "",
+  senderName: "Equipe Abbatech",
+  senderEmail: process.env.NEXT_PUBLIC_NEWSLETTER_SENDER_EMAIL ?? "",
+  bodyHtml: "",
+  bodyText: "",
+  status: "draft",
+  scheduledAt: "",
+  sentAt: "",
+  recipientGroupId: ""
 };
 
 export const elementPresets: ElementPreset[] = [
@@ -218,6 +253,7 @@ export const emptyManagementBootstrap: ManagementBootstrap = {
   templates: [],
   elements: [],
   newsletterGroups: [],
+  newsletterRecipients: [],
   newsletterCampaigns: [],
   privacyRequests: []
 };

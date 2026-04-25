@@ -2,6 +2,7 @@
 
 import { ActionButton } from "../ActionButton";
 import {
+  emptyPermissionCodeForm,
   emptyPermissionForm,
   emptyRoleForm,
   menuGroups
@@ -13,6 +14,10 @@ import type { RefreshManager } from "./moduleTypes";
 export function AccessModules({ manager }: { manager: RefreshManager }) {
   const {
     view,
+    handlePermissionCodeSubmit,
+    permissionCodeForm,
+    setPermissionCodeForm,
+    editPermissionCode,
     handlePermissionSubmit,
     permissionForm,
     setPermissionForm,
@@ -32,6 +37,91 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
           <p className="text-[16px] leading-8 text-[#4b4b4b]">
             Configurações de permissões para acesso, inclusão, alteração e exclusão de registros nos aplicativos do Sistema.
           </p>
+          <form className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" onSubmit={handlePermissionCodeSubmit}>
+            {permissionCodeForm.id ? (
+              <div className="flex items-center justify-between border border-[#cfe3f3] bg-[#eef7fd] px-4 py-3 text-[14px] text-[#215d85]">
+                <span>Editando uma permissão do sistema.</span>
+                <button
+                  className="font-semibold text-[#0c67ad] hover:underline"
+                  onClick={() => setPermissionCodeForm(emptyPermissionCodeForm)}
+                  type="button"
+                >
+                  Cancelar edição
+                </button>
+              </div>
+            ) : null}
+            <div className="grid gap-4 lg:grid-cols-[1fr_2fr_auto]">
+              <div>
+                <label className="admin-label">Código</label>
+                <input
+                  className="admin-input"
+                  onChange={(event) =>
+                    setPermissionCodeForm((current) => ({ ...current, code: event.target.value }))
+                  }
+                  placeholder="modulo.acao"
+                  value={permissionCodeForm.code}
+                />
+              </div>
+              <div>
+                <label className="admin-label">Descrição</label>
+                <input
+                  className="admin-input"
+                  onChange={(event) =>
+                    setPermissionCodeForm((current) => ({ ...current, description: event.target.value }))
+                  }
+                  value={permissionCodeForm.description}
+                />
+              </div>
+              <div className="flex items-end gap-2">
+                <ActionButton tone="green" type="submit">
+                  {permissionCodeForm.id ? "Salvar" : "Incluir"}
+                </ActionButton>
+                <ActionButton onClick={() => setPermissionCodeForm(emptyPermissionCodeForm)}>Nova</ActionButton>
+              </div>
+            </div>
+          </form>
+          <div className="overflow-x-auto border border-[#d8d8d8]">
+            <table className="admin-table min-w-full">
+              <thead>
+                <tr>
+                  <th className="w-[90px]">Id</th>
+                  <th>Código</th>
+                  <th>Descrição</th>
+                  <th>Perfis</th>
+                  <th className="w-[90px]">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {management.permissions.map((permission) => (
+                  <tr key={permission.id}>
+                    <td>{displayRecordCode(permission.legacyId, permission.id)}</td>
+                    <td>
+                      <button
+                        className="text-[#0c67ad] hover:underline"
+                        onClick={() => editPermissionCode(permission)}
+                        type="button"
+                      >
+                        {permission.code}
+                      </button>
+                    </td>
+                    <td>{permission.description ?? ""}</td>
+                    <td>{permission.roles.map((role) => role.name).join(", ") || "--"}</td>
+                    <td>
+                      <button
+                        className="text-[#c4473c] hover:underline"
+                        onClick={() =>
+                          removeEntity(`/management/permissions/${permission.id}`, "Permissão excluída com sucesso.")
+                        }
+                        type="button"
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <form className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" onSubmit={handlePermissionSubmit}>
             {permissionForm.id ? (
               <div className="flex items-center justify-between border border-[#cfe3f3] bg-[#eef7fd] px-4 py-3 text-[14px] text-[#215d85]">

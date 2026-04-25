@@ -24,8 +24,16 @@ export const permissions = [
   { code: "roles.write", description: "Gerenciar grupos e perfis" },
   { code: "permissions.read", description: "Ler permissoes" },
   { code: "permissions.write", description: "Gerenciar permissoes" },
+  { code: "applications.read", description: "Ler aplicativos" },
+  { code: "applications.write", description: "Gerenciar aplicativos" },
+  { code: "emails.read", description: "Ler emails do sistema" },
+  { code: "emails.write", description: "Gerenciar emails do sistema" },
+  { code: "statistics.read", description: "Ler estatisticas" },
+  { code: "statistics.write", description: "Gerenciar estatisticas" },
   { code: "newsletters.read", description: "Ler campanhas" },
+  { code: "newsletters.write", description: "Gerenciar newsletters" },
   { code: "privacy.read", description: "Ler pedidos LGPD" },
+  { code: "privacy.write", description: "Gerenciar pedidos LGPD" },
   { code: "management.read", description: "Ler cadastros administrativos" },
   { code: "management.write", description: "Gerenciar cadastros administrativos" }
 ] as const;
@@ -79,7 +87,15 @@ export const roleDefinitions: readonly RoleDefinition[] = [
     name: "Publicador Geral",
     description: "Responsavel pela publicacao dos conteudos dinamicos e validacao da newsletter.",
     functionName: "Publicador",
-    permissionCodes: ["contents.read", "contents.write", "sections.read", "templates.read", "newsletters.read", "management.read"],
+    permissionCodes: [
+      "contents.read",
+      "contents.write",
+      "sections.read",
+      "templates.read",
+      "newsletters.read",
+      "newsletters.write",
+      "management.read"
+    ],
     menuAccesses: [
       { topMenu: "content", viewKey: "content-list" },
       { topMenu: "content", viewKey: "sections-tree" },
@@ -100,7 +116,7 @@ export const roleDefinitions: readonly RoleDefinition[] = [
     name: "Marketing",
     description: "Opera comunicacao, newsletters e leitura do painel",
     functionName: "Editor",
-    permissionCodes: ["contents.read", "templates.read", "newsletters.read", "management.read"],
+    permissionCodes: ["contents.read", "templates.read", "newsletters.read", "newsletters.write", "management.read"],
     menuAccesses: [
       { topMenu: "content", viewKey: "content-list" },
       { topMenu: "newsletter", viewKey: "newsletter" }
@@ -126,7 +142,8 @@ export const applicationDefinitions = [
   { name: "Usuários", area: "Administração", link: "/Manager/Usuarios.php", description: "Cadastro de usuários." },
   { name: "Email", area: "Sistema", link: "/Manager/Email.php", description: "E-mails utilizados pelo portal." },
   { name: "Aplicativos", area: "Sistema", link: "/Manager/Aplicativos.php", description: "Cadastro de aplicativos e áreas de menu." },
-  { name: "Estatísticas", area: "Administração", link: "/Manager/Estatistica.php", description: "Acessos por seção." }
+  { name: "Estatísticas", area: "Administração", link: "/Manager/Estatistica.php", description: "Acessos por seção." },
+  { name: "Newsletter", area: "Newsletter", link: "/Manager/Newsletter.php", description: "Grupos, destinatários e campanhas." }
 ] as const;
 
 export const roleAccessDefinitions = [
@@ -141,6 +158,7 @@ export const roleAccessDefinitions = [
   { role: "Administrador", app: "Email", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Administrador", app: "Aplicativos", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Administrador", app: "Estatísticas", canCreate: false, canUpdate: true, canDelete: true, canAccess: true },
+  { role: "Administrador", app: "Newsletter", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Desenvolvedor", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Desenvolvedor", app: "Seção", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Desenvolvedor", app: "Templates", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
@@ -148,7 +166,9 @@ export const roleAccessDefinitions = [
   { role: "Desenvolvedor", app: "Blocos de Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Publicador Geral", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: true, canAccess: true },
   { role: "Publicador Geral", app: "Seção", canCreate: true, canUpdate: true, canDelete: false, canAccess: true },
+  { role: "Publicador Geral", app: "Newsletter", canCreate: true, canUpdate: true, canDelete: false, canAccess: true },
   { role: "Editor", app: "Conteúdo", canCreate: true, canUpdate: true, canDelete: false, canAccess: true },
   { role: "Marketing", app: "Email", canCreate: false, canUpdate: true, canDelete: false, canAccess: true },
+  { role: "Marketing", app: "Newsletter", canCreate: true, canUpdate: true, canDelete: false, canAccess: true },
   { role: "LGPD", app: "Estatísticas", canCreate: false, canUpdate: true, canDelete: false, canAccess: true }
 ] as const;

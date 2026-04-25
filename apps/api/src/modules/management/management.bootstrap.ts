@@ -12,6 +12,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     templates,
     elements,
     newsletterGroups,
+    newsletterRecipients,
     newsletterCampaigns,
     privacyRequests
   ] = await Promise.all([
@@ -104,6 +105,17 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
         }
       },
       orderBy: [{ createdAt: "asc" }]
+    }),
+    prisma.newsletterRecipient.findMany({
+      include: {
+        group: true,
+        _count: {
+          select: {
+            dispatches: true
+          }
+        }
+      },
+      orderBy: [{ createdAt: "desc" }]
     }),
     prisma.newsletterCampaign.findMany({
       include: {
@@ -214,6 +226,18 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     templates,
     elements,
     newsletterGroups,
+    newsletterRecipients: newsletterRecipients.map((recipient: (typeof newsletterRecipients)[number]) => ({
+      id: recipient.id,
+      legacyId: recipient.legacyId,
+      email: recipient.email,
+      name: recipient.name,
+      groupId: recipient.groupId,
+      groupName: recipient.group.name,
+      consentAt: recipient.consentAt,
+      unsubscribedAt: recipient.unsubscribedAt,
+      createdAt: recipient.createdAt,
+      dispatchCount: recipient._count.dispatches
+    })),
     newsletterCampaigns,
     privacyRequests
   };

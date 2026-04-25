@@ -286,7 +286,14 @@ export type NewsletterCampaign = {
   legacyId?: number | null;
   name: string;
   subject: string;
+  senderName: string;
+  senderEmail: string;
+  bodyHtml: string;
+  bodyText: string | null;
   status: string;
+  scheduledAt: string | null;
+  sentAt: string | null;
+  recipientGroupId: string | null;
   recipientGroup: {
     id: string;
     name: string;
@@ -294,6 +301,19 @@ export type NewsletterCampaign = {
   _count: {
     dispatches: number;
   };
+};
+
+export type NewsletterRecipient = {
+  id: string;
+  legacyId?: number | null;
+  email: string;
+  name: string | null;
+  groupId: string;
+  groupName: string;
+  consentAt: string | null;
+  unsubscribedAt: string | null;
+  createdAt: string;
+  dispatchCount: number;
 };
 
 export type PrivacyRequest = {
@@ -323,6 +343,7 @@ export type ManagementBootstrap = {
   templates: Template[];
   elements: ManagedElement[];
   newsletterGroups: NewsletterGroup[];
+  newsletterRecipients: NewsletterRecipient[];
   newsletterCampaigns: NewsletterCampaign[];
   privacyRequests: PrivacyRequest[];
 };
@@ -376,6 +397,12 @@ export type PermissionFormState = {
   canUpdate: boolean;
   canDelete: boolean;
   canAccess: boolean;
+};
+
+export type PermissionCodeFormState = {
+  id?: string;
+  code: string;
+  description: string;
 };
 
 export type ApplicationFormState = {
@@ -455,6 +482,35 @@ export type SystemEmailFormState = {
   area: string;
   description: string;
   value: string;
+};
+
+export type NewsletterGroupFormState = {
+  id?: string;
+  name: string;
+  description: string;
+};
+
+export type NewsletterRecipientFormState = {
+  id?: string;
+  email: string;
+  name: string;
+  groupId: string;
+  consentAt: string;
+  unsubscribedAt: string;
+};
+
+export type NewsletterCampaignFormState = {
+  id?: string;
+  name: string;
+  subject: string;
+  senderName: string;
+  senderEmail: string;
+  bodyHtml: string;
+  bodyText: string;
+  status: string;
+  scheduledAt: string;
+  sentAt: string;
+  recipientGroupId: string;
 };
 
 export type ElementPreset = {

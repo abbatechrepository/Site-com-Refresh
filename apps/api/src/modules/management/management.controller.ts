@@ -6,7 +6,9 @@ import {
   UpsertApplicationDto,
   UpsertContentTypeDto,
   UpsertElementDto,
+  UpsertNewsletterCampaignDto,
   UpsertNewsletterGroupDto,
+  UpsertNewsletterRecipientDto,
   UpsertPermissionDto,
   UpsertRoleApplicationAccessDto,
   UpsertRoleDto,
@@ -172,15 +174,57 @@ export class ManagementController {
   }
 
   @Post("newsletter-groups")
-  @RequirePermissions("management.write")
+  @RequirePermissions("newsletters.write")
   createNewsletterGroup(@Body() body: UpsertNewsletterGroupDto) {
     return this.managementService.createNewsletterGroup(body);
   }
 
   @Patch("newsletter-groups/:id")
-  @RequirePermissions("management.write")
+  @RequirePermissions("newsletters.write")
   updateNewsletterGroup(@Param("id") id: string, @Body() body: UpsertNewsletterGroupDto) {
     return this.managementService.updateNewsletterGroup(id, body);
+  }
+
+  @Delete("newsletter-groups/:id")
+  @RequirePermissions("newsletters.write")
+  deleteNewsletterGroup(@Param("id") id: string) {
+    return this.managementService.deleteNewsletterGroup(id);
+  }
+
+  @Post("newsletter-recipients")
+  @RequirePermissions("newsletters.write")
+  createNewsletterRecipient(@Body() body: UpsertNewsletterRecipientDto) {
+    return this.managementService.createNewsletterRecipient(body);
+  }
+
+  @Patch("newsletter-recipients/:id")
+  @RequirePermissions("newsletters.write")
+  updateNewsletterRecipient(@Param("id") id: string, @Body() body: UpsertNewsletterRecipientDto) {
+    return this.managementService.updateNewsletterRecipient(id, body);
+  }
+
+  @Delete("newsletter-recipients/:id")
+  @RequirePermissions("newsletters.write")
+  deleteNewsletterRecipient(@Param("id") id: string) {
+    return this.managementService.deleteNewsletterRecipient(id);
+  }
+
+  @Post("newsletter-campaigns")
+  @RequirePermissions("newsletters.write")
+  createNewsletterCampaign(@Body() body: UpsertNewsletterCampaignDto) {
+    return this.managementService.createNewsletterCampaign(body);
+  }
+
+  @Patch("newsletter-campaigns/:id")
+  @RequirePermissions("newsletters.write")
+  updateNewsletterCampaign(@Param("id") id: string, @Body() body: UpsertNewsletterCampaignDto) {
+    return this.managementService.updateNewsletterCampaign(id, body);
+  }
+
+  @Delete("newsletter-campaigns/:id")
+  @RequirePermissions("newsletters.write")
+  deleteNewsletterCampaign(@Param("id") id: string) {
+    return this.managementService.deleteNewsletterCampaign(id);
   }
 
   @Post("system-emails")

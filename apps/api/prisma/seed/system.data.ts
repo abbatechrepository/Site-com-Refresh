@@ -1,21 +1,21 @@
 export const systemEmails = [
   {
     name: "Central de Atendimento",
-    email: "contato@abbatech.local",
+    email: "contato@abbatech.dev.br",
     area: "Contato",
     description: "Endereço principal para relacionamento com o usuário.",
     value: "portal"
   },
   {
     name: "Newsletter Abbatech",
-    email: "newsletter@abbatech.local",
+    email: "newsletter@abbatech.dev.br",
     area: "Newsletter",
     description: "Remetente padrão para campanhas editoriais.",
     value: "newsletter"
   },
   {
     name: "RH Interno",
-    email: "rh@abbatech.local",
+    email: "rh@abbatech.dev.br",
     area: "RH",
     description: "Comunicação de pessoas e processos internos.",
     value: "interno"

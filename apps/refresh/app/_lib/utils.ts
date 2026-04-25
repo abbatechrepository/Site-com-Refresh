@@ -206,7 +206,18 @@ export function getMenuConfig(role: LoggedUser["roles"][number] | null): MenuCon
     newsletter: []
   };
 
-  if (role.appAccesses.length > 0) {
+  if (role.menuAccesses.length > 0) {
+    for (const access of role.menuAccesses) {
+      const label = getBreadcrumbLabel(access.viewKey);
+
+      if (!groups[access.topMenu].some((item) => item.key === access.viewKey)) {
+        groups[access.topMenu].push({
+          key: access.viewKey,
+          label
+        });
+      }
+    }
+  } else {
     for (const access of role.appAccesses) {
       if (!access.canAccess) {
         continue;
@@ -223,17 +234,6 @@ export function getMenuConfig(role: LoggedUser["roles"][number] | null): MenuCon
       if (!groups[topMenu].some((item) => item.key === viewKey)) {
         groups[topMenu].push({
           key: viewKey,
-          label
-        });
-      }
-    }
-  } else {
-    for (const access of role.menuAccesses) {
-      const label = getBreadcrumbLabel(access.viewKey);
-
-      if (!groups[access.topMenu].some((item) => item.key === access.viewKey)) {
-        groups[access.topMenu].push({
-          key: access.viewKey,
           label
         });
       }

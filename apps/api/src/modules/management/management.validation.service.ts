@@ -58,6 +58,46 @@ export class ManagementValidationService {
     }
   }
 
+  async ensureUniqueNewsletterGroup(name: string, currentId?: string) {
+    const existing = await this.prisma.newsletterGroup.findFirst({
+      where: {
+        name,
+        ...(currentId ? { NOT: { id: currentId } } : {})
+      }
+    });
+
+    if (existing) {
+      throw new BadRequestException("Ja existe um grupo de newsletter com este nome.");
+    }
+  }
+
+  async ensureUniqueNewsletterRecipient(email: string, currentId?: string) {
+    const existing = await this.prisma.newsletterRecipient.findFirst({
+      where: {
+        email,
+        ...(currentId ? { NOT: { id: currentId } } : {})
+      }
+    });
+
+    if (existing) {
+      throw new BadRequestException("Ja existe um destinatario com este e-mail.");
+    }
+  }
+
+  async ensureNewsletterGroup(groupId?: string | null) {
+    if (!groupId) {
+      return;
+    }
+
+    const group = await this.prisma.newsletterGroup.findUnique({
+      where: { id: groupId }
+    });
+
+    if (!group) {
+      throw new BadRequestException("Grupo de newsletter invalido.");
+    }
+  }
+
   async ensureRolePermissions(permissionIds: string[]) {
     if (permissionIds.length === 0) {
       return;

@@ -79,6 +79,27 @@ export type UpsertNewsletterGroupInput = {
   description?: string;
 };
 
+export type UpsertNewsletterRecipientInput = {
+  email: string;
+  name?: string;
+  groupId: string;
+  consentAt?: string;
+  unsubscribedAt?: string;
+};
+
+export type UpsertNewsletterCampaignInput = {
+  name: string;
+  subject: string;
+  senderName: string;
+  senderEmail: string;
+  bodyHtml: string;
+  bodyText?: string;
+  status?: string;
+  scheduledAt?: string;
+  sentAt?: string;
+  recipientGroupId?: string;
+};
+
 export type UpsertSystemEmailInput = {
   name: string;
   email: string;

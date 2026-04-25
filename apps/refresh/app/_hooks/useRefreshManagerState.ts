@@ -7,6 +7,10 @@ import {
   emptyContentForm,
   emptyContentTypeForm,
   emptyElementForm,
+  emptyNewsletterCampaignForm,
+  emptyNewsletterGroupForm,
+  emptyNewsletterRecipientForm,
+  emptyPermissionCodeForm,
   emptyRoleForm,
   emptySectionForm,
   emptySystemEmailForm,
@@ -23,7 +27,11 @@ import type {
   ElementFormState,
   LoggedUser,
   ManagementBootstrap,
+  NewsletterCampaignFormState,
+  NewsletterGroupFormState,
+  NewsletterRecipientFormState,
   PermissionFormState,
+  PermissionCodeFormState,
   RoleFormState,
   Section,
   SectionFormState,
@@ -59,6 +67,7 @@ export function useRefreshManagerState() {
     templates: [],
     elements: [],
     newsletterGroups: [],
+    newsletterRecipients: [],
     newsletterCampaigns: [],
     privacyRequests: []
   });
@@ -66,12 +75,19 @@ export function useRefreshManagerState() {
   const [contentForm, setContentForm] = useState<ContentFormState>(emptyContentForm);
   const [contentTypeForm, setContentTypeForm] = useState<ContentTypeFormState>(emptyContentTypeForm);
   const [permissionForm, setPermissionForm] = useState<PermissionFormState>(emptyPermissionForm);
+  const [permissionCodeForm, setPermissionCodeForm] = useState<PermissionCodeFormState>(emptyPermissionCodeForm);
   const [applicationForm, setApplicationForm] = useState<ApplicationFormState>(emptyApplicationForm);
   const [roleForm, setRoleForm] = useState<RoleFormState>(emptyRoleForm);
   const [userForm, setUserForm] = useState<UserFormState>(emptyUserForm);
   const [templateForm, setTemplateForm] = useState<TemplateFormState>(emptyTemplateForm);
   const [elementForm, setElementForm] = useState<ElementFormState>(emptyElementForm);
   const [systemEmailForm, setSystemEmailForm] = useState<SystemEmailFormState>(emptySystemEmailForm);
+  const [newsletterGroupForm, setNewsletterGroupForm] =
+    useState<NewsletterGroupFormState>(emptyNewsletterGroupForm);
+  const [newsletterRecipientForm, setNewsletterRecipientForm] =
+    useState<NewsletterRecipientFormState>(emptyNewsletterRecipientForm);
+  const [newsletterCampaignForm, setNewsletterCampaignForm] =
+    useState<NewsletterCampaignFormState>(emptyNewsletterCampaignForm);
   const [highlightedUserId, setHighlightedUserId] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [view, setView] = useState<ViewKey>("content-list");
@@ -111,6 +127,8 @@ export function useRefreshManagerState() {
     setContentTypeForm,
     permissionForm,
     setPermissionForm,
+    permissionCodeForm,
+    setPermissionCodeForm,
     applicationForm,
     setApplicationForm,
     roleForm,
@@ -123,6 +141,12 @@ export function useRefreshManagerState() {
     setElementForm,
     systemEmailForm,
     setSystemEmailForm,
+    newsletterGroupForm,
+    setNewsletterGroupForm,
+    newsletterRecipientForm,
+    setNewsletterRecipientForm,
+    newsletterCampaignForm,
+    setNewsletterCampaignForm,
     highlightedUserId,
     setHighlightedUserId,
     selectedUserIds,

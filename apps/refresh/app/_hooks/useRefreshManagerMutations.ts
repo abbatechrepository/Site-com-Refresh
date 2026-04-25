@@ -7,6 +7,7 @@ import {
   emptyContentTypeForm,
   emptyElementForm,
   emptyPermissionForm,
+  emptyPermissionCodeForm,
   emptyRoleForm,
   emptySectionForm,
   emptySystemEmailForm,
@@ -174,6 +175,37 @@ export function useRefreshManagerMutations(
       state.setPermissionForm(emptyPermissionForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.permissionForm.id ? "Permissão atualizada com sucesso." : "Permissão criada com sucesso.");
+    } catch (submitError) {
+      state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar permissão.");
+    }
+  }
+
+  async function handlePermissionCodeSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    state.setError("");
+    state.setSuccess("");
+
+    try {
+      const path = state.permissionCodeForm.id
+        ? `/management/permissions/${state.permissionCodeForm.id}`
+        : "/management/permissions";
+      const method = state.permissionCodeForm.id ? "PATCH" : "POST";
+
+      await apiRequest(
+        path,
+        {
+          method,
+          body: JSON.stringify({
+            code: state.permissionCodeForm.code,
+            description: state.permissionCodeForm.description || undefined
+          })
+        },
+        state.token
+      );
+
+      state.setPermissionCodeForm(emptyPermissionCodeForm);
+      await session.bootstrap(state.token);
+      state.setSuccess(state.permissionCodeForm.id ? "Permissão atualizada com sucesso." : "Permissão criada com sucesso.");
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar permissão.");
     }
@@ -548,6 +580,7 @@ export function useRefreshManagerMutations(
     handleContentSubmit,
     handleContentTypeSubmit,
     handlePermissionSubmit,
+    handlePermissionCodeSubmit,
     handleApplicationSubmit,
     handleRoleSubmit,
     handleSystemEmailSubmit,

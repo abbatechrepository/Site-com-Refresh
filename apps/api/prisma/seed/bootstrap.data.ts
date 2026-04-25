@@ -1,0 +1,74 @@
+type RoleDefinition = {
+  name: string;
+  description: string;
+  functionName: string;
+  permissionCodes?: readonly string[];
+  menuAccesses: readonly {
+    topMenu: string;
+    viewKey: string;
+  }[];
+};
+
+export const bootstrapPermissions = [
+  { code: "sections.read", description: "Ler secoes" },
+  { code: "sections.write", description: "Gerenciar secoes" },
+  { code: "contents.read", description: "Ler conteudos no CMS" },
+  { code: "contents.write", description: "Gerenciar conteudos" },
+  { code: "templates.read", description: "Ler templates" },
+  { code: "templates.write", description: "Gerenciar templates" },
+  { code: "elements.read", description: "Ler elementos" },
+  { code: "elements.write", description: "Gerenciar elementos" },
+  { code: "users.read", description: "Ler usuarios" },
+  { code: "users.write", description: "Gerenciar usuarios" },
+  { code: "roles.read", description: "Ler grupos e perfis" },
+  { code: "roles.write", description: "Gerenciar grupos e perfis" },
+  { code: "permissions.read", description: "Ler permissoes" },
+  { code: "permissions.write", description: "Gerenciar permissoes" },
+  { code: "applications.read", description: "Ler aplicativos" },
+  { code: "applications.write", description: "Gerenciar aplicativos" },
+  { code: "emails.read", description: "Ler emails do sistema" },
+  { code: "emails.write", description: "Gerenciar emails do sistema" },
+  { code: "statistics.read", description: "Ler estatisticas" },
+  { code: "statistics.write", description: "Gerenciar estatisticas" },
+  { code: "newsletters.read", description: "Ler newsletters" },
+  { code: "newsletters.write", description: "Gerenciar newsletters" },
+  { code: "privacy.read", description: "Ler pedidos LGPD" },
+  { code: "privacy.write", description: "Gerenciar pedidos LGPD" },
+  { code: "management.read", description: "Ler cadastros administrativos" },
+  { code: "management.write", description: "Gerenciar cadastros administrativos" }
+] as const;
+
+export const bootstrapAdminRole: RoleDefinition = {
+  name: "Administrador",
+  description: "Acesso total a plataforma",
+  functionName: "Administrador",
+  menuAccesses: [
+    { topMenu: "administration", viewKey: "permissions" },
+    { topMenu: "administration", viewKey: "groups" },
+    { topMenu: "administration", viewKey: "users" },
+    { topMenu: "administration", viewKey: "statistics" },
+    { topMenu: "system", viewKey: "applications" },
+    { topMenu: "system", viewKey: "emails" },
+    { topMenu: "content", viewKey: "content-list" },
+    { topMenu: "content", viewKey: "sections-tree" },
+    { topMenu: "content", viewKey: "templates" },
+    { topMenu: "content", viewKey: "masks" },
+    { topMenu: "content", viewKey: "elements" },
+    { topMenu: "newsletter", viewKey: "newsletter" }
+  ]
+};
+
+export const bootstrapApplications = [
+  { name: "Conteúdo", area: "Conteúdo", link: "/Manager/Conteudo.php", description: "Cadastro e listagem de conteúdos." },
+  { name: "Seção", area: "Conteúdo", link: "/Manager/Secao.php", description: "Navegação, menus e arquitetura de informação." },
+  { name: "Templates", area: "Conteúdo", link: "/Manager/Template.php", description: "Cadastro de templates." },
+  { name: "Máscara", area: "Conteúdo", link: "/Manager/Mascara.php", description: "Máscaras de conteúdo." },
+  { name: "Blocos de Conteúdo", area: "Conteúdo", link: "/Manager/Elemento.php", description: "Elementos e blocos customizados." },
+  { name: "Permissões", area: "Administração", link: "/Manager/Permissao.php", description: "Permissões por grupo e aplicativo." },
+  { name: "Grupos", area: "Administração", link: "/Manager/Grupos.php", description: "Cadastro de grupos e workflow." },
+  { name: "Usuários", area: "Administração", link: "/Manager/Usuarios.php", description: "Cadastro de usuários." },
+  { name: "Email", area: "Sistema", link: "/Manager/Email.php", description: "E-mails utilizados pelo portal." },
+  { name: "Aplicativos", area: "Sistema", link: "/Manager/Aplicativos.php", description: "Cadastro de aplicativos e áreas de menu." },
+  { name: "Estatísticas", area: "Administração", link: "/Manager/Estatistica.php", description: "Acessos por seção." },
+  { name: "Newsletter", area: "Newsletter", link: "/Manager/Newsletter.php", description: "Grupos, destinatários e campanhas." }
+] as const;

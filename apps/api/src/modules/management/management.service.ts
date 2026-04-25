@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { hash } from "argon2";
 import { PrismaService } from "../../infra/prisma.service";
 import { buildManagementBootstrap } from "./management.bootstrap";
+import { ManagementNewslettersService } from "./management-newsletters.service";
+import { ManagementSequenceService } from "./management-sequence.service";
+import { ManagementUsersService } from "./management-users.service";
 import {
   UpsertApplicationInput,
   UpsertContentTypeInput,
   UpsertElementInput,
+  UpsertNewsletterCampaignInput,
   UpsertNewsletterGroupInput,
+  UpsertNewsletterRecipientInput,
   UpsertPermissionInput,
   UpsertRoleApplicationAccessInput,
   UpsertRoleInput,
@@ -14,57 +18,18 @@ import {
   UpsertTemplateInput,
   UpsertUserInput
 } from "./management.types";
-import { normalizeCpf, toSlug } from "./management.utils";
+import { toSlug } from "./management.utils";
 import { ManagementValidationService } from "./management.validation.service";
 
 @Injectable()
 export class ManagementService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly validation: ManagementValidationService
+    private readonly validation: ManagementValidationService,
+    private readonly sequence: ManagementSequenceService,
+    private readonly users: ManagementUsersService,
+    private readonly newsletters: ManagementNewslettersService
   ) {}
-
-  private async nextSequenceNumberFor<
-    TModelName extends
-      | "contentType"
-      | "permission"
-      | "legacyApplication"
-      | "roleApplicationAccess"
-      | "role"
-      | "user"
-      | "template"
-      | "element"
-      | "newsletterGroup"
-      | "systemEmail"
-  >(modelName: TModelName) {
-    const aggregatePromise = (() => {
-      switch (modelName) {
-        case "contentType":
-          return this.prisma.contentType.aggregate({ _max: { legacyId: true } });
-        case "permission":
-          return this.prisma.permission.aggregate({ _max: { legacyId: true } });
-        case "legacyApplication":
-          return this.prisma.legacyApplication.aggregate({ _max: { legacyId: true } });
-        case "roleApplicationAccess":
-          return this.prisma.roleApplicationAccess.aggregate({ _max: { legacyId: true } });
-        case "role":
-          return this.prisma.role.aggregate({ _max: { legacyId: true } });
-        case "user":
-          return this.prisma.user.aggregate({ _max: { legacyId: true } });
-        case "template":
-          return this.prisma.template.aggregate({ _max: { legacyId: true } });
-        case "element":
-          return this.prisma.element.aggregate({ _max: { legacyId: true } });
-        case "newsletterGroup":
-          return this.prisma.newsletterGroup.aggregate({ _max: { legacyId: true } });
-        case "systemEmail":
-          return this.prisma.systemEmail.aggregate({ _max: { legacyId: true } });
-      }
-    })();
-
-    const aggregate = await aggregatePromise;
-    return (aggregate._max.legacyId ?? 0) + 1;
-  }
 
   async bootstrap() {
     return buildManagementBootstrap(this.prisma);
@@ -76,7 +41,7 @@ export class ManagementService {
 
     return this.prisma.contentType.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("contentType"),
+        legacyId: await this.sequence.nextFor("contentType"),
         name: payload.name,
         slug,
         description: payload.description,
@@ -124,7 +89,7 @@ export class ManagementService {
 
     return this.prisma.permission.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("permission"),
+        legacyId: await this.sequence.nextFor("permission"),
         code,
         description: payload.description
       }
@@ -163,7 +128,7 @@ export class ManagementService {
 
     return this.prisma.legacyApplication.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("legacyApplication"),
+        legacyId: await this.sequence.nextFor("legacyApplication"),
         name: payload.name,
         area: payload.area,
         link: payload.link,
@@ -205,7 +170,7 @@ export class ManagementService {
 
     return this.prisma.roleApplicationAccess.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("roleApplicationAccess"),
+        legacyId: await this.sequence.nextFor("roleApplicationAccess"),
         roleId: payload.roleId,
         appId: payload.appId,
         canCreate: payload.canCreate ?? false,
@@ -261,11 +226,10 @@ export class ManagementService {
     await this.validation.ensureSectionIds(payload.sectionIds ?? []);
     await this.validation.ensureContentTypeIds(payload.contentTypeIds ?? []);
     this.validation.ensureRoleMenus(payload.menuAccesses ?? []);
-    const appAccesses = await this.validation.resolveRoleApplicationAccesses(payload);
 
     return this.prisma.role.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("role"),
+        legacyId: await this.sequence.nextFor("role"),
         name: payload.name,
         description: payload.description,
         functionName: payload.functionName,
@@ -291,9 +255,6 @@ export class ManagementService {
           create: (payload.contentTypeIds ?? []).map((contentTypeId) => ({
             contentTypeId
           }))
-        },
-        appAccesses: {
-          create: appAccesses
         }
       },
       include: {
@@ -321,7 +282,6 @@ export class ManagementService {
     await this.validation.ensureSectionIds(payload.sectionIds ?? []);
     await this.validation.ensureContentTypeIds(payload.contentTypeIds ?? []);
     this.validation.ensureRoleMenus(payload.menuAccesses ?? []);
-    const appAccesses = await this.validation.resolveRoleApplicationAccesses(payload);
 
     return this.prisma.role.update({
       where: { id },
@@ -355,10 +315,6 @@ export class ManagementService {
           create: (payload.contentTypeIds ?? []).map((contentTypeId) => ({
             contentTypeId
           }))
-        },
-        appAccesses: {
-          deleteMany: {},
-          create: appAccesses
         }
       },
       include: {
@@ -379,209 +335,15 @@ export class ManagementService {
   }
 
   async createUser(payload: UpsertUserInput) {
-    await this.validation.ensureRoleIds(payload.roleIds ?? []);
-    const normalizedEmail = payload.email.trim().toLowerCase();
-    const normalizedUsername = payload.username?.trim().toLowerCase() || null;
-    const normalizedCpf = normalizeCpf(payload.cpf);
-    await this.validation.ensureUniqueUserIdentity({
-      email: normalizedEmail,
-      username: normalizedUsername,
-      cpf: normalizedCpf
-    });
-
-    const legacyStatus = payload.status?.trim() || "Novo";
-    const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
-
-    const passwordHash = await hash(payload.password ?? "123456");
-
-    return this.prisma.user.create({
-      data: {
-        legacyId: await this.nextSequenceNumberFor("user"),
-        name: payload.name,
-        email: normalizedEmail,
-        username: normalizedUsername,
-        cpf: normalizedCpf,
-        cnh: payload.cnh?.trim() || null,
-        legacyStatus,
-        company: payload.company?.trim() || null,
-        jobTitle: payload.jobTitle?.trim() || null,
-        phone: payload.phone?.trim() || null,
-        address: payload.address?.trim() || null,
-        zipCode: payload.zipCode?.trim() || null,
-        city: payload.city?.trim() || null,
-        state: payload.state?.trim() || null,
-        secondaryAddress: payload.secondaryAddress?.trim() || null,
-        secondaryNumber: payload.secondaryNumber?.trim() || null,
-        secondaryComplement: payload.secondaryComplement?.trim() || null,
-        neighborhood: payload.neighborhood?.trim() || null,
-        notes: payload.notes?.trim() || null,
-        facebook: payload.facebook?.trim() || null,
-        instagram: payload.instagram?.trim() || null,
-        youtube: payload.youtube?.trim() || null,
-        forcePasswordChange: payload.forcePasswordChange ?? false,
-        passwordHash,
-        isActive,
-        isSuperAdmin: payload.isSuperAdmin ?? false,
-        consentVersion: "1.0",
-        consentAt: new Date(),
-        roles: {
-          create: (payload.roleIds ?? []).map((roleId) => ({
-            roleId
-          }))
-        }
-      },
-      include: {
-        roles: {
-          include: {
-            role: true
-          }
-        }
-      }
-    });
+    return this.users.createUser(payload);
   }
 
   async updateUser(id: string, payload: UpsertUserInput) {
-    const current = await this.prisma.user.findUnique({
-      where: { id }
-    });
-
-    if (!current) {
-      throw new NotFoundException("Usuario nao encontrado.");
-    }
-
-    await this.validation.ensureRoleIds(payload.roleIds ?? []);
-    const normalizedEmail = payload.email.trim().toLowerCase();
-    const normalizedUsername = payload.username?.trim().toLowerCase() || null;
-    const normalizedCpf = normalizeCpf(payload.cpf);
-    await this.validation.ensureUniqueUserIdentity(
-      {
-        email: normalizedEmail,
-        username: normalizedUsername,
-        cpf: normalizedCpf
-      },
-      id
-    );
-
-    const legacyStatus =
-      payload.status?.trim() || current.legacyStatus || "Novo";
-    const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
-    const passwordHash =
-      current.passwordHash === "LDAP" || !payload.password
-        ? undefined
-        : await hash(payload.password);
-
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        name: payload.name,
-        email: normalizedEmail,
-        username: normalizedUsername,
-        cpf: normalizedCpf,
-        cnh: payload.cnh?.trim() || null,
-        legacyStatus,
-        company: payload.company?.trim() || null,
-        jobTitle: payload.jobTitle?.trim() || null,
-        phone: payload.phone?.trim() || null,
-        address: payload.address?.trim() || null,
-        zipCode: payload.zipCode?.trim() || null,
-        city: payload.city?.trim() || null,
-        state: payload.state?.trim() || null,
-        secondaryAddress: payload.secondaryAddress?.trim() || null,
-        secondaryNumber: payload.secondaryNumber?.trim() || null,
-        secondaryComplement: payload.secondaryComplement?.trim() || null,
-        neighborhood: payload.neighborhood?.trim() || null,
-        notes: payload.notes?.trim() || null,
-        facebook: payload.facebook?.trim() || null,
-        instagram: payload.instagram?.trim() || null,
-        youtube: payload.youtube?.trim() || null,
-        forcePasswordChange:
-          payload.forcePasswordChange ??
-          current.forcePasswordChange ??
-          false,
-        passwordHash,
-        isActive,
-        isSuperAdmin: payload.isSuperAdmin ?? current.isSuperAdmin,
-        roles: {
-          deleteMany: {},
-          create: (payload.roleIds ?? []).map((roleId) => ({
-            roleId
-          }))
-        }
-      },
-      include: {
-        roles: {
-          include: {
-            role: true
-          }
-        }
-      }
-    });
+    return this.users.updateUser(id, payload);
   }
 
   async deleteUser(id: string) {
-    const current = await this.prisma.user.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: {
-            authoredContents: true,
-            revisions: true,
-            auditLogs: true,
-            roles: true
-          }
-        }
-      }
-    });
-
-    if (!current) {
-      throw new NotFoundException("Usuario nao encontrado.");
-    }
-
-    const hasHistory =
-      current._count.authoredContents > 0 ||
-      current._count.revisions > 0 ||
-      current._count.auditLogs > 0;
-
-    if (!hasHistory) {
-      return this.prisma.user.delete({
-        where: { id }
-      });
-    }
-
-    const archiveSuffix = id.slice(-8);
-
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        name: `${current.name} (Excluído)`,
-        email: `excluido+${archiveSuffix}@abbatech.local`,
-        username: current.username ? `excluido.${archiveSuffix}` : null,
-        cpf: null,
-        cnh: null,
-        legacyStatus: "Excluído",
-        isActive: false,
-        isSuperAdmin: false,
-        forcePasswordChange: false,
-        company: null,
-        jobTitle: null,
-        phone: null,
-        address: null,
-        zipCode: null,
-        city: null,
-        state: null,
-        secondaryAddress: null,
-        secondaryNumber: null,
-        secondaryComplement: null,
-        neighborhood: null,
-        notes: "Usuário arquivado automaticamente por possuir histórico vinculado.",
-        facebook: null,
-        instagram: null,
-        youtube: null,
-        roles: {
-          deleteMany: {}
-        }
-      }
-    });
+    return this.users.deleteUser(id);
   }
 
   async createTemplate(payload: UpsertTemplateInput) {
@@ -590,7 +352,7 @@ export class ManagementService {
 
     return this.prisma.template.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("template"),
+        legacyId: await this.sequence.nextFor("template"),
         name: payload.name,
         slug,
         description: payload.description,
@@ -635,7 +397,7 @@ export class ManagementService {
   async createElement(payload: UpsertElementInput) {
     return this.prisma.element.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("element"),
+        legacyId: await this.sequence.nextFor("element"),
         name: payload.name,
         thumbLabel: payload.thumbLabel,
         content: payload.content ?? "",
@@ -673,37 +435,45 @@ export class ManagementService {
   }
 
   async createNewsletterGroup(payload: UpsertNewsletterGroupInput) {
-    return this.prisma.newsletterGroup.create({
-      data: {
-        legacyId: await this.nextSequenceNumberFor("newsletterGroup"),
-        name: payload.name,
-        description: payload.description
-      }
-    });
+    return this.newsletters.createNewsletterGroup(payload);
   }
 
   async updateNewsletterGroup(id: string, payload: UpsertNewsletterGroupInput) {
-    const current = await this.prisma.newsletterGroup.findUnique({
-      where: { id }
-    });
+    return this.newsletters.updateNewsletterGroup(id, payload);
+  }
 
-    if (!current) {
-      throw new NotFoundException("Grupo de newsletter nao encontrado.");
-    }
+  async deleteNewsletterGroup(id: string) {
+    return this.newsletters.deleteNewsletterGroup(id);
+  }
 
-    return this.prisma.newsletterGroup.update({
-      where: { id },
-      data: {
-        name: payload.name,
-        description: payload.description
-      }
-    });
+  async createNewsletterRecipient(payload: UpsertNewsletterRecipientInput) {
+    return this.newsletters.createNewsletterRecipient(payload);
+  }
+
+  async updateNewsletterRecipient(id: string, payload: UpsertNewsletterRecipientInput) {
+    return this.newsletters.updateNewsletterRecipient(id, payload);
+  }
+
+  async deleteNewsletterRecipient(id: string) {
+    return this.newsletters.deleteNewsletterRecipient(id);
+  }
+
+  async createNewsletterCampaign(payload: UpsertNewsletterCampaignInput) {
+    return this.newsletters.createNewsletterCampaign(payload);
+  }
+
+  async updateNewsletterCampaign(id: string, payload: UpsertNewsletterCampaignInput) {
+    return this.newsletters.updateNewsletterCampaign(id, payload);
+  }
+
+  async deleteNewsletterCampaign(id: string) {
+    return this.newsletters.deleteNewsletterCampaign(id);
   }
 
   async createSystemEmail(payload: UpsertSystemEmailInput) {
     return this.prisma.systemEmail.create({
       data: {
-        legacyId: await this.nextSequenceNumberFor("systemEmail"),
+        legacyId: await this.sequence.nextFor("systemEmail"),
         name: payload.name,
         email: payload.email.trim().toLowerCase(),
         area: payload.area,

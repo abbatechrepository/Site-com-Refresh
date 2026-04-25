@@ -133,7 +133,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
               <div>
-                <label className="admin-label">Senha (padrão 123456)</label>
+                <label className="admin-label">Senha temporária</label>
                 <input
                   className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, password: event.target.value }))}

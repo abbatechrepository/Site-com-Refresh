@@ -2,7 +2,23 @@
 
 import { emptyContentForm, emptySectionForm } from "../_lib/constants";
 import { formatDate, formatTime } from "../_lib/utils";
-import type { Content, ContentFormState, ContentType, ApplicationRecord, ManagedElement, ManagedUser, Role, RoleApplicationAccessRecord, Section, SystemEmailRecord, Template } from "../_lib/types";
+import type {
+  ApplicationRecord,
+  Content,
+  ContentFormState,
+  ContentType,
+  ManagedElement,
+  ManagedUser,
+  NewsletterCampaign,
+  NewsletterGroup,
+  NewsletterRecipient,
+  Permission,
+  Role,
+  RoleApplicationAccessRecord,
+  Section,
+  SystemEmailRecord,
+  Template
+} from "../_lib/types";
 import type { useRefreshManagerState } from "./useRefreshManagerState";
 
 type RefreshManagerState = ReturnType<typeof useRefreshManagerState>;
@@ -91,6 +107,14 @@ export function useRefreshManagerEditors(state: RefreshManagerState) {
       canUpdate: permission.canUpdate,
       canDelete: permission.canDelete,
       canAccess: permission.canAccess
+    });
+  }
+
+  function editPermissionCode(permission: Permission) {
+    state.setPermissionCodeForm({
+      id: permission.id,
+      code: permission.code,
+      description: permission.description ?? ""
     });
   }
 
@@ -187,6 +211,41 @@ export function useRefreshManagerEditors(state: RefreshManagerState) {
     });
   }
 
+  function editNewsletterGroup(group: NewsletterGroup) {
+    state.setNewsletterGroupForm({
+      id: group.id,
+      name: group.name,
+      description: group.description ?? ""
+    });
+  }
+
+  function editNewsletterRecipient(recipient: NewsletterRecipient) {
+    state.setNewsletterRecipientForm({
+      id: recipient.id,
+      email: recipient.email,
+      name: recipient.name ?? "",
+      groupId: recipient.groupId,
+      consentAt: toDatetimeInput(recipient.consentAt),
+      unsubscribedAt: toDatetimeInput(recipient.unsubscribedAt)
+    });
+  }
+
+  function editNewsletterCampaign(campaign: NewsletterCampaign) {
+    state.setNewsletterCampaignForm({
+      id: campaign.id,
+      name: campaign.name,
+      subject: campaign.subject,
+      senderName: campaign.senderName,
+      senderEmail: campaign.senderEmail,
+      bodyHtml: campaign.bodyHtml,
+      bodyText: campaign.bodyText ?? "",
+      status: campaign.status,
+      scheduledAt: toDatetimeInput(campaign.scheduledAt),
+      sentAt: toDatetimeInput(campaign.sentAt),
+      recipientGroupId: campaign.recipientGroupId ?? ""
+    });
+  }
+
   return {
     resetContentForm,
     selectContent,
@@ -195,11 +254,19 @@ export function useRefreshManagerEditors(state: RefreshManagerState) {
     editSection,
     editContentType,
     editPermission,
+    editPermissionCode,
     editApplication,
     editRole,
     editUser,
     editTemplate,
     editElement,
-    editSystemEmail
+    editSystemEmail,
+    editNewsletterGroup,
+    editNewsletterRecipient,
+    editNewsletterCampaign
   };
+}
+
+function toDatetimeInput(value: string | null) {
+  return value ? value.slice(0, 16) : "";
 }

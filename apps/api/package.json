@@ -9,8 +9,10 @@
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "prisma:seed": "ts-node --project tsconfig.json --transpile-only prisma/seed.ts",
-    "prisma:reset-demo": "cross-env SEED_RESET=true ts-node --project tsconfig.json --transpile-only prisma/seed.ts"
+    "prisma:seed": "npm run seed:bootstrap",
+    "seed:bootstrap": "ts-node --project tsconfig.json --transpile-only prisma/seed.ts",
+    "seed:demo": "ts-node --project tsconfig.json --transpile-only prisma/seed.demo.ts",
+    "prisma:reset-demo": "cross-env SEED_RESET=true ts-node --project tsconfig.json --transpile-only prisma/seed.demo.ts"
   },
   "prisma": {
     "seed": "npm run prisma:seed"

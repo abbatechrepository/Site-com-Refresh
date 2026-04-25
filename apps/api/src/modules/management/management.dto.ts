@@ -261,6 +261,70 @@ export class UpsertNewsletterGroupDto {
   description?: string;
 }
 
+export class UpsertNewsletterRecipientDto {
+  @IsString()
+  @IsEmail()
+  email!: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsString()
+  @MinLength(1)
+  groupId!: string;
+
+  @IsOptional()
+  @IsString()
+  consentAt?: string;
+
+  @IsOptional()
+  @IsString()
+  unsubscribedAt?: string;
+}
+
+export class UpsertNewsletterCampaignDto {
+  @IsString()
+  @MinLength(2)
+  name!: string;
+
+  @IsString()
+  @MinLength(2)
+  subject!: string;
+
+  @IsString()
+  @MinLength(2)
+  senderName!: string;
+
+  @IsString()
+  @IsEmail()
+  senderEmail!: string;
+
+  @IsString()
+  @MinLength(2)
+  bodyHtml!: string;
+
+  @IsOptional()
+  @IsString()
+  bodyText?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  scheduledAt?: string;
+
+  @IsOptional()
+  @IsString()
+  sentAt?: string;
+
+  @IsOptional()
+  @IsString()
+  recipientGroupId?: string;
+}
+
 export class UpsertSystemEmailDto {
   @IsString()
   @MinLength(2)

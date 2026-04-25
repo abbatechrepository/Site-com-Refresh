@@ -31,7 +31,7 @@ export const launchCampaign = {
   name: "Lancamento da plataforma Abbatech",
   subject: "Novo portal Abbatech no ar",
   senderName: "Equipe Abbatech",
-  senderEmail: "noreply@abbatech.local",
+  senderEmail: "newsletter@abbatech.dev.br",
   bodyHtml: "<p>O novo portal Abbatech ja esta em demonstracao com CMS e API integrados.</p>",
   bodyText: "O novo portal Abbatech ja esta em demonstracao com CMS e API integrados.",
   status: "draft"
