@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import Image from "next/image";
 
 import { ActionButton } from "./ActionButton";
+import { refreshLogoSrc } from "../_lib/assets";
 
 type RefreshLoginProps = {
   identifier: string;
@@ -31,7 +32,7 @@ export function RefreshLogin({
               alt="Abbatech"
               height={72}
               priority
-              src="/brand/logov2.png"
+              src={refreshLogoSrc}
               unoptimized
               width={100}
             />

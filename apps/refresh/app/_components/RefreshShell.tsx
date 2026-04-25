@@ -1,6 +1,7 @@
 import { getBreadcrumbLabel, getBreadcrumbTop, getViewTitle } from "../_lib/utils";
 import type { RefreshShellProps } from "../_lib/types";
 import Image from "next/image";
+import { refreshLogoSrc } from "../_lib/assets";
 
 export function RefreshShell({
   user,
@@ -31,7 +32,7 @@ export function RefreshShell({
                         alt="Abbatech"
                         height={72}
                         priority
-                        src="/abbatech/refresh/brand/logov2.png"
+                        src={refreshLogoSrc}
                         unoptimized
                         width={100}
                       />
