@@ -1,4 +1,4 @@
-x-app-env: &app-env
+x-app-env: &a1
   NODE_ENV: ${NODE_ENV:-production}
   MYSQL_DATABASE: ${MYSQL_DATABASE:-refresh}
   MYSQL_USER: ${MYSQL_USER:-refresh}
@@ -27,7 +27,6 @@ x-app-env: &app-env
   LGPD_RETENTION_DAYS: ${LGPD_RETENTION_DAYS:-365}
   ADMIN_EMAIL: ${ADMIN_EMAIL}
   ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-
 services:
   mysql:
     image: mysql:8.4
@@ -39,7 +38,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql_prod_data:/var/lib/mysql
-
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
@@ -49,21 +47,35 @@ services:
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
     volumes:
       - minio_prod_data:/data
-
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
     environment:
-      <<: *app-env
+      <<: *a1
     depends_on:
       - mysql
       - minio
     networks:
       - default
       - dokploy-network
-
+    labels:
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-web.rule=Host(`abbatech.dev.br`) && PathPrefix(`/abbatech/api`)
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-web.entrypoints=web
+      - traefik.http.services.portal-abbatech-refresh-g4ud9u-3-web.loadbalancer.server.port=3333
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-web.service=portal-abbatech-refresh-g4ud9u-3-web
+      - traefik.http.middlewares.stripprefix-portal-abbatech-refresh-g4ud9u-3.stripprefix.prefixes=/abbatech/api
+      - traefik.http.middlewares.addprefix-portal-abbatech-refresh-g4ud9u-3.addprefix.prefix=/api/v1
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-websecure.rule=Host(`abbatech.dev.br`) && PathPrefix(`/abbatech/api`)
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-websecure.entrypoints=websecure
+      - traefik.http.services.portal-abbatech-refresh-g4ud9u-3-websecure.loadbalancer.server.port=3333
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-websecure.service=portal-abbatech-refresh-g4ud9u-3-websecure
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-websecure.middlewares=stripprefix-portal-abbatech-refresh-g4ud9u-3,addprefix-portal-abbatech-refresh-g4ud9u-3
+      - traefik.http.routers.portal-abbatech-refresh-g4ud9u-3-websecure.tls.certresolver=letsencrypt
+      - traefik.enable=true
   portal:
     build:
       context: .
@@ -74,14 +86,13 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     restart: unless-stopped
     environment:
-      <<: *app-env
+      <<: *a1
       INTERNAL_API_URL: http://api:3333/api/v1
     depends_on:
       - api
     networks:
       - default
       - dokploy-network
-
   refresh:
     build:
       context: .
@@ -92,18 +103,16 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     restart: unless-stopped
     environment:
-      <<: *app-env
+      <<: *a1
       INTERNAL_API_URL: http://api:3333/api/v1
     depends_on:
       - api
     networks:
       - default
       - dokploy-network
-
 volumes:
-  mysql_prod_data:
-  minio_prod_data:
-
+  mysql_prod_data: null
+  minio_prod_data: null
 networks:
   dokploy-network:
     external: true
