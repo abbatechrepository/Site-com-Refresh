@@ -1,0 +1,87 @@
+name: refresh-local-prod
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: abbatech-mysql-localprod
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: refresh
+      MYSQL_USER: refresh
+      MYSQL_PASSWORD: refresh
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_localprod_data:/var/lib/mysql
+
+  minio:
+    image: minio/minio:latest
+    container_name: abbatech-minio-localprod
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+    volumes:
+      - minio_localprod_data:/data
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: abbatech-mailpit-localprod
+    restart: unless-stopped
+    ports:
+      - "1125:1025"
+      - "8125:8025"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: abbatech-api-localprod
+    restart: unless-stopped
+    env_file:
+      - .env.local-prod
+    ports:
+      - "4333:3333"
+    depends_on:
+      - mysql
+      - minio
+      - mailpit
+
+  portal:
+    build:
+      context: .
+      dockerfile: apps/portal/Dockerfile
+    container_name: abbatech-portal-localprod
+    restart: unless-stopped
+    env_file:
+      - .env.local-prod
+    environment:
+      INTERNAL_API_URL: http://api:3333/api/v1
+    ports:
+      - "4100:3000"
+    depends_on:
+      - api
+
+  refresh:
+    build:
+      context: .
+      dockerfile: apps/refresh/Dockerfile
+    container_name: abbatech-refresh-localprod
+    restart: unless-stopped
+    env_file:
+      - .env.local-prod
+    environment:
+      INTERNAL_API_URL: http://api:3333/api/v1
+    ports:
+      - "4101:3000"
+    depends_on:
+      - api
+
+volumes:
+  mysql_localprod_data:
+  minio_localprod_data:
