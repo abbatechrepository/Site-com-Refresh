@@ -189,6 +189,9 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
                     <td>{systemEmail.area}</td>
                     <td>{systemEmail.description ?? ""}</td>
                     <td>
+                      <button className="text-left text-[#0c67ad] hover:underline" onClick={() => editSystemEmail(systemEmail)} type="button">
+                          Editar
+                      </button>
                       <button className="text-[#c4473c] hover:underline" onClick={() => removeEntity(`/management/system-emails/${systemEmail.id}`, "Email excluído com sucesso.")} type="button">
                         Excluir
                       </button>
