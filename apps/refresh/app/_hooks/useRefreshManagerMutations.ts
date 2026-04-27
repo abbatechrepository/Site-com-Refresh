@@ -331,7 +331,7 @@ export function useRefreshManagerMutations(
     }
   }
 
-  async function handleUserSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleUserSubmit(event: FormEvent<HTMLFormElement>, profileTempImage?: File | null) {
     event.preventDefault();
     state.setError("");
     state.setSuccess("");
@@ -408,38 +408,57 @@ export function useRefreshManagerMutations(
       const path = state.userForm.id ? `/management/users/${state.userForm.id}` : "/management/users";
       const method = state.userForm.id ? "PATCH" : "POST";
 
+      const formData = new FormData();
+
+      formData.append("name", trimmedName);
+      formData.append("email", trimmedEmail);
+      formData.append("username", trimmedUsername);
+
+      if (state.userForm.cpf) formData.append("cpf", state.userForm.cpf);
+      if (state.userForm.cnh) formData.append("cnh", state.userForm.cnh);
+
+      formData.append("status", state.userForm.status);
+
+      if (state.userForm.company) formData.append("company", state.userForm.company);
+      if (state.userForm.jobTitle) formData.append("jobTitle", state.userForm.jobTitle);
+      if (state.userForm.phone) formData.append("phone", state.userForm.phone);
+      if (state.userForm.address) formData.append("address", state.userForm.address);
+      if (state.userForm.zipCode) formData.append("zipCode", state.userForm.zipCode);
+      if (state.userForm.city) formData.append("city", state.userForm.city);
+      if (state.userForm.state) formData.append("state", state.userForm.state);
+
+      if (state.userForm.secondaryAddress) formData.append("secondaryAddress", state.userForm.secondaryAddress);
+      if (state.userForm.secondaryNumber) formData.append("secondaryNumber", state.userForm.secondaryNumber);
+      if (state.userForm.secondaryComplement) formData.append("secondaryComplement", state.userForm.secondaryComplement);
+      if (state.userForm.neighborhood) formData.append("neighborhood", state.userForm.neighborhood);
+
+      if (state.userForm.notes) formData.append("notes", state.userForm.notes);
+
+      if (state.userForm.facebook) formData.append("facebook", state.userForm.facebook);
+      if (state.userForm.instagram) formData.append("instagram", state.userForm.instagram);
+      if (state.userForm.youtube) formData.append("youtube", state.userForm.youtube);
+
+      formData.append("forcePasswordChange", String(state.userForm.forcePasswordChange));
+      formData.append("isActive", String(state.userForm.isActive));
+      formData.append("isSuperAdmin", String(state.userForm.isSuperAdmin));
+
+      if (state.userForm.password) {
+        formData.append("password", state.userForm.password);
+      }
+
+      state.userForm.roleIds.forEach((id) => {
+        formData.append("roleIds[]", id);
+      });
+
+      if (profileTempImage) {
+        formData.append("file", profileTempImage);
+      }
+
       const savedUser = await apiRequest<ManagedUser>(
         path,
         {
           method,
-          body: JSON.stringify({
-            name: trimmedName,
-            email: trimmedEmail,
-            username: trimmedUsername,
-            cpf: state.userForm.cpf || undefined,
-            cnh: state.userForm.cnh || undefined,
-            status: state.userForm.status,
-            company: state.userForm.company || undefined,
-            jobTitle: state.userForm.jobTitle || undefined,
-            phone: state.userForm.phone || undefined,
-            address: state.userForm.address || undefined,
-            zipCode: state.userForm.zipCode || undefined,
-            city: state.userForm.city || undefined,
-            state: state.userForm.state || undefined,
-            secondaryAddress: state.userForm.secondaryAddress || undefined,
-            secondaryNumber: state.userForm.secondaryNumber || undefined,
-            secondaryComplement: state.userForm.secondaryComplement || undefined,
-            neighborhood: state.userForm.neighborhood || undefined,
-            notes: state.userForm.notes || undefined,
-            facebook: state.userForm.facebook || undefined,
-            instagram: state.userForm.instagram || undefined,
-            youtube: state.userForm.youtube || undefined,
-            forcePasswordChange: state.userForm.forcePasswordChange,
-            password: state.userForm.password || undefined,
-            isActive: state.userForm.isActive,
-            isSuperAdmin: state.userForm.isSuperAdmin,
-            roleIds: state.userForm.roleIds
-          })
+          body: formData
         },
         state.token
       );

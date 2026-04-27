@@ -106,6 +106,7 @@ export const emptyUserForm: UserFormState = {
   phone: "",
   address: "",
   zipCode: "",
+  picture: "",
   city: "",
   state: "",
   secondaryAddress: "",

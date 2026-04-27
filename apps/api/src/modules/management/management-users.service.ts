@@ -40,6 +40,7 @@ export class ManagementUsersService {
         name: payload.name,
         email: normalizedEmail,
         username: normalizedUsername,
+        picture: payload.picture,
         cpf: normalizedCpf,
         cnh: payload.cnh?.trim() || null,
         legacyStatus,
@@ -102,7 +103,8 @@ export class ManagementUsersService {
     const legacyStatus = payload.status?.trim() || current.legacyStatus || "Novo";
     const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
     const passwordHash = current.passwordHash === "LDAP" || !payload.password ? undefined : await hash(payload.password);
-
+    const picture = payload.picture? payload.picture : current.picture;
+ 
     return this.prisma.user.update({
       where: { id },
       data: {
@@ -110,6 +112,7 @@ export class ManagementUsersService {
         email: normalizedEmail,
         username: normalizedUsername,
         cpf: normalizedCpf,
+        picture: picture,
         cnh: payload.cnh?.trim() || null,
         legacyStatus,
         company: payload.company?.trim() || null,
