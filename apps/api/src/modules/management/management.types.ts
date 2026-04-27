@@ -49,6 +49,7 @@ export type UpsertUserInput = {
   name: string;
   email: string;
   username?: string;
+  picture?: string;
   cpf?: string;
   cnh?: string;
   status?: string;

@@ -4,6 +4,8 @@ import { ActionButton } from "../ActionButton";
 import { emptyUserForm } from "../../_lib/constants";
 import { displayRecordCode, toggleItem } from "../../_lib/utils";
 import type { RefreshManager } from "./moduleTypes";
+import { useState, useEffect, useRef } from "react";
+import Cropper from "react-easy-crop";
 
 export function UserModules({ manager }: { manager: RefreshManager }) {
   const {
@@ -25,9 +27,110 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     removeUsers
   } = manager;
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [profileTempImage, setProfileTempImage] = useState<File | null>(null);
+  const [profileTempPreview, setProfileTempPreview] = useState<string>("");
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  const [viewImageUrl, setViewImageUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (profileTempPreview) {
+        URL.revokeObjectURL(profileTempPreview);
+      }
+    };
+  }, [profileTempPreview]);
+
   const allVisibleUserIds = sortedUsers.map((managedUser) => managedUser.id);
   const allVisibleUsersSelected =
     allVisibleUserIds.length > 0 && allVisibleUserIds.every((userId) => selectedUserIds.includes(userId));
+
+  function resetCrop() {
+    if (profileTempPreview) {
+      URL.revokeObjectURL(profileTempPreview);
+    }
+
+    setProfileTempImage(null);
+    setProfileTempPreview("");
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleCrop() {
+    const image = new Image();
+    const src = profileTempPreview
+      ? profileTempPreview
+      : userForm.picture
+      ? `/abbatech/refresh${userForm.picture}`
+      : null;
+
+    if (!src) return;
+
+    image.src = src;
+
+    await new Promise((resolve) => {
+      if (image.complete) resolve(true);
+      else image.onload = resolve;
+    });
+
+    const canvas = document.createElement("canvas");
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    if (!croppedAreaPixels) return;
+
+    const size = Math.min(
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    );
+
+    canvas.width = size;
+    canvas.height = size;
+
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      size,
+      size,
+      0,
+      0,
+      size,
+      size
+    );
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob((b) => resolve(b), "image/jpeg")
+    );
+
+    if (!blob) return;
+
+    if (profileTempPreview) {
+      URL.revokeObjectURL(profileTempPreview);
+    }
+
+    const newUrl = URL.createObjectURL(blob);
+
+    setProfileTempPreview(newUrl);
+    setProfileTempImage(new File([blob], "cropped.jpg", { type: "image/jpeg" }));
+
+    setIsPreviewOpen(false);
+  }
 
   function toggleAllVisibleUsers() {
     setSelectedUserIds((current) => {
@@ -69,7 +172,28 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     if (view === "users") {
       return (
         <section className="space-y-6">
-          <form className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" onSubmit={handleUserSubmit}>
+          <form 
+            className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" 
+            onSubmit={
+              async (e) => {
+                e.preventDefault();
+
+                if (!userForm.picture && !profileTempImage) {
+                  alert("Selecione uma imagem");
+                  return;
+                }
+
+                if (profileTempPreview && !profileTempImage) {
+                  alert("Corte a imagem antes de salvar");
+                  return;
+                }
+
+                await handleUserSubmit(e, profileTempImage);
+
+                resetCrop();
+              }
+            }
+            encType="multipart/form-data">
             {userForm.id ? (
               <div className="flex items-center justify-between border border-[#cfe3f3] bg-[#eef7fd] px-4 py-3 text-[14px] text-[#215d85]">
                 <span>Modo de edição ativo para este usuário.</span>
@@ -78,6 +202,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   onClick={() => {
                     setUserForm(emptyUserForm);
                     setHighlightedUserId("");
+                    resetCrop();
                   }}
                   type="button"
                 >
@@ -85,6 +210,59 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 </button>
               </div>
             ) : null}
+            <div>
+              <label className="admin-label">Foto de Perfil</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+
+                  if (profileTempPreview) {
+                    URL.revokeObjectURL(profileTempPreview);
+                  }
+
+                  const preview = URL.createObjectURL(file);
+
+                  setProfileTempImage(file);
+                  setProfileTempPreview(preview);
+
+                  setCrop({ x: 0, y: 0 });
+                  setZoom(1);
+                  setCroppedAreaPixels(null);
+
+                  setIsPreviewOpen(true);
+                }}
+              />
+            </div>
+            {(profileTempPreview || userForm.picture) && (
+              <div
+                className="mt-2 w-24 h-24 overflow-hidden rounded cursor-zoom-in"
+                onClick={() => {
+                  if (profileTempPreview || userForm.picture) {
+                    setCrop({ x: 0, y: 0 });
+                    setZoom(1);
+                    setCroppedAreaPixels(null);
+
+                    setIsPreviewOpen(true);
+                  }
+                }}
+              >
+                <img
+                  src={
+                    profileTempPreview
+                      ? profileTempPreview
+                      : userForm.picture
+                        ? `/abbatech/refresh${userForm.picture}`
+                        : undefined
+                  }
+                  alt="preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <label className="admin-label">Nome</label>
@@ -184,6 +362,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   onClick={() => {
                     setUserForm(emptyUserForm);
                     setHighlightedUserId("");
+                    resetCrop();
                   }}
                 >
                   Novo
@@ -479,6 +658,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   </th>
                   <th className="w-[70px]">Id</th>
                   <th>Nome</th>
+                  <th>Foto</th>
                   <th>Username</th>
                   <th className="w-[90px]">CPF</th>
                   <th>E-mail</th>
@@ -506,6 +686,21 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                         {managedUser.name}
                       </button>
                     </td>
+                    <td>
+                      {managedUser.picture ? (
+                       <img
+                          src={`/abbatech/refresh${managedUser.picture}`}
+                          alt={managedUser.username ?? ""}
+                          className="w-12 h-12 object-cover cursor-zoom-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setViewImageUrl(`/abbatech/refresh${managedUser.picture}`);
+                          }}
+                        />
+                      ) : (
+                        "-"
+                      )}
+                    </td>
                     <td className="text-[#0c67ad]">{managedUser.username ?? "-"}</td>
                     <td className="text-[#0c67ad]">{managedUser.cpf ?? "-"}</td>
                     <td className="text-[#0c67ad]">{managedUser.email}</td>
@@ -526,6 +721,78 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </tbody>
             </table>
           </div>
+          {isPreviewOpen && (
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+              
+              <div className="relative w-[90vw] h-[80vh] bg-black">
+                <Cropper
+                  image={
+                    profileTempPreview
+                      ? profileTempPreview
+                      : userForm.picture
+                        ? `/abbatech/refresh${userForm.picture}`
+                        : undefined
+                  }
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, croppedPixels) => setCroppedAreaPixels(croppedPixels)}
+                />
+              </div>
+
+              <button
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-2 rounded shadow-lg hover:bg-green-700 z-50"
+                onClick={handleCrop}
+              >
+                Confirmar corte
+              </button>
+
+              <input
+                type="range"
+                min={1}
+                max={2}
+                step={0.1}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[200px] z-10"
+              />
+
+              <button
+                className="absolute top-4 right-4 text-white text-2xl"
+                onClick={() => {
+                  setIsPreviewOpen(false);
+
+                  setCrop({ x: 0, y: 0 });
+                  setZoom(1);
+                  setCroppedAreaPixels(null);
+
+                  if (!profileTempImage) {
+                    setProfileTempPreview("");
+                  }
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {viewImageUrl && (
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+              <img
+                src={viewImageUrl}
+                className="max-w-[90vw] max-h-[90vh] object-contain"
+              />
+
+              <button
+                className="absolute top-4 right-4 text-white text-2xl"
+                onClick={() => setViewImageUrl(null)}
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </section>
       );
     }

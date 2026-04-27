@@ -11,6 +11,7 @@ model User {
   id                String               @id @default(cuid())
   legacyId          Int?                 @unique
   name              String
+  picture           String?
   email             String               @unique
   username          String?              @unique
   cpf               String?              @unique

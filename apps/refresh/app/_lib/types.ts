@@ -237,6 +237,7 @@ export type ManagedUser = {
   legacyId?: number | null;
   name: string;
   email: string;
+  picture: string;
   username?: string | null;
   cpf?: string | null;
   cnh?: string | null;
@@ -434,6 +435,7 @@ export type UserFormState = {
   name: string;
   email: string;
   username: string;
+  picture: string;
   cpf: string;
   cnh: string;
   status: string;

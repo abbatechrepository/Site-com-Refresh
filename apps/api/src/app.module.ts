@@ -10,6 +10,7 @@ import { TemplatesModule } from "./modules/templates/templates.module";
 import { NewslettersModule } from "./modules/newsletters/newsletters.module";
 import { PrivacyModule } from "./modules/privacy/privacy.module";
 import { ManagementModule } from "./modules/management/management.module";
+import { UploadService } from "./modules/upload/upload.service";
 
 @Module({
   imports: [
@@ -32,6 +33,6 @@ import { ManagementModule } from "./modules/management/management.module";
     ManagementModule
   ],
   controllers: [HealthController],
-  providers: [PrismaService]
+  providers: [PrismaService, UploadService]
 })
 export class AppModule {}

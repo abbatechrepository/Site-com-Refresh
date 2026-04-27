@@ -2,6 +2,10 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@n
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { PermissionsGuard } from "../auth/permissions.guard";
 import { RequirePermissions } from "../auth/permissions.decorator";
+import { UseInterceptors, UploadedFile } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { memoryStorage } from "multer";
+
 import {
   UpsertApplicationDto,
   UpsertContentTypeDto,
@@ -17,11 +21,12 @@ import {
   UpsertUserDto
 } from "./management.dto";
 import { ManagementService } from "./management.service";
+import { UploadService } from "../upload/upload.service";
 
 @Controller("management")
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ManagementController {
-  constructor(private readonly managementService: ManagementService) {}
+  constructor(private readonly managementService: ManagementService, private readonly uploadService: UploadService) {}
 
   @Get("bootstrap")
   @RequirePermissions("management.read")
@@ -121,14 +126,52 @@ export class ManagementController {
 
   @Post("users")
   @RequirePermissions("management.write")
-  createUser(@Body() body: UpsertUserDto) {
-    return this.managementService.createUser(body);
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: memoryStorage(),
+    })
+  )
+  createUser(
+    @Body() body: UpsertUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const imageUrl = file
+      ? this.uploadService.saveUserImage(file, body.username)
+      : undefined;
+
+    if (imageUrl == null) {
+      return {
+        success: false,
+        message: "Erro ao fazer upload da imagem"
+      };
+    }
+
+    return this.managementService.createUser({
+      ...body,
+      picture: imageUrl
+    });
   }
 
   @Patch("users/:id")
   @RequirePermissions("management.write")
-  updateUser(@Param("id") id: string, @Body() body: UpsertUserDto) {
-    return this.managementService.updateUser(id, body);
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: memoryStorage(),
+    })
+  )
+  updateUser(
+    @Param("id") id: string,
+    @Body() body: UpsertUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const imageUrl = file
+      ? this.uploadService.saveUserImage(file, body.username)
+      : undefined;
+
+    return this.managementService.updateUser(id, {
+      ...body,
+      ...(imageUrl && { picture: imageUrl }),
+    });
   }
 
   @Delete("users/:id")

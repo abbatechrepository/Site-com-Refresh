@@ -7,10 +7,12 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${apiUrl}${path}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options?.headers ?? {})
+   headers: {
+    ...(options?.body instanceof FormData
+      ? {}
+      : { "Content-Type": "application/json" }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options?.headers ?? {})
     }
   });
 

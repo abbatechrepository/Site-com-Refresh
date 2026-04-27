@@ -7,6 +7,7 @@ import { ManagementSequenceService } from "./management-sequence.service";
 import { ManagementService } from "./management.service";
 import { ManagementUsersService } from "./management-users.service";
 import { ManagementValidationService } from "./management.validation.service";
+import { UploadService } from "../upload/upload.service";
 
 @Module({
   imports: [AuthModule],
@@ -17,7 +18,8 @@ import { ManagementValidationService } from "./management.validation.service";
     ManagementSequenceService,
     ManagementUsersService,
     ManagementNewslettersService,
-    PrismaService
+    PrismaService,
+    UploadService
   ]
 })
 export class ManagementModule {}

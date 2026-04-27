@@ -40,10 +40,15 @@ npm install
 docker compose up --build
 ```
 
+## Atualizar schema
+```bash
+cd apps/api && npx prisma db push
+```
+
 Servicos:
 
-- Portal: `http://localhost:3100`
-- Refresh CMS: `http://localhost:3101`
+- Portal: `http://localhost:3100/abbatech/portal`
+- Refresh CMS: `http://localhost:3101/abbatech/refresh`
 - API: `http://localhost:3333/api/v1`
 - Mailpit: `http://localhost:8025`
 - MinIO Console: `http://localhost:9001`

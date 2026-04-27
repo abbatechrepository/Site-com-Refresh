@@ -148,6 +148,7 @@ export function useRefreshManagerEditors(state: RefreshManagerState) {
     state.setUserForm({
       id: managedUser.id,
       name: managedUser.name,
+      picture: managedUser.picture,
       email: managedUser.email,
       username: managedUser.username ?? "",
       cpf: managedUser.cpf ?? "",

@@ -142,6 +142,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
       email: user.email,
       username: user.username,
       cpf: user.cpf,
+      picture: user.picture,
       cnh: (user.cnh as string | null | undefined) ?? null,
       status: (user.legacyStatus as string | null | undefined) ?? (user.isActive ? "Ativo" : "Inativo"),
       company: (user.company as string | null | undefined) ?? null,

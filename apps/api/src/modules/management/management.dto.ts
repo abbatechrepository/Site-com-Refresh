@@ -1,4 +1,6 @@
 import { Type } from "class-transformer";
+import { Transform } from "class-transformer";
+
 import {
   IsArray,
   IsBoolean,
@@ -155,6 +157,10 @@ export class UpsertUserDto {
   @MinLength(3)
   username!: string;
 
+  @IsString()
+  @IsOptional()
+  picture?: string;
+
   @IsOptional()
   @IsString()
   @MinLength(11)
@@ -230,6 +236,7 @@ export class UpsertUserDto {
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === "true" || value === true)
   forcePasswordChange?: boolean;
 
   @IsOptional()
@@ -239,10 +246,12 @@ export class UpsertUserDto {
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === "true" || value === true)
   isActive?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === "true" || value === true)
   isSuperAdmin?: boolean;
 
   @IsOptional()
