@@ -172,8 +172,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     if (view === "users") {
       return (
         <section className="space-y-6">
-          <form 
-            className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" 
+          <form
+            className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4"
             onSubmit={
               async (e) => {
                 e.preventDefault();
@@ -354,22 +354,6 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   <option value="Excluído">Excluído</option>
                 </select>
               </div>
-              <div className="flex items-end gap-2">
-                <ActionButton tone="green" type="submit">
-                  {userForm.id ? "Salvar alterações" : "Incluir"}
-                </ActionButton>
-                <ActionButton
-                  onClick={() => {
-                    setUserForm(emptyUserForm);
-                    setHighlightedUserId("");
-                    resetCrop();
-                  }}
-                >
-                  Novo
-                </ActionButton>
-              </div>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <label className="admin-label">Empresa</label>
                 <input
@@ -378,6 +362,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   value={userForm.company}
                 />
               </div>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-3">
+
               <div>
                 <label className="admin-label">Função</label>
                 <input
@@ -394,16 +381,16 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   value={userForm.phone}
                 />
               </div>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="lg:col-span-3">
+              <div>
                 <label className="admin-label">Endereço</label>
                 <textarea
-                  className="admin-textarea"
+                  className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, address: event.target.value }))}
                   value={userForm.address}
                 />
               </div>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <label className="admin-label">CEP</label>
                 <input
@@ -634,6 +621,20 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   <p className="text-[13px] text-[#777]">Nenhum aplicativo liberado pelos grupos selecionados.</p>
                 )}
               </div>
+              <div className="flex items-end gap-2">
+                <ActionButton tone="green" type="submit">
+                  {userForm.id ? "Salvar alterações" : "Incluir"}
+                </ActionButton>
+                <ActionButton
+                  onClick={() => {
+                    setUserForm(emptyUserForm);
+                    setHighlightedUserId("");
+                    resetCrop();
+                  }}
+                >
+                  Novo
+                </ActionButton>
+              </div>
             </div>
           </form>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -723,7 +724,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
           </div>
           {isPreviewOpen && (
             <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-              
+
               <div className="relative w-[90vw] h-[80vh] bg-black">
                 <Cropper
                   image={
