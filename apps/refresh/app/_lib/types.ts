@@ -39,6 +39,7 @@ export type LoggedUser = {
   email: string;
   username?: string | null;
   cpf?: string | null;
+  picture?: string | null;
   permissions: string[];
   activeRoleId?: string | null;
   roles: Array<{
@@ -237,7 +238,7 @@ export type ManagedUser = {
   legacyId?: number | null;
   name: string;
   email: string;
-  picture: string;
+  picture?: string | null;
   username?: string | null;
   cpf?: string | null;
   cnh?: string | null;

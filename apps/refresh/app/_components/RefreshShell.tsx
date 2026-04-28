@@ -1,4 +1,4 @@
-import { getBreadcrumbLabel, getBreadcrumbTop, getViewTitle } from "../_lib/utils";
+import { getBreadcrumbLabel, getBreadcrumbTop, getViewTitle, resolveUserPictureUrl } from "../_lib/utils";
 import type { RefreshShellProps } from "../_lib/types";
 import Image from "next/image";
 import { refreshLogoSrc } from "../_lib/assets";
@@ -23,6 +23,10 @@ export function RefreshShell({
   isPending,
   children
 }: RefreshShellProps) {
+
+  const userPictureUrl = resolveUserPictureUrl(user?.picture);
+  const userInitial = user?.name?.trim().slice(0, 1).toUpperCase() ?? "U";
+
   return (
     <main className="min-h-screen bg-transparent text-[#16324f]">
       <header className="border-b border-[rgba(183,205,227,0.86)] bg-white/84 shadow-[0_14px_36px_rgba(15,33,57,0.06)] backdrop-blur-sm">
@@ -43,8 +47,16 @@ export function RefreshShell({
 
           <div className="relative flex min-w-[320px] items-center justify-between rounded-[22px] border border-[rgba(18,39,66,0.1)] bg-[linear-gradient(135deg,#0f223c_0%,#143256_60%,#1973ea_100%)] px-5 py-5 text-white shadow-[0_18px_40px_rgba(15,33,57,0.24)]">
             <div className="flex items-center gap-4">
-              <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/20 bg-white/12 text-lg font-semibold backdrop-blur-sm">
-                {user?.name.slice(0, 1) ?? "U"}
+              <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/12 text-lg font-semibold backdrop-blur-sm">
+                {userPictureUrl ? (
+                  <img
+                    src={userPictureUrl}
+                    alt={`Foto de ${user?.name ?? "usuário"}`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{userInitial}</span>
+                )}
               </div>
               <div>
                 <p className="text-[15px] font-semibold tracking-[0.02em]">{user?.name ?? "Usuário"}</p>

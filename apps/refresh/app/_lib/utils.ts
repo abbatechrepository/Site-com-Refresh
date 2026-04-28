@@ -1,4 +1,5 @@
 import { menuGroups, permissionLabelMap } from "./constants";
+import { normalizeRefreshAssetPath } from "./assets";
 import type {
   LoggedUser,
   ManagedUser,
@@ -478,4 +479,23 @@ export function roleName(role: LoggedUser["roles"][number] | null | undefined) {
 
 export function toggleItem(list: string[], item: string) {
   return list.includes(item) ? list.filter((entry) => entry !== item) : [...list, item];
+}
+
+export function resolveUserPictureUrl(picture?: string | null) {
+  if (!picture) return null;
+
+  const value = picture.trim();
+
+  if (!value) return null;
+
+  if (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("data:") ||
+    value.startsWith("blob:")
+  ) {
+    return value;
+  }
+
+  return normalizeRefreshAssetPath(value);
 }

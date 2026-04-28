@@ -79,6 +79,7 @@ export class AuthService {
         email: user.email,
         username: user.username,
         cpf: user.cpf,
+        picture: user.picture,
         permissions,
         roleId: activeRole?.id
       }),
@@ -88,6 +89,7 @@ export class AuthService {
         email: user.email,
         username: user.username,
         cpf: user.cpf,
+        picture: user.picture,
         permissions,
         activeRoleId: activeRole?.id ?? null
       }
@@ -134,6 +136,7 @@ export class AuthService {
         email: user.email,
         username: user.username,
         cpf: user.cpf,
+        picture: user.picture,
         permissions,
         roleId: activeRole.id
       })
@@ -176,6 +179,12 @@ export class AuthService {
       email: user.email,
       username: user.username,
       cpf: user.cpf,
+
+      // ALTERAÇÃO:
+      // Inclui a foto no retorno do usuário autenticado.
+      // Esse retorno alimenta o LoggedUser usado pelo RefreshShell.
+      picture: user.picture,
+
       isActive: user.isActive,
       lastLoginAt: user.lastLoginAt,
       permissions: authenticatedUser.permissions,
