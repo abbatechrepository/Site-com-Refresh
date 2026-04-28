@@ -383,7 +383,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </div>
               <div>
                 <label className="admin-label">Endereço</label>
-                <textarea
+                <input
                   className="admin-input"
                   onChange={(event) => setUserForm((current) => ({ ...current, address: event.target.value }))}
                   value={userForm.address}
