@@ -42,11 +42,11 @@ docker compose up --build
 
 ## Atualizar schema
 ```bash
-cd apps/api && npx prisma db push
+npx prisma migrate deploy -w @abbatech/api 
+npm run prisma:seed -w @abbatech/api
 ```
 
-Servicos:
-
+## Servicos:
 - Portal: `http://localhost:3100/abbatech/portal`
 - Refresh CMS: `http://localhost:3101/abbatech/refresh`
 - API: `http://localhost:3333/api/v1`
