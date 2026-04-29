@@ -6,6 +6,7 @@ import { emptyUserForm } from "../../_lib/constants";
 import { displayRecordCode, toggleItem } from "../../_lib/utils";
 import type { RefreshManager } from "./moduleTypes";
 import { useState, useEffect, useRef } from "react";
+import { ImagePlus } from "lucide-react";
 import Cropper from "react-easy-crop";
 
 export function UserModules({ manager }: { manager: RefreshManager }) {
@@ -252,7 +253,11 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </div>
             ) : null}
             <div>
-              <label className="admin-label">Foto de Perfil</label>
+              <label className="admin-label">
+                <span className="inline-flex items-center gap-2">
+                  <ImagePlus size={16} strokeWidth={2} />Foto de Perfil
+                </span>
+              </label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -283,7 +288,10 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
               >
-                Escolher imagem
+                <span className="inline-flex items-center gap-2">
+                  <ImagePlus size={16} strokeWidth={2} />
+                  Escolher imagem
+                </span>
               </ActionButton>
             </div>
             {(profileTempPreview || userForm.picture) && (
