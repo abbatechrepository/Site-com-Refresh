@@ -257,6 +257,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                className="hidden"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
                   if (!file) return;
@@ -277,6 +278,13 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   setIsPreviewOpen(true);
                 }}
               />
+
+              <ActionButton
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Escolher imagem
+              </ActionButton>
             </div>
             {(profileTempPreview || userForm.picture) && (
               <div
