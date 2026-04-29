@@ -62,8 +62,10 @@ export function useRefreshManagerMutations(
       await session.bootstrap(state.token);
       state.setSuccess(state.editingSectionId ? "Seção atualizada com sucesso." : "Seção cadastrada com sucesso.");
       state.setView("sections-tree");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar seção.");
+      return false;
     }
   }
 
@@ -104,8 +106,10 @@ export function useRefreshManagerMutations(
       await session.bootstrap(state.token);
       state.setSuccess("Conteúdo salvo com sucesso.");
       state.setView("content-list");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar conteúdo.");
+      return false;
     }
   }
 
@@ -140,8 +144,10 @@ export function useRefreshManagerMutations(
       state.setSuccess(state.contentTypeForm.id ? "Máscara atualizada com sucesso." : "Máscara criada com sucesso.");
       state.setTopMenu("content");
       state.setView("masks");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar máscara.");
+      return false;
     }
   }
 
@@ -175,8 +181,10 @@ export function useRefreshManagerMutations(
       state.setPermissionForm(emptyPermissionForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.permissionForm.id ? "Permissão atualizada com sucesso." : "Permissão criada com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar permissão.");
+      return false;
     }
   }
 
@@ -206,8 +214,10 @@ export function useRefreshManagerMutations(
       state.setPermissionCodeForm(emptyPermissionCodeForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.permissionCodeForm.id ? "Permissão atualizada com sucesso." : "Permissão criada com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar permissão.");
+      return false;
     }
   }
 
@@ -237,8 +247,10 @@ export function useRefreshManagerMutations(
       state.setApplicationForm(emptyApplicationForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.applicationForm.id ? "Aplicativo atualizado com sucesso." : "Aplicativo criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar aplicativo.");
+      return false;
     }
   }
 
@@ -281,8 +293,10 @@ export function useRefreshManagerMutations(
       state.setRoleForm(emptyRoleForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.roleForm.id ? "Perfil atualizado com sucesso." : "Perfil criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar perfil.");
+      return false;
     }
   }
 
@@ -313,8 +327,10 @@ export function useRefreshManagerMutations(
       state.setSystemEmailForm(emptySystemEmailForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.systemEmailForm.id ? "Email atualizado com sucesso." : "Email criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar email.");
+      return false;
     }
   }
 
@@ -346,38 +362,38 @@ export function useRefreshManagerMutations(
       if (!trimmedName) {
         state.setError("Você precisa informar o nome.");
         window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
+        return false;
       }
 
       if (!trimmedEmail) {
         state.setError("Você precisa informar o e-mail.");
         window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
+        return false;
       }
 
       if (!trimmedUsername) {
         state.setError("Você precisa informar o username.");
         window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
+        return false;
       }
 
       if (shouldValidatePassword) {
         if (!state.userForm.password) {
           state.setError("Você precisa informar a senha.");
           window.scrollTo({ top: 0, behavior: "smooth" });
-          return;
+          return false;
         }
 
         if (state.userForm.password !== state.userForm.passwordConfirmation) {
           state.setError("Senha informada não confere.");
           window.scrollTo({ top: 0, behavior: "smooth" });
-          return;
+          return false;
         }
 
         if (state.userForm.password.length < 6) {
           state.setError("A senha deve ter no mínimo seis caracteres.");
           window.scrollTo({ top: 0, behavior: "smooth" });
-          return;
+          return false;
         }
       }
 
@@ -402,7 +418,7 @@ export function useRefreshManagerMutations(
 
       if (conflictingUser) {
         handleConflictingUser(conflictingUser, normalizedUsername, normalizedCpf);
-        return;
+        return false;
       }
 
       const path = state.userForm.id ? `/management/users/${state.userForm.id}` : "/management/users";
@@ -468,8 +484,10 @@ export function useRefreshManagerMutations(
       state.setSelectedUserIds([]);
       await session.bootstrap(state.token);
       state.setSuccess(state.userForm.id ? "Usuário atualizado com sucesso." : "Usuário criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar usuário.");
+      return false;
     }
   }
 
@@ -520,8 +538,10 @@ export function useRefreshManagerMutations(
       state.setTemplateForm(emptyTemplateForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.templateForm.id ? "Template atualizado com sucesso." : "Template criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar template.");
+      return false;
     }
   }
 
@@ -552,8 +572,10 @@ export function useRefreshManagerMutations(
       state.setElementForm(emptyElementForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.elementForm.id ? "Elemento atualizado com sucesso." : "Elemento criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar elemento.");
+      return false;
     }
   }
 
