@@ -1,6 +1,7 @@
 "use client";
 
 import { ActionButton } from "../ActionButton";
+import { AdminModal } from "../AdminModal";
 import { emptyUserForm } from "../../_lib/constants";
 import { displayRecordCode, toggleItem } from "../../_lib/utils";
 import type { RefreshManager } from "./moduleTypes";
@@ -28,6 +29,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
   } = manager;
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [profileTempImage, setProfileTempImage] = useState<File | null>(null);
   const [profileTempPreview, setProfileTempPreview] = useState<string>("");
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -154,6 +156,26 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     }
   }
 
+  function closeUserModal() {
+    setUserForm(emptyUserForm);
+    setHighlightedUserId("");
+    resetCrop();
+    setIsUserModalOpen(false);
+  }
+
+  function openNewUser() {
+    setUserForm(emptyUserForm);
+    setHighlightedUserId("");
+    resetCrop();
+    setIsUserModalOpen(true);
+  }
+
+  function openEditUser(managedUser: (typeof sortedUsers)[number]) {
+    resetCrop();
+    editUser(managedUser);
+    setIsUserModalOpen(true);
+  }
+
   function getUserRowClassName(managedUser: (typeof sortedUsers)[number]) {
     if (managedUser.id === highlightedUserId) {
       return "bg-[#fff8d9]";
@@ -173,8 +195,21 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     if (view === "users") {
       return (
         <section className="space-y-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <ActionButton onClick={openNewUser} tone="green">
+              Incluir Usuário
+            </ActionButton>
+          </div>
+
+          <AdminModal
+            error={manager.error}
+            isOpen={isUserModalOpen}
+            onClose={closeUserModal}
+            size="full"
+            title={userForm.id ? "Editar Usuário" : "Novo Usuário"}
+          >
           <form
-            className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4"
+            className="admin-modal-form space-y-4"
             onSubmit={
               async (e) => {
                 e.preventDefault();
@@ -189,9 +224,12 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   return;
                 }
 
-                await handleUserSubmit(e, profileTempImage);
+                const saved = await handleUserSubmit(e, profileTempImage);
 
-                resetCrop();
+                if (saved) {
+                  resetCrop();
+                  setIsUserModalOpen(false);
+                }
               }
             }
             encType="multipart/form-data">
@@ -200,11 +238,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 <span>Modo de edição ativo para este usuário.</span>
                 <button
                   className="font-semibold text-[#0c67ad] hover:underline"
-                  onClick={() => {
-                    setUserForm(emptyUserForm);
-                    setHighlightedUserId("");
-                    resetCrop();
-                  }}
+                  onClick={closeUserModal}
                   type="button"
                 >
                   Cancelar edição
@@ -622,10 +656,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   <p className="text-[13px] text-[#777]">Nenhum aplicativo liberado pelos grupos selecionados.</p>
                 )}
               </div>
-              <div className="flex items-end gap-2">
-                <ActionButton tone="green" type="submit">
-                  {userForm.id ? "Salvar alterações" : "Incluir"}
-                </ActionButton>
+              <div className="admin-modal-footer flex flex-wrap justify-end gap-2 lg:col-span-2">
+                <ActionButton onClick={closeUserModal}>Cancelar</ActionButton>
                 <ActionButton
                   onClick={() => {
                     setUserForm(emptyUserForm);
@@ -633,11 +665,15 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                     resetCrop();
                   }}
                 >
-                  Novo
+                  Limpar
+                </ActionButton>
+                <ActionButton tone="green" type="submit">
+                  {userForm.id ? "Salvar alterações" : "Incluir"}
                 </ActionButton>
               </div>
             </div>
           </form>
+          </AdminModal>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[13px] text-[#666]">
               {selectedUserIds.length > 0 ? `${selectedUserIds.length} selecionado(s)` : `${sortedUsers.length} usuário(s)`}
@@ -684,10 +720,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                     </td>
                     <td>{displayRecordCode(managedUser.displayId, managedUser.id)}</td>
                     <td>
-                      <button className="text-[#0c67ad] hover:underline" onClick={() => {
-                          resetCrop();
-                          editUser(managedUser);
-                        }}
+                      <button className="text-[#0c67ad] hover:underline" onClick={() => openEditUser(managedUser)}
                         type="button">
                         {managedUser.name}
                       </button>
@@ -714,10 +747,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                     <td className="text-[#0c67ad]">{managedUser.status ?? (managedUser.isActive ? "Ativo" : "Inativo")}</td>
                     <td>
                       <div className="flex flex-col gap-1">
-                        <button className="text-left text-[#0c67ad] hover:underline" onClick={() => {
-                            resetCrop();
-                            editUser(managedUser);
-                          }}
+                        <button className="text-left text-[#0c67ad] hover:underline" onClick={() => openEditUser(managedUser)}
                           type="button">
                           Editar
                         </button>

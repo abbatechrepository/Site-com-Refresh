@@ -138,3 +138,21 @@ select.admin-input {
   background-size: 6px 6px, 6px 6px, 100% 100%;
   background-repeat: no-repeat;
 }
+
+.admin-modal-form {
+  border: 1px solid var(--refresh-stroke);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  box-shadow: 0 18px 38px rgba(15, 33, 57, 0.08);
+  padding: 16px;
+}
+
+.admin-modal-footer {
+  position: sticky;
+  bottom: -20px;
+  margin: 20px -16px -16px;
+  border-top: 1px solid var(--refresh-stroke);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 14px 16px;
+  backdrop-filter: blur(10px);
+}

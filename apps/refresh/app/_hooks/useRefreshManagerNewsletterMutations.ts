@@ -44,8 +44,10 @@ export function useRefreshManagerNewsletterMutations(
       state.setNewsletterGroupForm(emptyNewsletterGroupForm);
       await session.bootstrap(state.token);
       state.setSuccess(state.newsletterGroupForm.id ? "Grupo atualizado com sucesso." : "Grupo criado com sucesso.");
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar grupo.");
+      return false;
     }
   }
 
@@ -80,8 +82,10 @@ export function useRefreshManagerNewsletterMutations(
       state.setSuccess(
         state.newsletterRecipientForm.id ? "Destinatário atualizado com sucesso." : "Destinatário criado com sucesso."
       );
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar destinatário.");
+      return false;
     }
   }
 
@@ -121,8 +125,10 @@ export function useRefreshManagerNewsletterMutations(
       state.setSuccess(
         state.newsletterCampaignForm.id ? "Campanha atualizada com sucesso." : "Campanha criada com sucesso."
       );
+      return true;
     } catch (submitError) {
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar campanha.");
+      return false;
     }
   }
 
