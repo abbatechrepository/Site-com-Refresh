@@ -204,7 +204,13 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
           <AdminModal
             error={manager.error}
             isOpen={isUserModalOpen}
-            onClose={closeUserModal}
+            onClose={() => {
+              if (isPreviewOpen) {
+                return;
+              }
+
+              closeUserModal();
+            }}
             size="full"
             title={userForm.id ? "Editar Usuário" : "Novo Usuário"}
           >
@@ -762,9 +768,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </table>
           </div>
           {isPreviewOpen && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/86">
 
-              <div className="relative w-[90vw] h-[80vh] bg-black">
+              <div className="relative h-[80vh] w-[90vw] overflow-hidden rounded-[8px] border border-white/15 bg-black shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
                 <Cropper
                   image={
                     profileTempPreview
@@ -783,8 +789,9 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </div>
 
               <button
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-2 rounded shadow-lg hover:bg-green-700 z-50"
+                className="absolute bottom-6 left-1/2 z-[122] -translate-x-1/2 rounded-[8px] bg-green-600 px-6 py-2 font-semibold text-white shadow-lg hover:bg-green-700"
                 onClick={handleCrop}
+                type="button"
               >
                 Confirmar corte
               </button>
@@ -796,11 +803,11 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 step={0.1}
                 value={zoom}
                 onChange={(e) => setZoom(Number(e.target.value))}
-                className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[200px] z-10"
+                className="absolute bottom-20 left-1/2 z-[122] w-[200px] -translate-x-1/2"
               />
 
               <button
-                className="absolute top-4 right-4 text-white text-2xl"
+                className="absolute right-4 top-4 z-[122] flex h-10 w-10 items-center justify-center rounded-[8px] border border-white/20 bg-white/10 text-2xl text-white hover:bg-white/20"
                 onClick={() => {
                   setIsPreviewOpen(false);
 
@@ -812,6 +819,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                     setProfileTempPreview("");
                   }
                 }}
+                type="button"
               >
                 ✕
               </button>
@@ -819,15 +827,16 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
           )}
 
           {viewImageUrl && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/86">
               <img
                 src={viewImageUrl}
                 className="max-w-[90vw] max-h-[90vh] object-contain"
               />
 
               <button
-                className="absolute top-4 right-4 text-white text-2xl"
+                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[8px] border border-white/20 bg-white/10 text-2xl text-white hover:bg-white/20"
                 onClick={() => setViewImageUrl(null)}
+                type="button"
               >
                 ✕
               </button>
