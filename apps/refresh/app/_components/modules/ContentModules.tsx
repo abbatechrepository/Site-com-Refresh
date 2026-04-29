@@ -111,7 +111,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                     <td>
                       <input type="checkbox" />
                     </td>
-                    <td>{displayRecordCode(content.legacyId, content.id)}</td>
+                    <td>{displayRecordCode(content.displayId, content.id)}</td>
                     <td>
                       <div>{formatDate(content.publishedAt)}</div>
                       <div className="mt-2 inline-flex items-center gap-2 border border-[#ddd] px-2 py-1 text-[13px]">

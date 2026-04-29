@@ -1,4 +1,4 @@
-import type { SeedContent, SeedSection } from "./types";
+import type { SeedContent, SeedSection } from "./demo.types";
 
 export const seedContentTypes = [
   {

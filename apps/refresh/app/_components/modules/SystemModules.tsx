@@ -103,7 +103,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {management.applications.map((application) => (
                   <tr key={application.id}>
-                    <td>{displayRecordCode(application.legacyId, application.id)}</td>
+                    <td>{displayRecordCode(application.displayId, application.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editApplication(application)} type="button">
                         {application.name}
@@ -179,7 +179,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {management.systemEmails.map((systemEmail) => (
                   <tr key={systemEmail.id}>
-                    <td>{displayRecordCode(systemEmail.legacyId, systemEmail.id)}</td>
+                    <td>{displayRecordCode(systemEmail.displayId, systemEmail.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editSystemEmail(systemEmail)} type="button">
                         {systemEmail.name}
@@ -231,7 +231,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {statisticRows.map((section) => (
                   <tr key={section.id}>
-                    <td>{displayRecordCode(section.legacyId, section.id)}</td>
+                    <td>{displayRecordCode(section.displayId, section.id)}</td>
                     <td>{section.name}</td>
                     <td className="text-[#0c67ad]">{section.path}</td>
                     <td>{section.visits ?? 0}</td>
@@ -487,7 +487,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {management.newsletterGroups.map((group) => (
                   <tr key={group.id}>
-                    <td>{displayRecordCode(group.legacyId, group.id)}</td>
+                    <td>{displayRecordCode(group.displayId, group.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editNewsletterGroup(group)} type="button">
                         {group.name}
@@ -522,7 +522,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {management.newsletterRecipients.map((recipient) => (
                   <tr key={recipient.id}>
-                    <td>{displayRecordCode(recipient.legacyId, recipient.id)}</td>
+                    <td>{displayRecordCode(recipient.displayId, recipient.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editNewsletterRecipient(recipient)} type="button">
                         {recipient.name ?? "--"}
@@ -560,7 +560,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {management.newsletterCampaigns.map((campaign) => (
                   <tr key={campaign.id}>
-                    <td>{displayRecordCode(campaign.legacyId, campaign.id)}</td>
+                    <td>{displayRecordCode(campaign.displayId, campaign.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editNewsletterCampaign(campaign)} type="button">
                         {campaign.name}

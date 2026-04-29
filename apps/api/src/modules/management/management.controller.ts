@@ -131,14 +131,13 @@ export class ManagementController {
       storage: memoryStorage(),
     })
   )
-  createUser(
+  async createUser(
     @Body() body: UpsertUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     const imageUrl = file
-      ? this.uploadService.saveUserImage(file, body.username)
-      : undefined;
-
+      ? await this.uploadService.saveUserImage(file, body.username)
+      : undefined;    
     if (imageUrl == null) {
       return {
         success: false,
@@ -159,13 +158,14 @@ export class ManagementController {
       storage: memoryStorage(),
     })
   )
-  updateUser(
+  async updateUser(
     @Param("id") id: string,
     @Body() body: UpsertUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
+
     const imageUrl = file
-      ? this.uploadService.saveUserImage(file, body.username)
+      ? await this.uploadService.saveUserImage(file, body.username)
       : undefined;
 
     return this.managementService.updateUser(id, {

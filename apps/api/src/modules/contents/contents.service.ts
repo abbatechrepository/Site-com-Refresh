@@ -27,11 +27,11 @@ export class ContentsService {
   private async nextSequenceNumber() {
     const aggregate = await this.prisma.content.aggregate({
       _max: {
-        legacyId: true
+        displayId: true
       }
     });
 
-    return (aggregate._max.legacyId ?? 0) + 1;
+    return (aggregate._max.displayId ?? 0) + 1;
   }
 
   async listPublished() {
@@ -119,7 +119,7 @@ export class ContentsService {
 
     const content = await this.prisma.content.create({
       data: {
-        legacyId: await this.nextSequenceNumber(),
+        displayId: await this.nextSequenceNumber(),
         title: payload.title,
         slug,
         excerpt: payload.excerpt,

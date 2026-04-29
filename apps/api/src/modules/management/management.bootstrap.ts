@@ -76,7 +76,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
       },
       orderBy: [{ code: "asc" }]
     }),
-    prisma.legacyApplication.findMany({
+    prisma.systemApplication.findMany({
       orderBy: [{ area: "asc" }, { name: "asc" }]
     }),
     prisma.roleApplicationAccess.findMany({
@@ -137,14 +137,14 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     contentTypes,
     users: users.map((user: (typeof users)[number] & Record<string, unknown>) => ({
       id: user.id,
-      legacyId: (user.legacyId as number | undefined) ?? null,
+      displayId: (user.displayId as number | undefined) ?? null,
       name: user.name,
       email: user.email,
       username: user.username,
       cpf: user.cpf,
       picture: user.picture,
       cnh: (user.cnh as string | null | undefined) ?? null,
-      status: (user.legacyStatus as string | null | undefined) ?? (user.isActive ? "Ativo" : "Inativo"),
+      status: (user.status as string | null | undefined) ?? (user.isActive ? "Ativo" : "Inativo"),
       company: (user.company as string | null | undefined) ?? null,
       jobTitle: (user.jobTitle as string | null | undefined) ?? null,
       phone: (user.phone as string | null | undefined) ?? null,
@@ -170,7 +170,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     })),
     roles: roles.map((role: (typeof roles)[number]) => ({
       id: role.id,
-      legacyId: role.legacyId,
+      displayId: role.displayId,
       name: role.name,
       description: role.description,
       functionName: role.functionName,
@@ -201,7 +201,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     })),
     permissions: permissions.map((permission: (typeof permissions)[number]) => ({
       id: permission.id,
-      legacyId: permission.legacyId,
+      displayId: permission.displayId,
       code: permission.code,
       description: permission.description,
       roles: permission.roles.map((entry: (typeof permission.roles)[number]) => ({
@@ -212,7 +212,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     applications,
     roleApplicationAccesses: roleApplicationAccesses.map((entry: (typeof roleApplicationAccesses)[number]) => ({
       id: entry.id,
-      legacyId: entry.legacyId,
+      displayId: entry.displayId,
       roleId: entry.roleId,
       roleName: entry.role.name,
       appId: entry.appId,
@@ -229,7 +229,7 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
     newsletterGroups,
     newsletterRecipients: newsletterRecipients.map((recipient: (typeof newsletterRecipients)[number]) => ({
       id: recipient.id,
-      legacyId: recipient.legacyId,
+      displayId: recipient.displayId,
       email: recipient.email,
       name: recipient.name,
       groupId: recipient.groupId,

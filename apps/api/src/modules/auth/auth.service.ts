@@ -55,7 +55,7 @@ export class AuthService {
       throw new UnauthorizedException("Credenciais invalidas.");
     }
 
-    if (!user.isActive || ["Inativo", "Excluído"].includes(user.legacyStatus)) {
+    if (!user.isActive || ["Inativo", "Excluído"].includes(user.status)) {
       throw new UnauthorizedException("Usuario inativo.");
     }
 
