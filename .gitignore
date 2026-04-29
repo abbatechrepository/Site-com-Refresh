@@ -70,3 +70,6 @@ test-results/
 # Misc project files
 Manager/
 handoff-status.md
+
+# Local database backups
+backups/

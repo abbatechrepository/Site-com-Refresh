@@ -57,18 +57,3 @@ export const bootstrapAdminRole: RoleDefinition = {
     { topMenu: "newsletter", viewKey: "newsletter" }
   ]
 };
-
-export const bootstrapApplications = [
-  { name: "Conteúdo", area: "Conteúdo", link: "/Manager/Conteudo.php", description: "Cadastro e listagem de conteúdos." },
-  { name: "Seção", area: "Conteúdo", link: "/Manager/Secao.php", description: "Navegação, menus e arquitetura de informação." },
-  { name: "Templates", area: "Conteúdo", link: "/Manager/Template.php", description: "Cadastro de templates." },
-  { name: "Máscara", area: "Conteúdo", link: "/Manager/Mascara.php", description: "Máscaras de conteúdo." },
-  { name: "Blocos de Conteúdo", area: "Conteúdo", link: "/Manager/Elemento.php", description: "Elementos e blocos customizados." },
-  { name: "Permissões", area: "Administração", link: "/Manager/Permissao.php", description: "Permissões por grupo e aplicativo." },
-  { name: "Grupos", area: "Administração", link: "/Manager/Grupos.php", description: "Cadastro de grupos e workflow." },
-  { name: "Usuários", area: "Administração", link: "/Manager/Usuarios.php", description: "Cadastro de usuários." },
-  { name: "Email", area: "Sistema", link: "/Manager/Email.php", description: "E-mails utilizados pelo portal." },
-  { name: "Aplicativos", area: "Sistema", link: "/Manager/Aplicativos.php", description: "Cadastro de aplicativos e áreas de menu." },
-  { name: "Estatísticas", area: "Administração", link: "/Manager/Estatistica.php", description: "Acessos por seção." },
-  { name: "Newsletter", area: "Newsletter", link: "/Manager/Newsletter.php", description: "Grupos, destinatários e campanhas." }
-] as const;

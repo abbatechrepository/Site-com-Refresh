@@ -110,7 +110,7 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
                     <td>
                       <input type="checkbox" />
                     </td>
-                    <td>{displayRecordCode(contentType.legacyId, contentType.id)}</td>
+                    <td>{displayRecordCode(contentType.displayId, contentType.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editContentType(contentType)} type="button">
                         {contentType.name}
@@ -183,7 +183,7 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
                     <td>
                       <input type="checkbox" />
                     </td>
-                    <td>{displayRecordCode(template.legacyId, template.id)}</td>
+                    <td>{displayRecordCode(template.displayId, template.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editTemplate(template)} type="button">
                         {template.slug}
@@ -262,7 +262,7 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
                     <td>
                       <input type="checkbox" />
                     </td>
-                    <td>{displayRecordCode(element.legacyId, element.id)}</td>
+                    <td>{displayRecordCode(element.displayId, element.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editElement(element)} type="button">
                         {element.name}

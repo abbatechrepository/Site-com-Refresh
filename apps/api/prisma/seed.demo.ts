@@ -1,16 +1,26 @@
 import { PrismaClient } from "@prisma/client";
 import { hash } from "argon2";
 
-import { applicationDefinitions, permissions, roleAccessDefinitions, roleDefinitions } from "./seed/access.data";
+import { applicationDefinitions, permissions, roleAccessDefinitions, roleDefinitions } from "./seed/access.demo.data";
 import { runBootstrapSeed } from "./seed/bootstrap";
-import { contents, sections, seedContentTypes, seedElements, seedTemplates, visitSeeds } from "./seed/content.data";
-import { launchCampaign, newsletterGroups, newsletterRecipients } from "./seed/newsletter.data";
-import { createSeedUsers, systemEmails } from "./seed/system.data";
+import { contents, sections, seedContentTypes, seedElements, seedTemplates, visitSeeds } from "./seed/content.demo.data";
+import { launchCampaign, newsletterGroups, newsletterRecipients } from "./seed/newsletter.demo.data";
+import { createSeedUsers, systemEmails } from "./seed/system.demo.data";
 
 const prisma = new PrismaClient();
 
 type PermissionRecord = Awaited<ReturnType<typeof prisma.permission.findMany>>[number];
 type RoleRecord = Awaited<ReturnType<typeof prisma.role.upsert>>;
+
+function assertDemoSeedAllowed() {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Seed demo bloqueado em ambiente de producao.");
+  }
+
+  if (process.env.ALLOW_DEMO_SEED !== "true") {
+    throw new Error("Seed demo bloqueado. Defina ALLOW_DEMO_SEED=true apenas em ambiente DEV para executar dados demonstrativos.");
+  }
+}
 
 async function seedPermissions() {
   for (const permission of permissions) {
@@ -89,10 +99,10 @@ async function seedRoles(permissionByCode: Map<string, PermissionRecord>, resetM
 }
 
 async function seedApplications(roleMap: Map<string, RoleRecord>, resetMode: boolean) {
-  const applicationMap = new Map<string, Awaited<ReturnType<typeof prisma.legacyApplication.upsert>>>();
+  const applicationMap = new Map<string, Awaited<ReturnType<typeof prisma.systemApplication.upsert>>>();
 
   for (const application of applicationDefinitions) {
-    const saved = await prisma.legacyApplication.upsert({
+    const saved = await prisma.systemApplication.upsert({
       where: { name: application.name },
       update: application,
       create: application
@@ -478,6 +488,8 @@ async function seedPrivacyRequests() {
 }
 
 async function main() {
+  assertDemoSeedAllowed();
+
   const resetMode = process.env.SEED_RESET === "true";
   const bootstrap = await runBootstrapSeed(prisma);
   const admin = await prisma.user.findUniqueOrThrow({ where: { email: bootstrap.adminEmail } });

@@ -41,7 +41,7 @@ export class ManagementService {
 
     return this.prisma.contentType.create({
       data: {
-        legacyId: await this.sequence.nextFor("contentType"),
+        displayId: await this.sequence.nextFor("contentType"),
         name: payload.name,
         slug,
         description: payload.description,
@@ -89,7 +89,7 @@ export class ManagementService {
 
     return this.prisma.permission.create({
       data: {
-        legacyId: await this.sequence.nextFor("permission"),
+        displayId: await this.sequence.nextFor("permission"),
         code,
         description: payload.description
       }
@@ -126,9 +126,9 @@ export class ManagementService {
   async createApplication(payload: UpsertApplicationInput) {
     await this.validation.ensureUniqueApplicationName(payload.name);
 
-    return this.prisma.legacyApplication.create({
+    return this.prisma.systemApplication.create({
       data: {
-        legacyId: await this.sequence.nextFor("legacyApplication"),
+        displayId: await this.sequence.nextFor("systemApplication"),
         name: payload.name,
         area: payload.area,
         link: payload.link,
@@ -138,7 +138,7 @@ export class ManagementService {
   }
 
   async updateApplication(id: string, payload: UpsertApplicationInput) {
-    const current = await this.prisma.legacyApplication.findUnique({
+    const current = await this.prisma.systemApplication.findUnique({
       where: { id }
     });
 
@@ -148,7 +148,7 @@ export class ManagementService {
 
     await this.validation.ensureUniqueApplicationName(payload.name, id);
 
-    return this.prisma.legacyApplication.update({
+    return this.prisma.systemApplication.update({
       where: { id },
       data: {
         name: payload.name,
@@ -160,7 +160,7 @@ export class ManagementService {
   }
 
   async deleteApplication(id: string) {
-    return this.prisma.legacyApplication.delete({
+    return this.prisma.systemApplication.delete({
       where: { id }
     });
   }
@@ -170,7 +170,7 @@ export class ManagementService {
 
     return this.prisma.roleApplicationAccess.create({
       data: {
-        legacyId: await this.sequence.nextFor("roleApplicationAccess"),
+        displayId: await this.sequence.nextFor("roleApplicationAccess"),
         roleId: payload.roleId,
         appId: payload.appId,
         canCreate: payload.canCreate ?? false,
@@ -229,7 +229,7 @@ export class ManagementService {
 
     return this.prisma.role.create({
       data: {
-        legacyId: await this.sequence.nextFor("role"),
+        displayId: await this.sequence.nextFor("role"),
         name: payload.name,
         description: payload.description,
         functionName: payload.functionName,
@@ -352,7 +352,7 @@ export class ManagementService {
 
     return this.prisma.template.create({
       data: {
-        legacyId: await this.sequence.nextFor("template"),
+        displayId: await this.sequence.nextFor("template"),
         name: payload.name,
         slug,
         description: payload.description,
@@ -397,7 +397,7 @@ export class ManagementService {
   async createElement(payload: UpsertElementInput) {
     return this.prisma.element.create({
       data: {
-        legacyId: await this.sequence.nextFor("element"),
+        displayId: await this.sequence.nextFor("element"),
         name: payload.name,
         thumbLabel: payload.thumbLabel,
         content: payload.content ?? "",
@@ -473,7 +473,7 @@ export class ManagementService {
   async createSystemEmail(payload: UpsertSystemEmailInput) {
     return this.prisma.systemEmail.create({
       data: {
-        legacyId: await this.sequence.nextFor("systemEmail"),
+        displayId: await this.sequence.nextFor("systemEmail"),
         name: payload.name,
         email: payload.email.trim().toLowerCase(),
         area: payload.area,

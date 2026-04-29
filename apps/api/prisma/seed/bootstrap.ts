@@ -1,19 +1,18 @@
 import type { PrismaClient } from "@prisma/client";
 import { hash } from "argon2";
 
-import { bootstrapAdminRole, bootstrapApplications, bootstrapPermissions } from "./bootstrap.data";
+import { bootstrapAdminRole, bootstrapPermissions } from "./bootstrap.data";
 
 type PermissionRecord = Awaited<ReturnType<PrismaClient["permission"]["findMany"]>>[number];
 type RoleRecord = Awaited<ReturnType<PrismaClient["role"]["upsert"]>>;
-type ApplicationRecord = Awaited<ReturnType<PrismaClient["legacyApplication"]["upsert"]>>;
-type LegacyModelDelegate = {
-  aggregate(args: { _max: { legacyId: true } }): Promise<{ _max: { legacyId: number | null } }>;
+type DisplayIdModelDelegate = {
+  aggregate(args: { _max: { displayId: true } }): Promise<{ _max: { displayId: number | null } }>;
   findMany(args: {
-    where: { legacyId: null };
+    where: { displayId: null };
     select: { id: true };
     orderBy: { id: "asc" };
   }): Promise<Array<{ id: string }>>;
-  update(args: { where: { id: string }; data: { legacyId: number } }): Promise<unknown>;
+  update(args: { where: { id: string }; data: { displayId: number } }): Promise<unknown>;
 };
 
 async function seedPermissions(prisma: PrismaClient) {
@@ -115,61 +114,56 @@ async function seedAdminRole(
   return role;
 }
 
-async function seedApplications(prisma: PrismaClient, adminRole: RoleRecord, resetMode: boolean) {
-  const applicationMap = new Map<string, ApplicationRecord>();
+async function seedAdminUser(prisma: PrismaClient, adminRole: RoleRecord) {
+  const configuredAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const configuredAdminUsername = process.env.ADMIN_USERNAME?.trim().toLowerCase();
 
-  for (const application of bootstrapApplications) {
-    const saved = await prisma.legacyApplication.upsert({
-      where: { name: application.name },
-      update: application,
-      create: application
+  if (!configuredAdminEmail) {
+    const existingSuperAdmin = await prisma.user.findFirst({
+      where: {
+        isActive: true,
+        isSuperAdmin: true
+      },
+      orderBy: {
+        createdAt: "asc"
+      }
     });
 
-    applicationMap.set(application.name, saved);
-  }
-
-  const accessCount = await prisma.roleApplicationAccess.count({
-    where: { roleId: adminRole.id }
-  });
-  const shouldSeedAccesses = resetMode || accessCount === 0;
-
-  if (resetMode) {
-    await prisma.roleApplicationAccess.deleteMany({
-      where: { roleId: adminRole.id }
-    });
-  }
-
-  if (shouldSeedAccesses) {
-    for (const app of applicationMap.values()) {
-      await prisma.roleApplicationAccess.upsert({
+    if (existingSuperAdmin) {
+      await prisma.userRole.upsert({
         where: {
-          roleId_appId: {
-            roleId: adminRole.id,
-            appId: app.id
+          userId_roleId: {
+            userId: existingSuperAdmin.id,
+            roleId: adminRole.id
           }
         },
         update: {},
         create: {
-          roleId: adminRole.id,
-          appId: app.id,
-          canCreate: app.name !== "Estatísticas",
-          canUpdate: true,
-          canDelete: true,
-          canAccess: true
+          userId: existingSuperAdmin.id,
+          roleId: adminRole.id
         }
       });
-    }
-  }
-}
 
-async function seedAdminUser(prisma: PrismaClient, adminRole: RoleRecord) {
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "admin@abbatech.local";
-  const adminPassword = process.env.ADMIN_PASSWORD || "Refresh123!";
-  const adminUsername = process.env.ADMIN_USERNAME?.trim().toLowerCase() || "admin";
-  const passwordHash = await hash(adminPassword);
+      return existingSuperAdmin;
+    }
+
+    throw new Error("ADMIN_EMAIL deve ser configurado para criar o administrador inicial.");
+  }
+
   const existing = await prisma.user.findUnique({
-    where: { email: adminEmail }
+    where: { email: configuredAdminEmail }
   });
+
+  const shouldResetPassword = process.env.ADMIN_RESET_PASSWORD === "true";
+  const shouldHashPassword = !existing || shouldResetPassword;
+
+  if (shouldHashPassword && !adminPassword) {
+    throw new Error("ADMIN_PASSWORD deve ser configurado para criar ou redefinir o administrador inicial.");
+  }
+
+  const passwordHash = shouldHashPassword ? await hash(adminPassword!) : undefined;
+  const adminUsername = configuredAdminUsername || configuredAdminEmail.split("@")[0] || "admin";
 
   const user = existing
     ? await prisma.user.update({
@@ -179,21 +173,21 @@ async function seedAdminUser(prisma: PrismaClient, adminRole: RoleRecord) {
           username: existing.username ?? adminUsername,
           isActive: true,
           isSuperAdmin: true,
-          legacyStatus: existing.legacyStatus === "Excluído" ? "Ativo" : existing.legacyStatus,
+          status: existing.status === "Excluído" ? "Ativo" : existing.status,
           consentVersion: existing.consentVersion ?? "1.0",
-          ...(process.env.ADMIN_RESET_PASSWORD === "true" ? { passwordHash } : {})
+          ...(passwordHash ? { passwordHash } : {})
         }
       })
     : await prisma.user.create({
         data: {
           name: process.env.ADMIN_NAME || "Administrador Abbatech",
-          email: adminEmail,
+          email: configuredAdminEmail,
           username: adminUsername,
           cpf: process.env.ADMIN_CPF || null,
-          passwordHash,
+          passwordHash: passwordHash!,
           isActive: true,
           isSuperAdmin: true,
-          legacyStatus: "Ativo",
+          status: "Ativo",
           consentVersion: "1.0",
           consentAt: new Date()
         }
@@ -216,30 +210,31 @@ async function seedAdminUser(prisma: PrismaClient, adminRole: RoleRecord) {
   return user;
 }
 
-async function backfillLegacyIdsFor(model: LegacyModelDelegate) {
-  const aggregate = await model.aggregate({ _max: { legacyId: true } });
+
+async function backfillDisplayIdsFor(model: DisplayIdModelDelegate) {
+  const aggregate = await model.aggregate({ _max: { displayId: true } });
   const records = await model.findMany({
-    where: { legacyId: null },
+    where: { displayId: null },
     select: { id: true },
     orderBy: { id: "asc" }
   });
-  let nextLegacyId = (aggregate._max.legacyId ?? 0) + 1;
+  let nextDisplayId = (aggregate._max.displayId ?? 0) + 1;
 
   for (const record of records) {
     await model.update({
       where: { id: record.id },
-      data: { legacyId: nextLegacyId }
+      data: { displayId: nextDisplayId }
     });
-    nextLegacyId += 1;
+    nextDisplayId += 1;
   }
 }
 
-async function backfillLegacyIds(prisma: PrismaClient) {
+async function backfillDisplayIds(prisma: PrismaClient) {
   const models = [
     prisma.user,
     prisma.role,
     prisma.permission,
-    prisma.legacyApplication,
+    prisma.systemApplication,
     prisma.roleApplicationAccess,
     prisma.section,
     prisma.contentType,
@@ -251,10 +246,10 @@ async function backfillLegacyIds(prisma: PrismaClient) {
     prisma.newsletterRecipient,
     prisma.newsletterCampaign,
     prisma.privacyRequest
-  ] as unknown as LegacyModelDelegate[];
+  ] as unknown as DisplayIdModelDelegate[];
 
   for (const model of models) {
-    await backfillLegacyIdsFor(model);
+    await backfillDisplayIdsFor(model);
   }
 }
 
@@ -263,9 +258,8 @@ export async function runBootstrapSeed(prisma: PrismaClient) {
   const permissionByCode = await seedPermissions(prisma);
   const adminRole = await seedAdminRole(prisma, permissionByCode, resetMode);
 
-  await seedApplications(prisma, adminRole, resetMode);
   const adminUser = await seedAdminUser(prisma, adminRole);
-  await backfillLegacyIds(prisma);
+  await backfillDisplayIds(prisma);
 
   return {
     adminEmail: adminUser.email

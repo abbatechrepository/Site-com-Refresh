@@ -26,8 +26,8 @@ export class ManagementUsersService {
       cpf: normalizedCpf
     });
 
-    const legacyStatus = payload.status?.trim() || "Novo";
-    const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
+    const status = payload.status?.trim() || "Novo";
+    const isActive = !["Inativo", "Excluído"].includes(status);
     if (!payload.password) {
       throw new BadRequestException("Informe uma senha temporaria para criar o usuario.");
     }
@@ -36,14 +36,14 @@ export class ManagementUsersService {
 
     return this.prisma.user.create({
       data: {
-        legacyId: await this.sequence.nextFor("user"),
+        displayId: await this.sequence.nextFor("user"),
         name: payload.name,
         email: normalizedEmail,
         username: normalizedUsername,
         picture: payload.picture,
         cpf: normalizedCpf,
         cnh: payload.cnh?.trim() || null,
-        legacyStatus,
+        status,
         company: payload.company?.trim() || null,
         jobTitle: payload.jobTitle?.trim() || null,
         phone: payload.phone?.trim() || null,
@@ -100,8 +100,8 @@ export class ManagementUsersService {
       id
     );
 
-    const legacyStatus = payload.status?.trim() || current.legacyStatus || "Novo";
-    const isActive = !["Inativo", "Excluído"].includes(legacyStatus);
+    const status = payload.status?.trim() || current.status || "Novo";
+    const isActive = !["Inativo", "Excluído"].includes(status);
     const passwordHash = current.passwordHash === "LDAP" || !payload.password ? undefined : await hash(payload.password);
     const picture = payload.picture? payload.picture : current.picture;
  
@@ -114,7 +114,7 @@ export class ManagementUsersService {
         cpf: normalizedCpf,
         picture: picture,
         cnh: payload.cnh?.trim() || null,
-        legacyStatus,
+        status,
         company: payload.company?.trim() || null,
         jobTitle: payload.jobTitle?.trim() || null,
         phone: payload.phone?.trim() || null,
@@ -183,7 +183,7 @@ export class ManagementUsersService {
         username: current.username ? `excluido.${archiveSuffix}` : null,
         cpf: null,
         cnh: null,
-        legacyStatus: "Excluído",
+        status: "Excluído",
         isActive: false,
         isSuperAdmin: false,
         forcePasswordChange: false,

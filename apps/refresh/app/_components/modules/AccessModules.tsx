@@ -94,7 +94,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               <tbody>
                 {management.permissions.map((permission) => (
                   <tr key={permission.id}>
-                    <td>{displayRecordCode(permission.legacyId, permission.id)}</td>
+                    <td>{displayRecordCode(permission.displayId, permission.id)}</td>
                     <td>
                       <button
                         className="text-[#0c67ad] hover:underline"
@@ -234,7 +234,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                     <td>
                       <input type="checkbox" />
                     </td>
-                    <td>{displayRecordCode(row.legacyId, row.id)}</td>
+                    <td>{displayRecordCode(row.displayId, row.id)}</td>
                     <td>
                       <button
                         className="text-[#0c67ad] hover:underline"
@@ -469,7 +469,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                     <td>
                       <input type="checkbox" />
                     </td>
-                    <td>{displayRecordCode(role.legacyId, role.id)}</td>
+                    <td>{displayRecordCode(role.displayId, role.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => editRole(role)} type="button">
                         {role.name}

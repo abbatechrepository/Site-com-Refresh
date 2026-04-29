@@ -71,10 +71,11 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
 
   async function handleCrop() {
     const image = new Image();
+    image.crossOrigin = "anonymous";
     const src = profileTempPreview
       ? profileTempPreview
       : userForm.picture
-      ? `/abbatech/refresh${userForm.picture}`
+      ? userForm.picture
       : null;
 
     if (!src) return;
@@ -172,8 +173,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     if (view === "users") {
       return (
         <section className="space-y-6">
-          <form
-            className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4"
+          <form 
+            className="space-y-4 border border-[#d8d8d8] bg-[#fbfbfb] p-4" 
             onSubmit={
               async (e) => {
                 e.preventDefault();
@@ -255,7 +256,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                     profileTempPreview
                       ? profileTempPreview
                       : userForm.picture
-                        ? `/abbatech/refresh${userForm.picture}`
+                        ? userForm.picture
                         : undefined
                   }
                   alt="preview"
@@ -354,6 +355,22 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   <option value="Excluído">Excluído</option>
                 </select>
               </div>
+              <div className="flex items-end gap-2">
+                <ActionButton tone="green" type="submit">
+                  {userForm.id ? "Salvar alterações" : "Incluir"}
+                </ActionButton>
+                <ActionButton
+                  onClick={() => {
+                    setUserForm(emptyUserForm);
+                    setHighlightedUserId("");
+                    resetCrop();
+                  }}
+                >
+                  Novo
+                </ActionButton>
+              </div>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <label className="admin-label">Empresa</label>
                 <input
@@ -362,9 +379,6 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   value={userForm.company}
                 />
               </div>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-3">
-
               <div>
                 <label className="admin-label">Função</label>
                 <input
@@ -381,16 +395,16 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   value={userForm.phone}
                 />
               </div>
-              <div>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="lg:col-span-3">
                 <label className="admin-label">Endereço</label>
-                <input
-                  className="admin-input"
+                <textarea
+                  className="admin-textarea"
                   onChange={(event) => setUserForm((current) => ({ ...current, address: event.target.value }))}
                   value={userForm.address}
                 />
               </div>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <label className="admin-label">CEP</label>
                 <input
@@ -621,20 +635,6 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   <p className="text-[13px] text-[#777]">Nenhum aplicativo liberado pelos grupos selecionados.</p>
                 )}
               </div>
-              <div className="flex items-end gap-2">
-                <ActionButton tone="green" type="submit">
-                  {userForm.id ? "Salvar alterações" : "Incluir"}
-                </ActionButton>
-                <ActionButton
-                  onClick={() => {
-                    setUserForm(emptyUserForm);
-                    setHighlightedUserId("");
-                    resetCrop();
-                  }}
-                >
-                  Novo
-                </ActionButton>
-              </div>
             </div>
           </form>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -681,21 +681,25 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                         type="checkbox"
                       />
                     </td>
-                    <td>{displayRecordCode(managedUser.legacyId, managedUser.id)}</td>
+                    <td>{displayRecordCode(managedUser.displayId, managedUser.id)}</td>
                     <td>
-                      <button className="text-[#0c67ad] hover:underline" onClick={() => editUser(managedUser)} type="button">
+                      <button className="text-[#0c67ad] hover:underline" onClick={() => {
+                          resetCrop();
+                          editUser(managedUser);
+                        }} 
+                        type="button">
                         {managedUser.name}
                       </button>
                     </td>
                     <td>
                       {managedUser.picture ? (
                        <img
-                          src={`/abbatech/refresh${managedUser.picture}`}
+                          src={managedUser.picture}
                           alt={managedUser.username ?? ""}
                           className="w-12 h-12 object-cover cursor-zoom-in"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setViewImageUrl(`/abbatech/refresh${managedUser.picture}`);
+                            setViewImageUrl(managedUser.picture ?? null);
                           }}
                         />
                       ) : (
@@ -709,7 +713,11 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                     <td className="text-[#0c67ad]">{managedUser.status ?? (managedUser.isActive ? "Ativo" : "Inativo")}</td>
                     <td>
                       <div className="flex flex-col gap-1">
-                        <button className="text-left text-[#0c67ad] hover:underline" onClick={() => editUser(managedUser)} type="button">
+                        <button className="text-left text-[#0c67ad] hover:underline" onClick={() => {
+                            resetCrop();
+                            editUser(managedUser);
+                          }} 
+                          type="button">
                           Editar
                         </button>
                         <button className="text-left text-[#c4473c] hover:underline" onClick={() => confirmRemoveUsers([managedUser.id])} type="button">
@@ -724,14 +732,14 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
           </div>
           {isPreviewOpen && (
             <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-
+              
               <div className="relative w-[90vw] h-[80vh] bg-black">
                 <Cropper
                   image={
                     profileTempPreview
                       ? profileTempPreview
                       : userForm.picture
-                        ? `/abbatech/refresh${userForm.picture}`
+                        ? userForm.picture
                         : undefined
                   }
                   crop={crop}

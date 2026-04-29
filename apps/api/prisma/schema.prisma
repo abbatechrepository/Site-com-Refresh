@@ -8,67 +8,67 @@ datasource db {
 }
 
 model User {
-  id                String               @id @default(cuid())
-  legacyId          Int?                 @unique
-  name              String
-  picture           String?
-  email             String               @unique
-  username          String?              @unique
-  cpf               String?              @unique
-  cnh               String?
-  legacyStatus      String               @default("Novo")
-  company           String?
-  jobTitle          String?
-  phone             String?
-  address           String?              @db.Text
-  zipCode           String?
-  city              String?
-  state             String?
-  secondaryAddress  String?
-  secondaryNumber   String?
+  id                  String            @id @default(cuid())
+  displayId           Int?              @unique
+  name                String
+  picture             String?
+  email               String            @unique
+  username            String?           @unique
+  cpf                 String?           @unique
+  cnh                 String?
+  status              String            @default("Novo")
+  company             String?
+  jobTitle            String?
+  phone               String?
+  address             String?           @db.Text
+  zipCode             String?
+  city                String?
+  state               String?
+  secondaryAddress    String?
+  secondaryNumber     String?
   secondaryComplement String?
-  neighborhood      String?
-  notes             String?              @db.Text
-  facebook          String?
-  instagram         String?
-  youtube           String?
-  forcePasswordChange Boolean            @default(false)
-  passwordHash      String
-  isActive          Boolean              @default(true)
-  isSuperAdmin      Boolean              @default(false)
-  lastLoginAt       DateTime?
-  consentAt         DateTime?
-  consentVersion    String?
-  dataClassification String             @default("internal")
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-  roles             UserRole[]
-  authoredContents  Content[]            @relation("AuthoredContents")
-  revisions         ContentRevision[]
-  auditLogs         AuditLog[]
+  neighborhood        String?
+  notes               String?           @db.Text
+  facebook            String?
+  instagram           String?
+  youtube             String?
+  forcePasswordChange Boolean           @default(false)
+  passwordHash        String
+  isActive            Boolean           @default(true)
+  isSuperAdmin        Boolean           @default(false)
+  lastLoginAt         DateTime?
+  consentAt           DateTime?
+  consentVersion      String?
+  dataClassification  String            @default("internal")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  roles               UserRole[]
+  authoredContents    Content[]         @relation("AuthoredContents")
+  revisions           ContentRevision[]
+  auditLogs           AuditLog[]
 }
 
 model Role {
-  id                 String                  @id @default(cuid())
-  legacyId           Int?                    @unique
-  parentRoleId       String?
-  name               String                  @unique
-  description        String?
-  functionName       String?
-  status             String                  @default("Ativo")
-  users              UserRole[]
-  permissions        RolePermission[]
-  menuAccesses       RoleMenuAccess[]
-  appAccesses        RoleApplicationAccess[]
-  sectionAccesses    RoleSectionAccess[]
+  id                  String                  @id @default(cuid())
+  displayId           Int?                    @unique
+  parentRoleId        String?
+  name                String                  @unique
+  description         String?
+  functionName        String?
+  status              String                  @default("Ativo")
+  users               UserRole[]
+  permissions         RolePermission[]
+  menuAccesses        RoleMenuAccess[]
+  appAccesses         RoleApplicationAccess[]
+  sectionAccesses     RoleSectionAccess[]
   contentTypeAccesses RoleContentTypeAccess[]
-  parentRole         Role?                   @relation("RoleHierarchy", fields: [parentRoleId], references: [id])
-  childRoles         Role[]                  @relation("RoleHierarchy")
+  parentRole          Role?                   @relation("RoleHierarchy", fields: [parentRoleId], references: [id])
+  childRoles          Role[]                  @relation("RoleHierarchy")
 }
 
 model Permission {
   id          String           @id @default(cuid())
-  legacyId    Int?             @unique
+  displayId   Int?             @unique
   code        String           @unique
   description String?
   roles       RolePermission[]
@@ -77,8 +77,8 @@ model Permission {
 model UserRole {
   userId String
   roleId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
 }
@@ -93,48 +93,48 @@ model RolePermission {
 }
 
 model RoleMenuAccess {
-  roleId   String
-  topMenu  String
-  viewKey  String
-  role     Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId  String
+  topMenu String
+  viewKey String
+  role    Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@id([roleId, topMenu, viewKey])
 }
 
 model Section {
-  id            String    @id @default(cuid())
-  legacyId      Int?      @unique
+  id            String              @id @default(cuid())
+  displayId     Int?                @unique
   parentId      String?
   name          String
-  slug          String    @unique
-  path          String    @unique
-  description   String?   @db.Text
-  order         Int       @default(0)
-  visits        Int       @default(0)
-  visibleInMenu Boolean   @default(true)
-  isActive      Boolean   @default(true)
-  parent        Section?  @relation("SectionTree", fields: [parentId], references: [id])
-  children      Section[] @relation("SectionTree")
+  slug          String              @unique
+  path          String              @unique
+  description   String?             @db.Text
+  order         Int                 @default(0)
+  visits        Int                 @default(0)
+  visibleInMenu Boolean             @default(true)
+  isActive      Boolean             @default(true)
+  parent        Section?            @relation("SectionTree", fields: [parentId], references: [id])
+  children      Section[]           @relation("SectionTree")
   contents      Content[]
   roleAccesses  RoleSectionAccess[]
 }
 
 model ContentType {
-  id                String    @id @default(cuid())
-  legacyId          Int?      @unique
-  name              String    @unique
-  slug              String    @unique
-  description       String?   @db.Text
-  allowRichText     Boolean   @default(true)
-  allowFeaturedMedia Boolean  @default(true)
-  schemaJson        Json
-  contents          Content[]
-  roleAccesses      RoleContentTypeAccess[]
+  id                 String                  @id @default(cuid())
+  displayId          Int?                    @unique
+  name               String                  @unique
+  slug               String                  @unique
+  description        String?                 @db.Text
+  allowRichText      Boolean                 @default(true)
+  allowFeaturedMedia Boolean                 @default(true)
+  schemaJson         Json
+  contents           Content[]
+  roleAccesses       RoleContentTypeAccess[]
 }
 
-model LegacyApplication {
+model SystemApplication {
   id          String                  @id @default(cuid())
-  legacyId    Int?                    @unique
+  displayId   Int?                    @unique
   name        String                  @unique
   description String?                 @db.Text
   area        String
@@ -143,16 +143,16 @@ model LegacyApplication {
 }
 
 model RoleApplicationAccess {
-  id         String            @id @default(cuid())
-  legacyId   Int?              @unique
-  roleId     String
-  appId      String
-  canCreate  Boolean           @default(false)
-  canUpdate  Boolean           @default(false)
-  canDelete  Boolean           @default(false)
-  canAccess  Boolean           @default(true)
-  role       Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  app        LegacyApplication @relation(fields: [appId], references: [id], onDelete: Cascade)
+  id        String            @id @default(cuid())
+  displayId Int?              @unique
+  roleId    String
+  appId     String
+  canCreate Boolean           @default(false)
+  canUpdate Boolean           @default(false)
+  canDelete Boolean           @default(false)
+  canAccess Boolean           @default(true)
+  role      Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  app       SystemApplication @relation(fields: [appId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, appId])
 }
@@ -177,7 +177,7 @@ model RoleContentTypeAccess {
 
 model SystemEmail {
   id          String   @id @default(cuid())
-  legacyId    Int?     @unique
+  displayId   Int?     @unique
   name        String
   email       String
   area        String
@@ -188,20 +188,20 @@ model SystemEmail {
 }
 
 model Template {
-  id          String    @id @default(cuid())
-  legacyId    Int?      @unique
-  name        String    @unique
-  slug        String    @unique
-  description String?   @db.Text
+  id           String    @id @default(cuid())
+  displayId    Int?      @unique
+  name         String    @unique
+  slug         String    @unique
+  description  String?   @db.Text
   componentKey String
   configSchema Json
-  isActive    Boolean   @default(true)
-  contents    Content[]
+  isActive     Boolean   @default(true)
+  contents     Content[]
 }
 
 model Element {
   id         String   @id @default(cuid())
-  legacyId   Int?     @unique
+  displayId  Int?     @unique
   name       String
   thumbLabel String?
   content    String   @db.LongText
@@ -212,64 +212,64 @@ model Element {
 }
 
 model Content {
-  id                 String             @id @default(cuid())
-  legacyId           Int?               @unique
+  id                 String            @id @default(cuid())
+  displayId          Int?              @unique
   title              String
-  slug               String             @unique
-  excerpt            String?            @db.Text
-  body               String?            @db.LongText
-  status             String             @default("draft")
-  visibility         String             @default("public")
+  slug               String            @unique
+  excerpt            String?           @db.Text
+  body               String?           @db.LongText
+  status             String            @default("draft")
+  visibility         String            @default("public")
   publishedAt        DateTime?
   contentTypeId      String
   sectionId          String
   templateId         String?
-  seoId              String?             @unique
+  seoId              String?           @unique
   authorId           String?
   featuredMediaId    String?
   lgpdRetentionUntil DateTime?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  contentType        ContentType        @relation(fields: [contentTypeId], references: [id])
-  section            Section            @relation(fields: [sectionId], references: [id])
-  template           Template?          @relation(fields: [templateId], references: [id])
-  seo                SeoMetadata?       @relation(fields: [seoId], references: [id])
-  author             User?              @relation("AuthoredContents", fields: [authorId], references: [id])
-  featuredMedia      MediaAsset?        @relation(fields: [featuredMediaId], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  contentType        ContentType       @relation(fields: [contentTypeId], references: [id])
+  section            Section           @relation(fields: [sectionId], references: [id])
+  template           Template?         @relation(fields: [templateId], references: [id])
+  seo                SeoMetadata?      @relation(fields: [seoId], references: [id])
+  author             User?             @relation("AuthoredContents", fields: [authorId], references: [id])
+  featuredMedia      MediaAsset?       @relation(fields: [featuredMediaId], references: [id])
   revisions          ContentRevision[]
 }
 
 model ContentRevision {
-  id         String   @id @default(cuid())
-  legacyId   Int?     @unique
-  contentId  String
-  editorId   String
-  snapshot   Json
-  createdAt  DateTime @default(now())
-  content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  editor     User     @relation(fields: [editorId], references: [id])
+  id        String   @id @default(cuid())
+  displayId Int?     @unique
+  contentId String
+  editorId  String
+  snapshot  Json
+  createdAt DateTime @default(now())
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  editor    User     @relation(fields: [editorId], references: [id])
 }
 
 model MediaAsset {
-  id                 String    @id @default(cuid())
-  legacyId           Int?      @unique
+  id                 String        @id @default(cuid())
+  displayId          Int?          @unique
   filename           String
   mimeType           String
   sizeInBytes        Int
-  storageKey         String    @unique
+  storageKey         String        @unique
   altText            String?
-  caption            String?   @db.Text
-  isPublic           Boolean   @default(false)
-  lgpdRestricted     Boolean   @default(false)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  caption            String?       @db.Text
+  isPublic           Boolean       @default(false)
+  lgpdRestricted     Boolean       @default(false)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
   featuredInContents Content[]
   seoImages          SeoMetadata[]
 }
 
 model SeoMetadata {
   id           String      @id @default(cuid())
-  legacyId     Int?        @unique
+  displayId    Int?        @unique
   title        String
   description  String      @db.Text
   keywords     String      @db.Text
@@ -281,81 +281,81 @@ model SeoMetadata {
 }
 
 model NewsletterCampaign {
-  id            String               @id @default(cuid())
-  legacyId      Int?                 @unique
-  name          String
-  subject       String
-  senderName    String
-  senderEmail   String
-  bodyHtml      String               @db.LongText
-  bodyText      String?              @db.LongText
-  status        String               @default("draft")
-  scheduledAt   DateTime?
-  sentAt        DateTime?
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  id               String               @id @default(cuid())
+  displayId        Int?                 @unique
+  name             String
+  subject          String
+  senderName       String
+  senderEmail      String
+  bodyHtml         String               @db.LongText
+  bodyText         String?              @db.LongText
+  status           String               @default("draft")
+  scheduledAt      DateTime?
+  sentAt           DateTime?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
   recipientGroupId String?
-  recipientGroup NewsletterGroup?    @relation(fields: [recipientGroupId], references: [id])
-  dispatches    NewsletterDispatch[]
+  recipientGroup   NewsletterGroup?     @relation(fields: [recipientGroupId], references: [id])
+  dispatches       NewsletterDispatch[]
 }
 
 model NewsletterGroup {
-  id          String               @id @default(cuid())
-  legacyId    Int?                 @unique
-  name        String               @unique
-  description String?              @db.Text
-  createdAt   DateTime             @default(now())
+  id          String                @id @default(cuid())
+  displayId   Int?                  @unique
+  name        String                @unique
+  description String?               @db.Text
+  createdAt   DateTime              @default(now())
   recipients  NewsletterRecipient[]
   campaigns   NewsletterCampaign[]
 }
 
 model NewsletterRecipient {
-  id          String           @id @default(cuid())
-  legacyId    Int?             @unique
-  email       String           @unique
-  name        String?
-  consentAt   DateTime?
+  id             String               @id @default(cuid())
+  displayId      Int?                 @unique
+  email          String               @unique
+  name           String?
+  consentAt      DateTime?
   unsubscribedAt DateTime?
-  createdAt   DateTime         @default(now())
-  groupId     String
-  group       NewsletterGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  dispatches  NewsletterDispatch[]
+  createdAt      DateTime             @default(now())
+  groupId        String
+  group          NewsletterGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  dispatches     NewsletterDispatch[]
 }
 
 model NewsletterDispatch {
-  id           String               @id @default(cuid())
-  legacyId     Int?                 @unique
-  campaignId   String
-  recipientId  String
-  status       String               @default("queued")
+  id                String              @id @default(cuid())
+  displayId         Int?                @unique
+  campaignId        String
+  recipientId       String
+  status            String              @default("queued")
   providerMessageId String?
-  errorMessage String?              @db.Text
-  sentAt       DateTime?
-  campaign     NewsletterCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  recipient    NewsletterRecipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  errorMessage      String?             @db.Text
+  sentAt            DateTime?
+  campaign          NewsletterCampaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  recipient         NewsletterRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
-  id          String   @id @default(cuid())
-  legacyId    Int?     @unique
-  actorId     String?
-  action      String
-  entityType  String
-  entityId    String?
-  metadata    Json?
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-  actor       User?    @relation(fields: [actorId], references: [id])
+  id         String   @id @default(cuid())
+  displayId  Int?     @unique
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  actor      User?    @relation(fields: [actorId], references: [id])
 }
 
 model PrivacyRequest {
-  id             String   @id @default(cuid())
-  legacyId       Int?     @unique
-  type           String
-  subjectEmail   String
-  description    String?  @db.Text
-  status         String   @default("open")
-  handledAt      DateTime?
-  createdAt      DateTime @default(now())
+  id           String    @id @default(cuid())
+  displayId    Int?      @unique
+  type         String
+  subjectEmail String
+  description  String?   @db.Text
+  status       String    @default("open")
+  handledAt    DateTime?
+  createdAt    DateTime  @default(now())
 }

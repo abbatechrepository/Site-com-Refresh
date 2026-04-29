@@ -67,7 +67,7 @@ export function useRefreshManagerDerived(state: RefreshManagerState) {
           return byName;
         }
 
-        return (left.legacyId ?? 0) - (right.legacyId ?? 0);
+        return (left.displayId ?? 0) - (right.displayId ?? 0);
       }),
     [state.highlightedUserId, state.management.users]
   );

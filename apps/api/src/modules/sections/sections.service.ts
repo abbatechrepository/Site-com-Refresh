@@ -18,11 +18,11 @@ export class SectionsService {
   private async nextSequenceNumber() {
     const aggregate = await this.prisma.section.aggregate({
       _max: {
-        legacyId: true
+        displayId: true
       }
     });
 
-    return (aggregate._max.legacyId ?? 0) + 1;
+    return (aggregate._max.displayId ?? 0) + 1;
   }
 
   async listTree() {
@@ -61,7 +61,7 @@ export class SectionsService {
 
     return this.prisma.section.create({
       data: {
-        legacyId: await this.nextSequenceNumber(),
+        displayId: await this.nextSequenceNumber(),
         name: payload.name,
         slug,
         path,
