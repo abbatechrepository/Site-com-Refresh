@@ -70,8 +70,12 @@ export class ContentsService {
 
     return this.prisma.content.findMany({
       where: {
-        ...(scope.sectionIds ? { sectionId: { in: scope.sectionIds } } : {}),
-        ...(scope.contentTypeIds ? { contentTypeId: { in: scope.contentTypeIds } } : {})
+        ...(scope.sectionIds?.length
+          ? { sectionId: { in: scope.sectionIds } }
+          : {}),
+        ...(scope.contentTypeIds?.length
+          ? { contentTypeId: { in: scope.contentTypeIds } }
+          : {})
       },
       include: {
         section: true,
@@ -224,28 +228,28 @@ export class ContentsService {
     const [section, contentType] = await Promise.all([
       this.prisma.section.findUnique({
         where: { id: payload.sectionId }
-      }),
+    }),
       this.prisma.contentType.findUnique({
         where: { id: payload.contentTypeId }
       })
     ]);
 
     if (!section) {
-      throw new BadRequestException("Secao invalida.");
+      throw new BadRequestException("Seção inválida.");
     }
 
     if (!contentType) {
-      throw new BadRequestException("Tipo de conteudo invalido.");
+      throw new BadRequestException("Máscara invalida.");
     }
 
     const scope = await this.getRoleScope(roleId);
 
     if (scope.sectionIds && !scope.sectionIds.includes(payload.sectionId)) {
-      throw new ForbiddenException("Este perfil nao pode publicar na secao selecionada.");
+      throw new ForbiddenException("Este perfil nao pode publicar na seção selecionada.");
     }
 
     if (scope.contentTypeIds && !scope.contentTypeIds.includes(payload.contentTypeId)) {
-      throw new ForbiddenException("Este perfil nao pode usar a mascara selecionada.");
+      throw new ForbiddenException("Este perfil nao pode usar a máscara selecionada.");
     }
 
     if (payload.templateId) {
