@@ -21,7 +21,7 @@ export class ManagementNewslettersService {
 
     return this.prisma.newsletterGroup.create({
       data: {
-        legacyId: await this.sequence.nextFor("newsletterGroup"),
+        displayId: await this.sequence.nextFor("newsletterGroup"),
         name: payload.name,
         description: payload.description
       }
@@ -74,7 +74,7 @@ export class ManagementNewslettersService {
 
     return this.prisma.newsletterRecipient.create({
       data: {
-        legacyId: await this.sequence.nextFor("newsletterRecipient"),
+        displayId: await this.sequence.nextFor("newsletterRecipient"),
         email,
         name: payload.name?.trim() || null,
         groupId: payload.groupId,
@@ -126,7 +126,7 @@ export class ManagementNewslettersService {
 
     return this.prisma.newsletterCampaign.create({
       data: {
-        legacyId: await this.sequence.nextFor("newsletterCampaign"),
+        displayId: await this.sequence.nextFor("newsletterCampaign"),
         name: payload.name,
         subject: payload.subject,
         senderName: payload.senderName,

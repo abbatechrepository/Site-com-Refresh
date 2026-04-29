@@ -32,7 +32,7 @@ export type PublicContent = {
 
 export type AdminContent = {
   id: EntityId;
-  legacyId?: number | null;
+  displayId?: number | null;
   title: string;
   slug: string;
   excerpt: string | null;

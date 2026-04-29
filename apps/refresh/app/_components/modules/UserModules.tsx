@@ -681,7 +681,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                         type="checkbox"
                       />
                     </td>
-                    <td>{displayRecordCode(managedUser.legacyId, managedUser.id)}</td>
+                    <td>{displayRecordCode(managedUser.displayId, managedUser.id)}</td>
                     <td>
                       <button className="text-[#0c67ad] hover:underline" onClick={() => {
                           resetCrop();

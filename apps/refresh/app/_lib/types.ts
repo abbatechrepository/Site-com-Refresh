@@ -68,7 +68,7 @@ export type LoggedUser = {
 
 export type Section = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   slug: string;
   path: string;
@@ -86,7 +86,7 @@ export type Section = {
 
 export type Template = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   slug: string;
   description?: string | null;
@@ -97,7 +97,7 @@ export type Template = {
 
 export type ContentType = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   slug: string;
   description: string | null;
@@ -111,7 +111,7 @@ export type ContentType = {
 
 export type Content = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   title: string;
   slug: string;
   excerpt: string | null;
@@ -148,7 +148,7 @@ export type Content = {
 
 export type Permission = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   code: string;
   description: string | null;
   roles: Array<{
@@ -159,7 +159,7 @@ export type Permission = {
 
 export type Role = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   description: string | null;
   functionName?: string | null;
@@ -192,7 +192,7 @@ export type Role = {
 
 export type ApplicationRecord = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   area: string;
   link: string;
@@ -201,7 +201,7 @@ export type ApplicationRecord = {
 
 export type RoleApplicationAccessRecord = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   roleId: string;
   roleName: string;
   appId: string;
@@ -215,7 +215,7 @@ export type RoleApplicationAccessRecord = {
 
 export type SystemEmailRecord = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   email: string;
   area: string;
@@ -225,7 +225,7 @@ export type SystemEmailRecord = {
 
 export type ManagedElement = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   thumbLabel: string | null;
   content: string;
@@ -235,7 +235,7 @@ export type ManagedElement = {
 
 export type ManagedUser = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   email: string;
   picture?: string | null;
@@ -276,7 +276,7 @@ export type ManagedUser = {
 
 export type NewsletterGroup = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   description: string | null;
   createdAt: string;
@@ -288,7 +288,7 @@ export type NewsletterGroup = {
 
 export type NewsletterCampaign = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   subject: string;
   senderName: string;
@@ -310,7 +310,7 @@ export type NewsletterCampaign = {
 
 export type NewsletterRecipient = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   email: string;
   name: string | null;
   groupId: string;
@@ -323,7 +323,7 @@ export type NewsletterRecipient = {
 
 export type PrivacyRequest = {
   id: string;
-  legacyId?: number | null;
+  displayId?: number | null;
   type: string;
   subjectEmail: string;
   description: string | null;

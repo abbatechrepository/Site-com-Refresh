@@ -10,7 +10,7 @@ export type SectionTreeNode = {
 
 export type AdminSection = {
   id: EntityId;
-  legacyId?: number | null;
+  displayId?: number | null;
   name: string;
   slug: string;
   path: string;

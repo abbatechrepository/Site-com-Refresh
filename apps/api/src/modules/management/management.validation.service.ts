@@ -33,7 +33,7 @@ export class ManagementValidationService {
   }
 
   async ensureUniqueApplicationName(name: string, currentId?: string) {
-    const existing = await this.prisma.legacyApplication.findFirst({
+    const existing = await this.prisma.systemApplication.findFirst({
       where: {
         name,
         ...(currentId ? { NOT: { id: currentId } } : {})
@@ -191,7 +191,7 @@ export class ManagementValidationService {
   async ensureRoleApplication(roleId: string, appId: string, currentId?: string) {
     const [role, app, duplicate] = await Promise.all([
       this.prisma.role.findUnique({ where: { id: roleId } }),
-      this.prisma.legacyApplication.findUnique({ where: { id: appId } }),
+      this.prisma.systemApplication.findUnique({ where: { id: appId } }),
       this.prisma.roleApplicationAccess.findFirst({
         where: {
           roleId,
@@ -292,7 +292,7 @@ export class ManagementValidationService {
       return [];
     }
 
-    const applications = await this.prisma.legacyApplication.findMany({
+    const applications = await this.prisma.systemApplication.findMany({
       where: {
         name: {
           in: Array.from(requestedApplicationNames)
