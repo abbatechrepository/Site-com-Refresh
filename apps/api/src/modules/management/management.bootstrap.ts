@@ -27,6 +27,11 @@ export async function buildManagementBootstrap(prisma: PrismaService) {
       orderBy: [{ name: "asc" }]
     }),
     prisma.user.findMany({
+      where: {
+        status: {
+          not: "Excluído"
+        }
+      },
       include: {
         roles: {
           include: {

@@ -3,7 +3,7 @@
 import { ActionButton } from "../ActionButton";
 import { AdminModal } from "../AdminModal";
 import { emptyUserForm } from "../../_lib/constants";
-import { displayRecordCode, toggleItem } from "../../_lib/utils";
+import { displayRecordCode, isDeletedUser, toggleItem } from "../../_lib/utils";
 import type { RefreshManager } from "./moduleTypes";
 import { useState, useEffect, useRef } from "react";
 import { ImagePlus } from "lucide-react";
@@ -52,9 +52,14 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     };
   }, [profileTempPreview]);
 
-  const allVisibleUserIds = sortedUsers.map((managedUser) => managedUser.id);
+  const visibleUsers = sortedUsers.filter((managedUser) => !isDeletedUser(managedUser));
+
+  const allVisibleUserIds = visibleUsers.map((managedUser) => managedUser.id);
+  const allVisibleUserIdSet = new Set(allVisibleUserIds);
+  const selectedUserIdSet = new Set(selectedUserIds);
+  const visibleSelectedUserIds = selectedUserIds.filter((userId) => allVisibleUserIdSet.has(userId));
   const allVisibleUsersSelected =
-    allVisibleUserIds.length > 0 && allVisibleUserIds.every((userId) => selectedUserIds.includes(userId));
+    allVisibleUserIds.length > 0 && allVisibleUserIds.every((userId) => selectedUserIdSet.has(userId));
 
   function resetCrop() {
     if (profileTempPreview) {
@@ -698,9 +703,15 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
           </AdminModal>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[13px] text-[#666]">
-              {selectedUserIds.length > 0 ? `${selectedUserIds.length} selecionado(s)` : `${sortedUsers.length} usuário(s)`}
+              {visibleSelectedUserIds.length > 0
+                ? `${visibleSelectedUserIds.length} selecionado(s)`
+                : `${visibleUsers.length} usuário(s)`}
             </div>
-            <ActionButton disabled={selectedUserIds.length === 0} onClick={() => confirmRemoveUsers(selectedUserIds)} tone="red">
+            <ActionButton
+              disabled={visibleSelectedUserIds.length === 0}
+              onClick={() => confirmRemoveUsers(visibleSelectedUserIds)}
+              tone="red"
+            >
               Excluir selecionados
             </ActionButton>
           </div>
@@ -728,7 +739,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 </tr>
               </thead>
               <tbody>
-                {sortedUsers.map((managedUser) => (
+                {visibleUsers.map((managedUser) => (
                   <tr className={getUserRowClassName(managedUser)} key={managedUser.id}>
                     <td>
                       <input
