@@ -18,6 +18,7 @@ export default function RefreshPageClient() {
         onPasswordChange={manager.setPassword}
         onSubmit={manager.handleLogin}
         password={manager.password}
+        sessionAlert={manager.sessionAlert}
         success={manager.success}
       />
     );
