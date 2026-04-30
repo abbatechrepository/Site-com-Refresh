@@ -1,4 +1,4 @@
-import { menuGroups, permissionLabelMap } from "./constants";
+import { menuGroups, permissionLabelMap, userDeletedStatus } from "./constants";
 import { normalizeRefreshAssetPath } from "./assets";
 import type {
   LoggedUser,
@@ -479,6 +479,10 @@ export function roleName(role: LoggedUser["roles"][number] | null | undefined) {
 
 export function toggleItem(list: string[], item: string) {
   return list.includes(item) ? list.filter((entry) => entry !== item) : [...list, item];
+}
+
+export function isDeletedUser(user: ManagedUser) {
+  return user.status?.trim().toLowerCase() === userDeletedStatus.toLowerCase();
 }
 
 export function resolveUserPictureUrl(picture?: string | null) {

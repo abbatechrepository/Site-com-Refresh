@@ -166,6 +166,10 @@ export class ManagementUsersService {
       throw new NotFoundException("Usuario nao encontrado.");
     }
 
+    if (current.status === "Excluído") {
+      throw new BadRequestException("Usuário já está excluído.");
+    }
+
     const hasHistory =
       current._count.authoredContents > 0 || current._count.revisions > 0 || current._count.auditLogs > 0;
 
