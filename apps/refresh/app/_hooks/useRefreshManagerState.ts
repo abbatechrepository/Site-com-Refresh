@@ -48,6 +48,10 @@ export function useRefreshManagerState() {
   const [password, setPassword] = useState("Refresh123!");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [sessionAlert, setSessionAlert] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
   const [user, setUser] = useState<LoggedUser | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [contents, setContents] = useState<Content[]>([]);
@@ -109,6 +113,8 @@ export function useRefreshManagerState() {
     setError,
     success,
     setSuccess,
+    sessionAlert,
+    setSessionAlert,
     user,
     setUser,
     sections,
