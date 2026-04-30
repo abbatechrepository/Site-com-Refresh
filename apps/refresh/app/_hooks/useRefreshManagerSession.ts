@@ -18,6 +18,7 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
     setContentForm,
     setContents,
     setError,
+    setSessionAlert,
     setExpandedTopMenu,
     setManagement,
     setMeta,
@@ -86,10 +87,23 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
           "status" in bootstrapError &&
           [401, 403].includes((bootstrapError as Error & { status?: number }).status ?? 0)
         ) {
+          const hadAuthenticatedSession =
+            window.localStorage.getItem("refresh_authenticated_session") === "true";
+
           window.localStorage.removeItem("refresh_access_token");
+          window.localStorage.removeItem("refresh_authenticated_session");
+
           setToken("");
           setUser(null);
-          setError("Sua sessão expirou. Faça login novamente.");
+          setError("");
+
+          if (hadAuthenticatedSession) {
+            setSessionAlert({
+              title: "Sessão expirada",
+              message: "Sua sessão expirou. Faça login novamente para continuar."
+            });
+          }
+
           return;
         }
 
@@ -100,6 +114,7 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
       setContentForm,
       setContents,
       setError,
+      setSessionAlert,
       setExpandedTopMenu,
       setManagement,
       setMeta,
@@ -153,20 +168,26 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
       });
 
       window.localStorage.setItem("refresh_access_token", response.accessToken);
+      window.localStorage.setItem("refresh_authenticated_session", "true");
+
       setToken(response.accessToken);
+      setSessionAlert(null);
       setSuccess("Login realizado com sucesso.");
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : "Falha ao autenticar.");
     }
-  }, [identifier, password, setError, setSuccess, setToken]);
+  }, [identifier, password, setError, setSessionAlert, setSuccess, setToken]);
 
   const handleLogout = useCallback(() => {
     window.localStorage.removeItem("refresh_access_token");
+    window.localStorage.removeItem("refresh_authenticated_session");
+
     setToken("");
     setUser(null);
+    setSessionAlert(null);
     setSuccess("");
     setError("");
-  }, [setError, setSuccess, setToken, setUser]);
+  }, [setError, setSessionAlert, setSuccess, setToken, setUser]);
 
   const switchProfile = useCallback(async (profileId: string) => {
     const nextProfile = user?.roles.find((role) => role.id === profileId);

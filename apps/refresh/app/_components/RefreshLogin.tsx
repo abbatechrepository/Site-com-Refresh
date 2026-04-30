@@ -4,11 +4,17 @@ import Image from "next/image";
 import { ActionButton } from "./ActionButton";
 import { refreshLogoSrc } from "../_lib/assets";
 
+type SessionAlert = {
+  title: string;
+  message: string;
+} | null;
+
 type RefreshLoginProps = {
   identifier: string;
   password: string;
   error: string;
   success: string;
+  sessionAlert: SessionAlert;
   onIdentifierChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void | Promise<void>;
@@ -19,6 +25,7 @@ export function RefreshLogin({
   password,
   error,
   success,
+  sessionAlert,
   onIdentifierChange,
   onPasswordChange,
   onSubmit
@@ -68,6 +75,21 @@ export function RefreshLogin({
             Login de usuário
           </div>
           <div className="space-y-7 px-5 py-6">
+            {sessionAlert ? (
+              <div
+                className="flex items-start gap-3 rounded-[16px] border border-[#f0c36d]/70 bg-[#fff8e8] px-4 py-3 text-[#4d3a13] shadow-[0_14px_28px_rgba(15,33,57,0.08)]"
+                role="alert"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f0c36d]/25 text-[15px] font-bold text-[#b7791f]">
+                  !
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[14px] font-bold text-[#3d2c0f]">{sessionAlert.title}</p>
+                  <p className="text-[13px] font-medium leading-5 text-[#6d5421]">{sessionAlert.message}</p>
+                </div>
+              </div>
+            ) : null}
+
             <label className="block">
               <span className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.08em] text-[#4d6680]">Usuário</span>
               <input
