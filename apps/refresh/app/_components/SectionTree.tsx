@@ -14,19 +14,19 @@ export function SectionTree({
   onDelete
 }: SectionTreeProps) {
   return (
-    <ul className="space-y-1 text-[15px] text-[#0c67ad]">
+    <ul className="space-y-2 text-[14px] text-[#0f58d8]">
       {nodes.map((node) => (
         <li key={node.id}>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-[#333]">{node.name}</span>
-            <span className="text-[#555]">({node._count?.contents ?? 0})</span>
-            <button className="text-[12px] text-[#0c67ad] hover:underline" onClick={() => onEdit(node)} type="button">
+          <div className="flex flex-wrap items-center gap-2 rounded-[8px] border border-[#d7e3f1] bg-white px-3 py-2 shadow-[0_8px_18px_rgba(15,33,57,0.04)]">
+            <span className="font-semibold text-[#10233d]">{node.name}</span>
+            <span className="text-[#58708a]">({node._count?.contents ?? 0})</span>
+            <button className="admin-link text-[12px]" onClick={() => onEdit(node)} type="button">
               Editar conteúdo
             </button>
-            <button className="text-[12px] text-[#0c67ad] hover:underline" onClick={onOpenContents} type="button">
+            <button className="admin-link text-[12px]" onClick={onOpenContents} type="button">
               Listar conteúdos
             </button>
-            <button className="text-[12px] text-[#c4473c] hover:underline" onClick={() => onDelete(node)} type="button">
+            <button className="admin-link-danger text-[12px]" onClick={() => onDelete(node)} type="button">
               Excluir
             </button>
           </div>

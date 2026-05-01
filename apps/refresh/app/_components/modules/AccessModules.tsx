@@ -87,11 +87,11 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
   if (view === "permissions") {
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Configurações de permissões para acesso, inclusão, alteração e exclusão de registros nos aplicativos do Sistema.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewPermissionCode} tone="green">
             Nova Permissão
           </ActionButton>
@@ -100,7 +100,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -152,7 +152,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
           </table>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -369,17 +369,17 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
   if (view === "groups") {
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           O Workflow de publicação sempre inicia com o grupo de Autor e termina com o Publicador. Entre o Autor e o Publicador poderão ser acrescentados vários grupos de Editor conforme a necessidade.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewRole} tone="green">
             Incluir Grupo
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -531,7 +531,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
             <div className="grid gap-4 lg:grid-cols-2">
               <div>
                 <label className="admin-label">Seções associadas</label>
-                <div className="max-h-[220px] overflow-auto border border-[#e4e4e4] bg-white p-3">
+                <div className="admin-panel max-h-[220px] overflow-auto p-3">
                   <div className="grid gap-2">
                     {sections.map((section) => (
                       <label className="flex items-center gap-2 text-[14px]" key={section.id}>
@@ -556,7 +556,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
                 <p className="mb-2 text-[12px] text-[#666]">
                   Estas máscaras definem quais tipos de conteúdo este grupo pode listar, criar e editar.
                 </p>
-                <div className="max-h-[220px] overflow-auto border border-[#e4e4e4] bg-white p-3">
+                <div className="admin-panel max-h-[220px] overflow-auto p-3">
                   <div className="grid gap-2">
                     {availableContentTypes.map((contentType) => (
                       <label className="flex items-center gap-2 text-[14px]" key={contentType.id}>
@@ -581,7 +581,7 @@ export function AccessModules({ manager }: { manager: RefreshManager }) {
               <label className="admin-label">Menus habilitados para este grupo</label>
               <div className="grid gap-4 lg:grid-cols-2">
                 {(Object.entries(menuGroups) as Array<[TopMenuKey, Array<{ key: ViewKey; label: string }>]>).map(([menuKey, items]) => (
-                  <div className="border border-[#e4e4e4] bg-white p-3" key={menuKey}>
+                  <div className="admin-panel p-3" key={menuKey}>
                     <div className="mb-3 text-[14px] font-semibold text-[#333]">
                       {menuKey === "administration" ? "Administração" : menuKey === "newsletter" ? "Newsletter" : menuKey === "system" ? "Sistema" : "Conteúdo"}
                     </div>

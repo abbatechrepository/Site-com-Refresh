@@ -15,3 +15,4 @@ export function normalizeRefreshAssetPath(path: string) {
 }
 
 export const refreshLogoSrc = refreshAssetPath("/brand/logov2.png");
+export const refreshLoginBackgroundSrc = refreshAssetPath("/brand/img-cms.png");

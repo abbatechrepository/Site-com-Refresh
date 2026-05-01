@@ -124,17 +124,17 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
   if (view === "applications") {
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Cadastro de aplicativos, posicionamento nos menus e referência de link para as páginas do sistema.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewApplication} tone="green">
             Incluir Aplicativo
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -240,17 +240,17 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
   if (view === "emails") {
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Aqui estão listados todos os e-mails utilizados pelo portal em contato, newsletter, inscrições e demais aplicações.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewSystemEmail} tone="green">
             Incluir Email
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -346,15 +346,15 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
 
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Estatística resumida de acesso por navegação em seção. Clique em zerar estatística para recomeçar a contagem.
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="admin-toolbar">
           <ActionButton tone="red" onClick={() => void resetStatistics()}>
             Zerar TODAS as Estatísticas
           </ActionButton>
         </div>
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -383,7 +383,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
   if (view === "newsletter") {
     return (
       <section className="space-y-6">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewNewsletterGroup} tone="green">
             Incluir Grupo
           </ActionButton>
@@ -395,7 +395,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -435,7 +435,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
           </table>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -477,7 +477,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
           </table>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -807,19 +807,19 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
 
   return (
     <section className="space-y-6">
-      <p className="text-[16px] leading-8 text-[#4b4b4b]">Visão inicial de estatísticas e contexto operacional do manager.</p>
+      <p className="admin-copy">Visão inicial de estatísticas e contexto operacional do manager.</p>
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="border border-[#ddd] bg-[#fafafa] p-6">
+        <div className="admin-card">
           <div className="text-[14px] uppercase tracking-[0.08em] text-[#777]">Conteúdos</div>
-          <div className="mt-2 text-[44px] font-light text-[#111]">{contents.length}</div>
+          <div className="mt-2 text-[40px] font-semibold text-[#10233d]">{contents.length}</div>
         </div>
-        <div className="border border-[#ddd] bg-[#fafafa] p-6">
+        <div className="admin-card">
           <div className="text-[14px] uppercase tracking-[0.08em] text-[#777]">Usuários</div>
-          <div className="mt-2 text-[44px] font-light text-[#111]">{management.users.length}</div>
+          <div className="mt-2 text-[40px] font-semibold text-[#10233d]">{management.users.length}</div>
         </div>
-        <div className="border border-[#ddd] bg-[#fafafa] p-6">
+        <div className="admin-card">
           <div className="text-[14px] uppercase tracking-[0.08em] text-[#777]">LGPD</div>
-          <div className="mt-2 text-[44px] font-light text-[#111]">{management.privacyRequests.length}</div>
+          <div className="mt-2 text-[40px] font-semibold text-[#10233d]">{management.privacyRequests.length}</div>
         </div>
       </div>
     </section>

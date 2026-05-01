@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import Image from "next/image";
 
 import { ActionButton } from "./ActionButton";
-import { refreshLogoSrc } from "../_lib/assets";
+import { refreshLoginBackgroundSrc, refreshLogoSrc } from "../_lib/assets";
 
 type SessionAlert = {
   title: string;
@@ -31,107 +31,121 @@ export function RefreshLogin({
   onSubmit
 }: RefreshLoginProps) {
   return (
-    <main className="min-h-screen bg-transparent">
-      <div className="border-b border-[rgba(183,205,227,0.8)] bg-white/85 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[1600px] items-center px-6 py-8">
-          <div className="leading-none flex items-center gap-4">
+    <main className="min-h-screen bg-[#edf3fb] text-[#16324f]">
+      <section className="grid min-h-screen lg:grid-cols-[minmax(360px,520px)_minmax(0,1fr)]">
+        <div className="flex min-h-screen flex-col border-r border-[#d7e3f1] bg-white px-7 py-7 shadow-[18px_0_42px_rgba(15,33,57,0.08)]">
+          <div className="flex items-center gap-3">
             <Image
               alt="Abbatech"
+              className="h-14 w-auto"
               height={72}
               priority
               src={refreshLogoSrc}
               unoptimized
               width={100}
             />
-            <h1 className="text-[50px] font-bold uppercase leading-none tracking-[0.02em] bg-[linear-gradient(135deg,#13203a_0%,#18365c_54%,#1f4b78_100%)] bg-clip-text text-transparent">
-              ABBATECH
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      <section className="border-b border-[rgba(18,39,66,0.3)] bg-[radial-gradient(circle_at_78%_28%,rgba(33,199,217,0.28),transparent_16%),radial-gradient(circle_at_15%_10%,rgba(31,111,235,0.24),transparent_24%),linear-gradient(135deg,#091427_0%,#0f223c_54%,#143256_100%)]">
-        <div className="mx-auto flex max-w-[1600px] items-start justify-between gap-10 px-6 py-10 text-white">
-          <div className="pl-6">
-            <p className="font-display text-[54px] font-bold uppercase leading-none tracking-[0.02em]">REFRESH - 2026</p>
-            <p className="mt-2 max-w-[420px] text-[34px] font-light leading-[1.06] text-[#d9e7ff]">
-              Sistema de Gestão Web
-            </p>
-          </div>
-          <div className="rounded-[22px] border border-white/10 bg-white/6 px-8 py-6 pr-24 text-right shadow-[0_20px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm">
-            <p className="text-[17px] uppercase tracking-[0.12em] text-[#b5caea]">Suporte ABBATECH</p>
-            <p className="mt-1 text-[30px] font-bold">(51) 9 9114-1291</p>
-            <p className="mt-8 text-[18px] text-[#d7e6fb]">www.abbatech.dev.br</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-[1600px] gap-6 px-6 py-14 lg:grid-cols-[0.95fr_0.85fr]">
-        <form
-          className="overflow-hidden rounded-[24px] border border-[rgba(183,205,227,0.82)] bg-white/92 shadow-[0_24px_50px_rgba(15,33,57,0.12)] backdrop-blur-sm"
-          onSubmit={onSubmit}
-        >
-          <div className="border-b border-[rgba(215,227,241,0.9)] bg-[linear-gradient(135deg,#f7fbff_0%,#eef6ff_100%)] px-6 py-5 text-[18px] font-semibold text-[#132742]">
-            Login de usuário
-          </div>
-          <div className="space-y-7 px-5 py-6">
-            {sessionAlert ? (
-              <div
-                className="flex items-start gap-3 rounded-[16px] border border-[#f0c36d]/70 bg-[#fff8e8] px-4 py-3 text-[#4d3a13] shadow-[0_14px_28px_rgba(15,33,57,0.08)]"
-                role="alert"
-              >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f0c36d]/25 text-[15px] font-bold text-[#b7791f]">
-                  !
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[14px] font-bold text-[#3d2c0f]">{sessionAlert.title}</p>
-                  <p className="text-[13px] font-medium leading-5 text-[#6d5421]">{sessionAlert.message}</p>
-                </div>
-              </div>
-            ) : null}
-
-            <label className="block">
-              <span className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.08em] text-[#4d6680]">Usuário</span>
-              <input
-                className="h-[46px] w-full rounded-[12px] border border-[#d7e3f1] bg-[linear-gradient(180deg,#ffffff_0%,#f4f9ff_100%)] px-4 text-[18px] text-[#16324f] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] outline-none transition focus:border-[#1f6feb] focus:ring-4 focus:ring-[rgba(31,111,235,0.14)]"
-                onChange={(event) => onIdentifierChange(event.target.value)}
-                value={identifier}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.08em] text-[#4d6680]">Senha</span>
-              <input
-                className="h-[46px] w-full rounded-[12px] border border-[#d7e3f1] bg-[linear-gradient(180deg,#ffffff_0%,#f4f9ff_100%)] px-4 text-[18px] text-[#16324f] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] outline-none transition focus:border-[#1f6feb] focus:ring-4 focus:ring-[rgba(31,111,235,0.14)]"
-                onChange={(event) => onPasswordChange(event.target.value)}
-                type="password"
-                value={password}
-              />
-            </label>
-            <div className="flex items-center justify-between border-t border-[rgba(215,227,241,0.9)] pt-4">
-              <button className="text-[13px] font-semibold bg-[linear-gradient(135deg,#13203a_0%,#18365c_54%,#1f4b78_100%)] bg-clip-text text-transparent" type="button">
-                Lembrar senha
-              </button>
-              <ActionButton tone="blue" type="submit">
-                Entrar
-              </ActionButton>
+            <div>
+              <h1 className="text-[28px] font-extrabold uppercase leading-none text-[#10233d]">ABBATECH</h1>
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#58708a]">Refresh</p>
             </div>
-            {error ? <p className="text-sm font-semibold text-[#c0392b]">{error}</p> : null}
-            {success ? <p className="text-sm font-semibold text-[#2d8d46]">{success}</p> : null}
           </div>
-        </form>
 
-        <section className="px-4 py-4">
-          <h2 className="font-display text-[54px] font-bold uppercase tracking-[0.02em] text-[#10233d]">Precisa de Ajuda?</h2>
-          <div className="mt-8 space-y-6 text-[17px] leading-8 text-[#58708a]">
-            <p>
-              No campo <strong>Usuário</strong> pode ser utilizado seu nome de usuário, e-mail ou CPF.
-            </p>
-            <p>
-              <strong>Esqueceu a senha?</strong> Entre com o nome de usuário e clique em <strong>Lembrar senha</strong>.
-              Você receberá por e-mail as instruções para recuperação da senha.
-            </p>
+          <form className="mt-14 flex-1" onSubmit={onSubmit}>
+            <div className="max-w-[463px]">
+              <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-[#1f6feb]">Acesso seguro</p>
+              <h2 className="mt-3 text-[34px] font-extrabold leading-tight text-[#10233d]">Login de usuário</h2>
+
+              <div className="mt-8 space-y-6">
+                {sessionAlert ? (
+                  <div
+                    className="flex items-start gap-3 rounded-[8px] border border-[#f0c36d]/70 bg-[#fff8e8] px-4 py-3 text-[#4d3a13]"
+                    role="alert"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[#f0c36d]/25 text-[15px] font-bold text-[#b7791f]">
+                      !
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[14px] font-bold text-[#3d2c0f]">{sessionAlert.title}</p>
+                      <p className="text-[13px] font-medium leading-5 text-[#6d5421]">{sessionAlert.message}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                <label className="block">
+                  <span className="admin-label">Usuário</span>
+                  <input
+                    className="admin-input h-[46px] text-[16px]"
+                    onChange={(event) => onIdentifierChange(event.target.value)}
+                    value={identifier}
+                  />
+                </label>
+                <label className="block">
+                  <span className="admin-label">Senha</span>
+                  <input
+                    className="admin-input h-[46px] text-[16px]"
+                    onChange={(event) => onPasswordChange(event.target.value)}
+                    type="password"
+                    value={password}
+                  />
+                </label>
+
+                <div className="flex items-center justify-between border-t border-[#d7e3f1] pt-5">
+                  <button className="text-[13px] font-bold text-[#0f58d8] hover:underline" type="button">
+                    Lembrar senha
+                  </button>
+                  <ActionButton tone="blue" type="submit">
+                    Entrar
+                  </ActionButton>
+                </div>
+                {error ? <p className="text-sm font-bold text-[#c0392b]">{error}</p> : null}
+                {success ? <p className="text-sm font-bold text-[#2d8d46]">{success}</p> : null}
+              </div>
+            </div>
+          </form>
+
+          <div className="mt-8 border-t border-[#d7e3f1] pt-5 text-[13px] leading-6 text-[#58708a]">
+            <p className="font-bold text-[#10233d]">Suporte ABBATECH</p>
+            <p>(51) 9 9114-1291</p>
+            <p>www.abbatech.dev.br</p>
           </div>
-        </section>
+        </div>
+
+        <aside className="relative flex min-h-[420px] flex-col justify-between overflow-hidden bg-[#0d1b2f] px-8 py-9 text-white lg:min-h-screen lg:px-12 lg:py-12">
+          <Image
+            alt=""
+            className="object-cover opacity-100"
+            fill
+            priority
+            src={refreshLoginBackgroundSrc}
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,27,47,0.92)_0%,rgba(13,27,47,0.76)_46%,rgba(13,27,47,0.52)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,27,47,0.38)_0%,rgba(13,27,47,0.08)_46%,rgba(13,27,47,0.78)_100%)]" />
+
+          <div className="relative z-[1]">
+            <p className="inline-flex border-l-4 border-[#21c7d9] bg-[#07182c]/70 px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.22em] text-[#62f0ff] shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
+              REFRESH - 2026
+            </p>
+            <h2 className="mt-6 max-w-[760px] text-[58px] font-extrabold leading-[0.98] text-white drop-shadow-[0_6px_18px_rgba(0,0,0,0.45)]">
+              Sistema de Gestão Web
+            </h2>
+          </div>
+
+          <div className="relative z-[1] grid gap-4 text-white xl:grid-cols-2">
+            <div className="border-l-4 border-[#21c7d9] bg-[#07182c]/76 px-5 py-4 shadow-[0_18px_34px_rgba(0,0,0,0.24)] backdrop-blur-sm">
+              <p className="text-[15px] font-extrabold text-white">Usuário</p>
+              <p className="mt-2 text-[14px] font-medium leading-6 text-[#eaf4ff]">
+                Pode ser utilizado nome de usuário, e-mail ou CPF.
+              </p>
+            </div>
+            <div className="border-l-4 border-[#2fa36b] bg-[#07182c]/76 px-5 py-4 shadow-[0_18px_34px_rgba(0,0,0,0.24)] backdrop-blur-sm">
+              <p className="text-[15px] font-extrabold text-white">Recuperação</p>
+              <p className="mt-2 text-[14px] font-medium leading-6 text-[#eaf4ff]">
+                Use lembrar senha para receber as instruções por e-mail.
+              </p>
+            </div>
+          </div>
+        </aside>
       </section>
     </main>
   );
