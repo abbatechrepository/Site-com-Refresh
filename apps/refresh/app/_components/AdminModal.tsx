@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 type AdminModalSize = "md" | "lg" | "xl" | "full";
@@ -35,11 +35,6 @@ export function AdminModal({
 }: AdminModalProps) {
   const titleId = useId();
   const descriptionId = useId();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -69,7 +64,9 @@ export function AdminModal({
     };
   }, [isOpen, onClose]);
 
-  if (!isMounted || !isOpen) {
+  const portalTarget = typeof document === "undefined" ? null : document.body;
+
+  if (!isOpen || !portalTarget) {
     return null;
   }
 
@@ -130,6 +127,6 @@ export function AdminModal({
         </div>
       </div>
     </div>,
-    document.body
+    portalTarget
   );
 }
