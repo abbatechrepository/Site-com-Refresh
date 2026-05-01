@@ -172,7 +172,7 @@ export function useRefreshManagerSession(state: RefreshManagerState) {
 
       setToken(response.accessToken);
       setSessionAlert(null);
-      setSuccess("Login realizado com sucesso.");
+      // setSuccess("Login realizado com sucesso.");
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : "Falha ao autenticar.");
     }
