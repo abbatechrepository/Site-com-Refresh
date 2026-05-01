@@ -141,7 +141,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
                 <th className="w-[90px]">Id</th>
                 <th>Aplicativo</th>
                 <th>Área</th>
-                <th>Link</th>
+                {/* <th>Link</th> */}
                 <th>Descrição</th>
                 <th className="w-[90px]">Ação</th>
               </tr>
@@ -156,7 +156,7 @@ export function SystemModules({ manager }: { manager: RefreshManager }) {
                     </button>
                   </td>
                   <td>{application.area}</td>
-                  <td className="text-[#0c67ad]">{application.link}</td>
+                  {/* <td className="text-[#0c67ad]">{application.link}</td> */}
                   <td>{application.description ?? ""}</td>
                   <td>
                     <div className="flex flex-col gap-1">
