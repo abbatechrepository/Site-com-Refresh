@@ -73,13 +73,13 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
   if (view === "content-list" || view === "content-editor") {
     return (
       <section className="space-y-6">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewContent} tone="green">
             Incluir
           </ActionButton>
           <ActionButton>Buscar</ActionButton>
           <ActionButton tone="red">Excluir</ActionButton>
-          <select className="ml-4 h-[38px] min-w-[135px] border border-[#d7d7d7] bg-white px-3 text-[15px]">
+          <select className="admin-input ml-2 min-w-[145px]">
             <option>Publicado</option>
             <option>Novo</option>
             <option>Arquivado</option>
@@ -92,7 +92,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
           <ActionButton>Mudar Ordem</ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -119,7 +119,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                   <td>{displayRecordCode(content.displayId, content.id)}</td>
                   <td>
                     <div>{formatDate(content.publishedAt)}</div>
-                    <div className="mt-2 inline-flex items-center gap-2 border border-[#ddd] px-2 py-1 text-[13px]">
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-[6px] border border-[#d7e3f1] bg-[#f8fbff] px-2 py-1 text-[13px] text-[#58708a]">
                       {formatTime(content.publishedAt)}
                     </div>
                   </td>
@@ -192,7 +192,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 gap-0 border-x border-t border-[#e5e5e5] bg-[#f4f4f4] px-6 py-5 lg:grid-cols-6">
+              <div className="grid grid-cols-1 gap-0 border-x border-t border-[#d7e3f1] bg-[#f8fbff] px-6 py-5 lg:grid-cols-6">
                 <div className="lg:col-span-2">
                   <label className="admin-label">Data do conteúdo: (?)</label>
                   <input
@@ -306,13 +306,13 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
                 />
               </div>
 
-              <div className="border border-[#c9c9c9]">
-                <div className="bg-[#4f4f4f] px-3 py-3 text-[15px] font-semibold text-white">
+              <div className="overflow-hidden rounded-[8px] border border-[#d7e3f1] bg-white">
+                <div className="bg-[#10233d] px-4 py-3 text-[14px] font-semibold text-white">
                   Conteúdo completo (selecione templates padrão a direita): (?)
                 </div>
-                <div className="border-t border-dashed border-[#d9d9d9] px-6 py-6">
+                <div className="border-t border-dashed border-[#d7e3f1] px-6 py-6">
                   <textarea
-                    className="min-h-[180px] w-full border border-[#ddd] px-4 py-4 text-[15px] outline-none"
+                    className="admin-textarea min-h-[180px]"
                     onChange={(event) =>
                       setContentForm((current) => ({
                         ...current,
@@ -335,16 +335,16 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
 
               <div className="admin-form-row">
                 <label className="admin-label">Imagem de destaque do conteúdo (1300px x 730px): (?)</label>
-                <div className="border border-[#ddd] bg-white px-4 py-5 text-[15px] text-[#666]">Escolher arquivo</div>
+                <div className="rounded-[8px] border border-[#d7e3f1] bg-white px-4 py-5 text-[15px] text-[#58708a]">Escolher arquivo</div>
               </div>
 
               <div className="mt-8">
-                <h2 className="mb-6 text-[28px] font-light text-[#151515]">Seções associadas</h2>
-                <p className="mb-4 text-[15px] leading-7 text-[#444]">
+                <h2 className="mb-5 text-[24px] font-semibold text-[#10233d]">Seções associadas</h2>
+                <p className="admin-copy mb-4">
                   Associe abaixo as seções Origem e Destino nas quais deseja publicar o seu conteúdo.
                   Indique a seção principal marcando o rádio e a mesma seção visualizada marcando o checkbox.
                 </p>
-                <div className="overflow-x-auto border border-[#d8d8d8]">
+                <div className="admin-table-panel overflow-x-auto">
                   <table className="admin-table min-w-full">
                     <thead>
                       <tr>
@@ -381,13 +381,13 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
 
-            <aside className="border-l border-[#ececec] bg-[#fbfbfb] px-4 py-2">
-              <p className="mb-4 text-[30px] font-light text-[#444]">Básico</p>
+            <aside className="border-l border-[#d7e3f1] bg-[#f8fbff] px-4 py-3">
+              <p className="mb-4 text-[22px] font-semibold text-[#10233d]">Básico</p>
               <div className="space-y-4">
                 {templateLibrary.map((card) => (
                   <button
                     key={card.id}
-                    className={`flex h-[62px] w-full items-center justify-center border border-[#e2e2e2] bg-gradient-to-r px-3 text-center text-[10px] font-semibold text-[#555] ${card.accent}`}
+                    className={`flex h-[62px] w-full items-center justify-center rounded-[8px] border border-[#d7e3f1] bg-gradient-to-r px-3 text-center text-[10px] font-semibold text-[#31516f] shadow-[0_8px_18px_rgba(15,33,57,0.06)] transition hover:-translate-y-0.5 hover:border-[#b9cde2] ${card.accent}`}
                     onClick={() =>
                       setContentForm((current) => ({
                         ...current,
@@ -410,21 +410,21 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
   if (view === "sections-tree" || view === "section-editor") {
     return (
       <section className="space-y-8">
-        <p className="max-w-[980px] text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Organização lógica e hierárquica para classificação dos conteúdos.
           Seções representam a arquitetura de informação que define a estrutura completa de navegação do Portal.
         </p>
 
-        <div className="flex items-center gap-4 border border-[#e6e6e6] px-4 py-3">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewSection} tone="green">
             Incluir Seção
           </ActionButton>
-          <input className="h-[38px] flex-1 border border-[#ddd] px-3 text-[15px] outline-none" placeholder="Nome da seção para busca" />
+          <input className="admin-input min-w-[220px] flex-1" placeholder="Nome da seção para busca" />
           <ActionButton>Buscar</ActionButton>
         </div>
 
-        <div className="min-h-[380px]">
-          <div className="mb-2 text-[17px] font-semibold text-[#333]">≣ {portalRootLabel} ()</div>
+        <div className="admin-panel min-h-[380px] p-5">
+          <div className="mb-3 text-[16px] font-semibold text-[#10233d]">≣ {portalRootLabel} ()</div>
           <div className="ml-6">
             <SectionTree
               nodes={sectionTree}
@@ -443,7 +443,7 @@ export function ContentModules({ manager }: { manager: RefreshManager }) {
           title={sectionForm.name ? "Editar Seção" : "Nova Seção"}
         >
           <form className="admin-modal-form space-y-6" onSubmit={handleSectionSubmit}>
-            <div className="border-b border-[#ececec] bg-[#f7f7f7] px-4 py-4 text-[18px] text-[#333]">Dados da Seção ...</div>
+            <div className="rounded-[8px] border border-[#d7e3f1] bg-[#f8fbff] px-4 py-4 text-[17px] font-semibold text-[#10233d]">Dados da Seção ...</div>
 
             <div>
               <label className="admin-label">Nome da Seção:</label>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 type AdminModalSize = "md" | "lg" | "xl" | "full";
 
@@ -17,9 +18,9 @@ type AdminModalProps = {
 
 const sizeClasses: Record<AdminModalSize, string> = {
   md: "max-w-[640px]",
-  lg: "max-w-[860px]",
-  xl: "max-w-[1120px]",
-  full: "max-w-[1440px]"
+  lg: "max-w-[900px]",
+  xl: "max-w-[1180px]",
+  full: "max-w-[1480px]"
 };
 
 export function AdminModal({
@@ -34,6 +35,11 @@ export function AdminModal({
 }: AdminModalProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -41,6 +47,8 @@ export function AdminModal({
     }
 
     const previousOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyMargin = document.body.style.margin;
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -49,43 +57,48 @@ export function AdminModal({
     }
 
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.margin = "0";
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.margin = previousBodyMargin;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) {
+  if (!isMounted || !isOpen) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       aria-describedby={description ? descriptionId : undefined}
       aria-labelledby={titleId}
       aria-modal="true"
-      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#07182c]/68 px-4 py-6 backdrop-blur-sm sm:py-8"
+      className="fixed inset-0 z-[1000] isolate flex h-[100vh] w-[100vw] items-center justify-center overflow-hidden bg-[#07182c]/72 p-4 sm:p-6"
       role="dialog"
     >
+      <div className="absolute inset-0 z-0 backdrop-blur-lg backdrop-saturate-50" />
       <button
         aria-label="Fechar modal"
-        className="fixed inset-0 cursor-default"
+        className="absolute inset-0 z-[1] cursor-default"
         onClick={onClose}
         type="button"
       />
 
       <div
-        className={`relative my-auto w-full ${sizeClasses[size]} overflow-hidden rounded-[8px] border border-white/70 bg-white shadow-[0_30px_80px_rgba(7,24,44,0.34)]`}
+        className={`relative z-[2] flex max-h-[calc(100vh-32px)] w-[calc(100vw-32px)] ${sizeClasses[size]} flex-col overflow-hidden rounded-[8px] border border-white/70 bg-white shadow-[0_32px_90px_rgba(7,24,44,0.34)] sm:max-h-[calc(100vh-48px)] sm:w-[calc(100vw-48px)]`}
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[rgba(215,227,241,0.95)] bg-[linear-gradient(135deg,#ffffff_0%,#eef6ff_100%)] px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-[#d7e3f1] bg-[#10233d] px-6 py-5 text-white">
           <div>
-            <h2 className="font-display text-[28px] font-bold uppercase tracking-[0.02em] text-[#10233d]" id={titleId}>
+            <h2 className="font-display text-[24px] font-extrabold leading-tight" id={titleId}>
               {title}
             </h2>
             {description ? (
-              <p className="mt-1 text-[13px] leading-5 text-[#58708a]" id={descriptionId}>
+              <p className="mt-1 text-[13px] leading-5 text-[#b8cce4]" id={descriptionId}>
                 {description}
               </p>
             ) : null}
@@ -93,7 +106,7 @@ export function AdminModal({
 
           <button
             aria-label="Fechar"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[#cddced] bg-white text-[18px] font-semibold text-[#31516f] shadow-[0_8px_18px_rgba(15,33,57,0.08)] transition hover:border-[#9eb8d6] hover:bg-[#f5faff]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] border border-white/20 bg-white/10 text-[15px] font-bold text-white transition hover:bg-white/20"
             onClick={onClose}
             title="Fechar"
             type="button"
@@ -102,7 +115,7 @@ export function AdminModal({
           </button>
         </div>
 
-        <div className="max-h-[calc(100vh-170px)] overflow-y-auto bg-[#f8fbff] p-4 sm:p-5">
+        <div className="flex-1 overflow-y-auto bg-[#edf3fb] p-4 sm:p-6">
           {error ? (
             <p className="mb-4 rounded-[8px] border border-[#f1c9cf] bg-[#fff4f5] px-4 py-3 text-sm font-semibold text-[#c0392b]">
               {error}
@@ -116,6 +129,7 @@ export function AdminModal({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

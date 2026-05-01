@@ -84,17 +84,17 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
   if (view === "masks") {
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Determina para o usuário a formatação da inclusão para cada tipo de conteúdo.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewContentType} tone="green">
             Incluir Máscara
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -219,17 +219,17 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
   if (view === "templates") {
     return (
       <section className="space-y-6">
-        <p className="max-w-[1200px] text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Os templates determinam a formatação de apresentação dos conteúdos que serão exibidos para o usuário de acordo com as configurações e regras programadas.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewTemplate} tone="green">
             Incluir Template
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -361,17 +361,17 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
   if (view === "elements") {
     return (
       <section className="space-y-6">
-        <p className="text-[16px] leading-8 text-[#4b4b4b]">
+        <p className="admin-copy">
           Elementos Tipo HTML para utilização no cadastro de conteúdos.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="admin-toolbar">
           <ActionButton onClick={openNewElement} tone="green">
             Incluir Bloco
           </ActionButton>
         </div>
 
-        <div className="overflow-x-auto border border-[#d8d8d8]">
+        <div className="admin-table-panel overflow-x-auto">
           <table className="admin-table min-w-full">
             <thead>
               <tr>
@@ -403,7 +403,7 @@ export function DesignModules({ manager }: { manager: RefreshManager }) {
                     </button>
                   </td>
                   <td>
-                    <div className="inline-flex h-[68px] w-[265px] items-center justify-center bg-gradient-to-r from-[#f3f3f3] to-[#fcfcfc] text-[18px] font-semibold text-[#555]">
+                    <div className="inline-flex h-[68px] w-[265px] items-center justify-center rounded-[8px] border border-[#d7e3f1] bg-[#f8fbff] text-[16px] font-semibold text-[#58708a]">
                       {element.thumbLabel ?? "Sem thumb"}
                     </div>
                   </td>

@@ -184,15 +184,15 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
 
   function getUserRowClassName(managedUser: (typeof sortedUsers)[number]) {
     if (managedUser.id === highlightedUserId) {
-      return "bg-[#fff8d9]";
+      return "[&>td]:bg-[#fff8d9]";
     }
 
     if (managedUser.status === "Inativo") {
-      return "bg-[#fee2d8]/55";
+      return "[&>td]:bg-[#fee2d8]/55";
     }
 
     if (managedUser.status === "Novo") {
-      return "bg-[#eeffdd]/70";
+      return "[&>td]:bg-[#eeffdd]/70";
     }
 
     return undefined;
@@ -201,10 +201,26 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     if (view === "users") {
       return (
         <section className="space-y-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <ActionButton onClick={openNewUser} tone="green">
-              Incluir Usuário
-            </ActionButton>
+          <div className="admin-toolbar justify-between">
+            <div>
+              <div className="text-[18px] font-extrabold text-[#10233d]">
+                {visibleSelectedUserIds.length > 0
+                  ? `${visibleSelectedUserIds.length} selecionado(s)`
+                  : `${visibleUsers.length} usuário(s)`}
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <ActionButton onClick={openNewUser} tone="green">
+                Incluir Usuário
+              </ActionButton>
+              <ActionButton
+                disabled={visibleSelectedUserIds.length === 0}
+                onClick={() => confirmRemoveUsers(visibleSelectedUserIds)}
+                tone="red"
+              >
+                Excluir selecionados
+              </ActionButton>
+            </div>
           </div>
 
           <AdminModal
@@ -246,7 +262,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             }
             encType="multipart/form-data">
             {userForm.id ? (
-              <div className="flex items-center justify-between border border-[#cfe3f3] bg-[#eef7fd] px-4 py-3 text-[14px] text-[#215d85]">
+              <div className="flex items-center justify-between rounded-[8px] border border-[#cfe3f3] bg-[#eef7fd] px-4 py-3 text-[14px] text-[#215d85]">
                 <span>Modo de edição ativo para este usuário.</span>
                 <button
                   className="font-semibold text-[#0c67ad] hover:underline"
@@ -301,7 +317,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
             {(profileTempPreview || userForm.picture) && (
               <div
-                className="mt-2 w-24 h-24 overflow-hidden rounded cursor-zoom-in"
+                className="mt-2 h-24 w-24 cursor-zoom-in overflow-hidden rounded-[8px] border border-[#d7e3f1] shadow-[0_10px_24px_rgba(15,33,57,0.1)]"
                 onClick={() => {
                   if (profileTempPreview || userForm.picture) {
                     setCrop({ x: 0, y: 0 });
@@ -618,7 +634,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
               </div>
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="border border-[#d8d8d8] bg-white p-4">
+              <div className="admin-panel p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="text-[16px] font-semibold text-[#333]">Permissões herdadas</h3>
                   <button
@@ -635,7 +651,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 {selectedUserPermissionLabels.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {selectedUserPermissionLabels.map((label) => (
-                      <span className="border border-[#cfe1ee] bg-[#f5fbff] px-2 py-1 text-[12px] text-[#215d85]" key={label}>
+                      <span className="rounded-[999px] border border-[#cfe1ee] bg-[#f5fbff] px-2.5 py-1 text-[12px] font-semibold text-[#215d85]" key={label}>
                         {label}
                       </span>
                     ))}
@@ -644,7 +660,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   <p className="text-[13px] text-[#777]">Nenhuma permissão herdada. Vincule pelo menos um grupo.</p>
                 )}
               </div>
-              <div className="border border-[#d8d8d8] bg-white p-4">
+              <div className="admin-panel p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="text-[16px] font-semibold text-[#333]">Aplicativos liberados</h3>
                   <button
@@ -701,21 +717,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </div>
           </form>
           </AdminModal>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-[13px] text-[#666]">
-              {visibleSelectedUserIds.length > 0
-                ? `${visibleSelectedUserIds.length} selecionado(s)`
-                : `${visibleUsers.length} usuário(s)`}
-            </div>
-            <ActionButton
-              disabled={visibleSelectedUserIds.length === 0}
-              onClick={() => confirmRemoveUsers(visibleSelectedUserIds)}
-              tone="red"
-            >
-              Excluir selecionados
-            </ActionButton>
-          </div>
-          <div className="overflow-x-auto border border-[#d8d8d8]">
+          <div className="admin-table-panel overflow-x-auto">
             <table className="admin-table min-w-full">
               <thead>
                 <tr>
@@ -763,7 +765,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                        <img
                           src={managedUser.picture}
                           alt={managedUser.username ?? ""}
-                          className="w-12 h-12 object-cover cursor-zoom-in"
+                          className="h-12 w-12 cursor-zoom-in rounded-[8px] object-cover"
                           onClick={(e) => {
                             e.stopPropagation();
                             setViewImageUrl(managedUser.picture ?? null);
@@ -795,7 +797,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
             </table>
           </div>
           {isPreviewOpen && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/86">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/86">
 
               <div className="relative h-[80vh] w-[90vw] overflow-hidden rounded-[8px] border border-white/15 bg-black shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
                 <Cropper
@@ -854,7 +856,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
           )}
 
           {viewImageUrl && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/86">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/86">
               <img
                 src={viewImageUrl}
                 className="max-w-[90vw] max-h-[90vh] object-contain"
