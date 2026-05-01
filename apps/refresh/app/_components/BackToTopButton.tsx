@@ -38,11 +38,11 @@ export function BackToTopButton() {
       className="
         fixed bottom-6 right-6 z-50
         flex h-12 w-12 items-center justify-center
-        rounded-full
-        bg-[#0c67ad] text-white
-        shadow-lg shadow-black/20
+        rounded-[8px]
+        border border-white/20 bg-[#16324f] text-white
+        shadow-[0_14px_30px_rgba(15,33,57,0.22)]
         transition-all duration-300 ease-in-out
-        hover:-translate-y-1 hover:bg-[#09558f] hover:shadow-xl
+        hover:-translate-y-1 hover:bg-[#1f6feb]
         focus:outline-none focus:ring-4 focus:ring-[#0c67ad]/30
         active:scale-95
         md:bottom-8 md:right-8
