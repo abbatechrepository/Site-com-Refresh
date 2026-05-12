@@ -31,6 +31,28 @@ export function useRefreshManagerMutations(
   session: RefreshManagerSession,
   editors: RefreshManagerEditors
 ) {
+  function isAuthenticationError(error: unknown) {
+    return (
+      error instanceof Error &&
+      "status" in error &&
+      [401, 403].includes((error as Error & { status?: number }).status ?? 0)
+    );
+  }
+
+  function expireSession() {
+    window.localStorage.removeItem("refresh_access_token");
+    window.localStorage.removeItem("refresh_authenticated_session");
+
+    state.setToken("");
+    state.setUser(null);
+    state.setError("");
+    state.setSuccess("");
+    state.setSessionAlert({
+      title: "Sessão expirada",
+      message: "Faça login novamente para continuar."
+    });
+  }
+
   async function handleSectionSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     state.setError("");
@@ -486,6 +508,11 @@ export function useRefreshManagerMutations(
       state.setSuccess(state.userForm.id ? "Usuário atualizado com sucesso." : "Usuário criado com sucesso.");
       return true;
     } catch (submitError) {
+      if (isAuthenticationError(submitError)) {
+        expireSession();
+        return false;
+      }
+
       state.setError(submitError instanceof Error ? submitError.message : "Falha ao salvar usuário.");
       return false;
     }
