@@ -3,7 +3,7 @@
 import { ActionButton } from "../ActionButton";
 import { AdminModal } from "../AdminModal";
 import { emptyUserForm } from "../../_lib/constants";
-import { displayRecordCode, isDeletedUser, toggleItem } from "../../_lib/utils";
+import { displayRecordCode, isDeletedUser, toggleItem, resolveUserPictureUrl } from "../../_lib/utils";
 import type { RefreshManager } from "./moduleTypes";
 import { useState, useEffect, useRef } from "react";
 import { ImagePlus } from "lucide-react";
@@ -60,6 +60,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
   const visibleSelectedUserIds = selectedUserIds.filter((userId) => allVisibleUserIdSet.has(userId));
   const allVisibleUsersSelected =
     allVisibleUserIds.length > 0 && allVisibleUserIds.every((userId) => selectedUserIdSet.has(userId));
+  const userFormPictureUrl = resolveUserPictureUrl(userForm.picture);
 
   function resetCrop() {
     if (profileTempPreview) {
@@ -82,8 +83,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
     image.crossOrigin = "anonymous";
     const src = profileTempPreview
       ? profileTempPreview
-      : userForm.picture
-      ? userForm.picture
+      : userFormPictureUrl
+      ? userFormPictureUrl
       : null;
 
     if (!src) return;
@@ -315,11 +316,11 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 </span>
               </ActionButton>
             </div>
-            {(profileTempPreview || userForm.picture) && (
+            {(profileTempPreview || userFormPictureUrl) && (
               <div
                 className="mt-2 h-24 w-24 cursor-zoom-in overflow-hidden rounded-[8px] border border-[#d7e3f1] shadow-[0_10px_24px_rgba(15,33,57,0.1)]"
                 onClick={() => {
-                  if (profileTempPreview || userForm.picture) {
+                  if (profileTempPreview || userFormPictureUrl) {
                     setCrop({ x: 0, y: 0 });
                     setZoom(1);
                     setCroppedAreaPixels(null);
@@ -332,8 +333,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   src={
                     profileTempPreview
                       ? profileTempPreview
-                      : userForm.picture
-                        ? userForm.picture
+                      : userFormPictureUrl
+                        ? userFormPictureUrl
                         : undefined
                   }
                   alt="preview"
@@ -741,7 +742,10 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                 </tr>
               </thead>
               <tbody>
-                {visibleUsers.map((managedUser) => (
+                {visibleUsers.map((managedUser) => {
+                  const userPictureUrl = resolveUserPictureUrl(managedUser?.picture);
+                  const userInitial = managedUser?.name?.trim().slice(0, 1).toUpperCase() ?? "U";
+                  return (
                   <tr className={getUserRowClassName(managedUser)} key={managedUser.id}>
                     <td>
                       <input
@@ -761,18 +765,14 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                       </button>
                     </td>
                     <td>
-                      {managedUser.picture ? (
-                       <img
-                          src={managedUser.picture}
-                          alt={managedUser.username ?? ""}
-                          className="h-12 w-12 cursor-zoom-in rounded-[8px] object-cover"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setViewImageUrl(managedUser.picture ?? null);
-                          }}
+                      {userPictureUrl ? (
+                        <img
+                          src={userPictureUrl}
+                          alt={`Foto de ${managedUser?.name ?? "usuário"}`}
+                          className="h-10 w-10 object-cover"
                         />
                       ) : (
-                        "-"
+                        <span>{userInitial}</span>
                       )}
                     </td>
                     <td className="text-[#0c67ad]">{managedUser.username ?? "-"}</td>
@@ -792,7 +792,7 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
@@ -804,8 +804,8 @@ export function UserModules({ manager }: { manager: RefreshManager }) {
                   image={
                     profileTempPreview
                       ? profileTempPreview
-                      : userForm.picture
-                        ? userForm.picture
+                      : userFormPictureUrl
+                        ? userFormPictureUrl
                         : undefined
                   }
                   crop={crop}
