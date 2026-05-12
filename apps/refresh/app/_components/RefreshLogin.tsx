@@ -127,7 +127,7 @@ export function RefreshLogin({
               REFRESH - 2026
             </p>
             <h2 className="mt-6 max-w-[760px] text-[58px] font-extrabold leading-[0.98] text-white drop-shadow-[0_6px_18px_rgba(0,0,0,0.45)]">
-              Sistema de Gestão Web
+              Gestão de Sistemas Web
             </h2>
           </div>
 
