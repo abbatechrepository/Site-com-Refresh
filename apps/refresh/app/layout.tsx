@@ -18,7 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="flex-1">{children}</div>
           <footer className="border-t border-[#d7e3f1] bg-white/80 text-[#58708a]">
             <div className="mx-auto flex max-w-[1600px] items-center justify-center px-6 py-5 text-[13px]">
-              AbbaTech © 2026 - Inteligência na Web | Refresh - Gestão de Sistemas Web
+              AbbaTech © {new Date().getFullYear()} - Soluções Web | Refresh - Gestão Inteligente de Conteúdo em Sistemas
             </div>
           </footer>
         </div>

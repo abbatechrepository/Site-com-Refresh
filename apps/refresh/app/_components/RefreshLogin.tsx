@@ -104,7 +104,7 @@ export function RefreshLogin({
           </form>
 
           <div className="mt-8 border-t border-[#d7e3f1] pt-5 text-[13px] leading-6 text-[#58708a]">
-            <p className="font-bold text-[#10233d]">Suporte ABBATECH</p>
+            <p className="font-bold text-[#10233d]">SAC ABBATECH</p>
             <p>(51) 9 9114-1291</p>
             <p>www.abbatech.dev.br</p>
           </div>
@@ -124,10 +124,10 @@ export function RefreshLogin({
 
           <div className="relative z-[1]">
             <p className="inline-flex border-l-4 border-[#21c7d9] bg-[#07182c]/70 px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.22em] text-[#62f0ff] shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
-              REFRESH - 2026
+              REFRESH © {new Date().getFullYear()}
             </p>
             <h2 className="mt-6 max-w-[760px] text-[58px] font-extrabold leading-[0.98] text-white drop-shadow-[0_6px_18px_rgba(0,0,0,0.45)]">
-              Gestão de Sistemas Web
+              Gestão Inteligente de Conteúdo para Sistemas
             </h2>
           </div>
 
